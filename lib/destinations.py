@@ -1,11 +1,11 @@
 """
 Mapeia 'continente' -> lista de aeroportos (IATA) representativos.
-É uma lista curada dos hubs principais de cada região — não é exaustiva,
-mas cobre bem os destinos mais buscados. Edite à vontade para adicionar
+E uma lista curada dos hubs principais de cada regiao - nao e exaustiva,
+mas cobre bem os destinos mais buscados. Edite a vontade para adicionar
 ou remover aeroportos.
 
 Se o perfil de busca usa destination_type='airport', esse mapeamento
-não é usado — o código do aeroporto informado é usado diretamente.
+nao e usado - o codigo do aeroporto informado e usado diretamente.
 """
 
 CONTINENTS = {
@@ -41,4 +41,4 @@ def expand_destinations(destination_type: str, destination_value: str) -> list[s
     if destination_type == "continent":
         key = destination_value.lower().strip().replace(" ", "_")
         return CONTINENTS.get(key, [])
-    raise ValueError(f"destination_type inválido: {destination_type}")
+    raise ValueError(f"destination_type invalido: {destination_type}")
