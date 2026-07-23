@@ -1,1 +1,873 @@
-{}
+{
+  "LIS|BCN|2026-07-26|2026-07-30": {
+    "adults": 2,
+    "children_ages": [
+      13
+    ],
+    "currency": "EUR",
+    "depart_date": "2026-07-26",
+    "destination": "BCN",
+    "history": [
+      {
+        "checked_at": "2026-07-23T19:44:07.896936+00:00",
+        "price": 681.0
+      }
+    ],
+    "last_checked": "2026-07-23T19:44:07.896936+00:00",
+    "last_notified_price": 681.0,
+    "last_price": 681.0,
+    "mode": "voo",
+    "origin": "LIS",
+    "profile_name": "Barcelona",
+    "return_date": "2026-07-30",
+    "status": "notified"
+  },
+  "LIS|BCN|2026-07-26|2026-08-02": {
+    "adults": 1,
+    "children_ages": [],
+    "currency": "EUR",
+    "depart_date": "2026-07-26",
+    "destination": "BCN",
+    "history": [
+      {
+        "checked_at": "2026-07-23T19:45:26.131490+00:00",
+        "price": 176.0
+      }
+    ],
+    "last_checked": "2026-07-23T19:45:26.131490+00:00",
+    "last_notified_price": 176.0,
+    "last_price": 176.0,
+    "mode": "voo",
+    "origin": "LIS",
+    "profile_name": "vsdv",
+    "return_date": "2026-08-02",
+    "status": "notified"
+  },
+  "LIS|BCN|2026-08-02|2026-08-06": {
+    "adults": 2,
+    "children_ages": [
+      13
+    ],
+    "currency": "EUR",
+    "depart_date": "2026-08-02",
+    "destination": "BCN",
+    "history": [
+      {
+        "checked_at": "2026-07-23T19:44:10.989317+00:00",
+        "price": 462.0
+      }
+    ],
+    "last_checked": "2026-07-23T19:44:10.989317+00:00",
+    "last_notified_price": 462.0,
+    "last_price": 462.0,
+    "mode": "voo",
+    "origin": "LIS",
+    "profile_name": "Barcelona",
+    "return_date": "2026-08-06",
+    "status": "notified"
+  },
+  "LIS|BCN|2026-08-02|2026-08-09": {
+    "adults": 1,
+    "children_ages": [],
+    "currency": "EUR",
+    "depart_date": "2026-08-02",
+    "destination": "BCN",
+    "history": [
+      {
+        "checked_at": "2026-07-23T19:45:29.233602+00:00",
+        "price": 148.0
+      }
+    ],
+    "last_checked": "2026-07-23T19:45:29.233602+00:00",
+    "last_notified_price": 148.0,
+    "last_price": 148.0,
+    "mode": "voo",
+    "origin": "LIS",
+    "profile_name": "vsdv",
+    "return_date": "2026-08-09",
+    "status": "notified"
+  },
+  "LIS|BCN|2026-08-09|2026-08-13": {
+    "adults": 2,
+    "children_ages": [
+      13
+    ],
+    "currency": "EUR",
+    "depart_date": "2026-08-09",
+    "destination": "BCN",
+    "history": [
+      {
+        "checked_at": "2026-07-23T19:44:14.127605+00:00",
+        "price": 393.0
+      }
+    ],
+    "last_checked": "2026-07-23T19:44:14.127605+00:00",
+    "last_notified_price": 393.0,
+    "last_price": 393.0,
+    "mode": "voo",
+    "origin": "LIS",
+    "profile_name": "Barcelona",
+    "return_date": "2026-08-13",
+    "status": "notified"
+  },
+  "LIS|BCN|2026-08-09|2026-08-16": {
+    "adults": 1,
+    "children_ages": [],
+    "currency": "EUR",
+    "depart_date": "2026-08-09",
+    "destination": "BCN",
+    "history": [
+      {
+        "checked_at": "2026-07-23T19:45:32.144215+00:00",
+        "price": 148.0
+      }
+    ],
+    "last_checked": "2026-07-23T19:45:32.144215+00:00",
+    "last_notified_price": 148.0,
+    "last_price": 148.0,
+    "mode": "voo",
+    "origin": "LIS",
+    "profile_name": "vsdv",
+    "return_date": "2026-08-16",
+    "status": "notified"
+  },
+  "LIS|BCN|2026-08-16|2026-08-20": {
+    "adults": 2,
+    "children_ages": [
+      13
+    ],
+    "currency": "EUR",
+    "depart_date": "2026-08-16",
+    "destination": "BCN",
+    "history": [
+      {
+        "checked_at": "2026-07-23T19:44:17.084877+00:00",
+        "price": 468.0
+      }
+    ],
+    "last_checked": "2026-07-23T19:44:17.084877+00:00",
+    "last_notified_price": 468.0,
+    "last_price": 468.0,
+    "mode": "voo",
+    "origin": "LIS",
+    "profile_name": "Barcelona",
+    "return_date": "2026-08-20",
+    "status": "notified"
+  },
+  "LIS|BCN|2026-08-16|2026-08-23": {
+    "adults": 1,
+    "children_ages": [],
+    "currency": "EUR",
+    "depart_date": "2026-08-16",
+    "destination": "BCN",
+    "history": [
+      {
+        "checked_at": "2026-07-23T19:45:35.078350+00:00",
+        "price": 158.0
+      }
+    ],
+    "last_checked": "2026-07-23T19:45:35.078350+00:00",
+    "last_notified_price": 158.0,
+    "last_price": 158.0,
+    "mode": "voo",
+    "origin": "LIS",
+    "profile_name": "vsdv",
+    "return_date": "2026-08-23",
+    "status": "notified"
+  },
+  "LIS|BCN|2026-08-23|2026-08-27": {
+    "adults": 2,
+    "children_ages": [
+      13
+    ],
+    "currency": "EUR",
+    "depart_date": "2026-08-23",
+    "destination": "BCN",
+    "history": [
+      {
+        "checked_at": "2026-07-23T19:44:20.207080+00:00",
+        "price": 528.0
+      }
+    ],
+    "last_checked": "2026-07-23T19:44:20.207080+00:00",
+    "last_notified_price": 528.0,
+    "last_price": 528.0,
+    "mode": "voo",
+    "origin": "LIS",
+    "profile_name": "Barcelona",
+    "return_date": "2026-08-27",
+    "status": "notified"
+  },
+  "LIS|BCN|2026-08-23|2026-08-30": {
+    "adults": 1,
+    "children_ages": [],
+    "currency": "EUR",
+    "depart_date": "2026-08-23",
+    "destination": "BCN",
+    "history": [
+      {
+        "checked_at": "2026-07-23T19:45:38.052969+00:00",
+        "price": 195.0
+      }
+    ],
+    "last_checked": "2026-07-23T19:45:38.052969+00:00",
+    "last_notified_price": 195.0,
+    "last_price": 195.0,
+    "mode": "voo",
+    "origin": "LIS",
+    "profile_name": "vsdv",
+    "return_date": "2026-08-30",
+    "status": "notified"
+  },
+  "LIS|BCN|2026-08-30|2026-09-03": {
+    "adults": 2,
+    "children_ages": [
+      13
+    ],
+    "currency": "EUR",
+    "depart_date": "2026-08-30",
+    "destination": "BCN",
+    "history": [
+      {
+        "checked_at": "2026-07-23T19:44:23.296118+00:00",
+        "price": 447.0
+      }
+    ],
+    "last_checked": "2026-07-23T19:44:23.296118+00:00",
+    "last_notified_price": 447.0,
+    "last_price": 447.0,
+    "mode": "voo",
+    "origin": "LIS",
+    "profile_name": "Barcelona",
+    "return_date": "2026-09-03",
+    "status": "notified"
+  },
+  "LIS|BCN|2026-08-30|2026-09-06": {
+    "adults": 1,
+    "children_ages": [],
+    "currency": "EUR",
+    "depart_date": "2026-08-30",
+    "destination": "BCN",
+    "history": [
+      {
+        "checked_at": "2026-07-23T19:45:41.236342+00:00",
+        "price": 161.0
+      }
+    ],
+    "last_checked": "2026-07-23T19:45:41.236342+00:00",
+    "last_notified_price": 161.0,
+    "last_price": 161.0,
+    "mode": "voo",
+    "origin": "LIS",
+    "profile_name": "vsdv",
+    "return_date": "2026-09-06",
+    "status": "notified"
+  },
+  "LIS|BCN|2026-09-06|2026-09-10": {
+    "adults": 2,
+    "children_ages": [
+      13
+    ],
+    "currency": "EUR",
+    "depart_date": "2026-09-06",
+    "destination": "BCN",
+    "history": [
+      {
+        "checked_at": "2026-07-23T19:44:26.227772+00:00",
+        "price": 528.0
+      }
+    ],
+    "last_checked": "2026-07-23T19:44:26.227772+00:00",
+    "last_notified_price": 528.0,
+    "last_price": 528.0,
+    "mode": "voo",
+    "origin": "LIS",
+    "profile_name": "Barcelona",
+    "return_date": "2026-09-10",
+    "status": "notified"
+  },
+  "LIS|BCN|2026-09-06|2026-09-13": {
+    "adults": 1,
+    "children_ages": [],
+    "currency": "EUR",
+    "depart_date": "2026-09-06",
+    "destination": "BCN",
+    "history": [
+      {
+        "checked_at": "2026-07-23T19:45:44.229533+00:00",
+        "price": 153.0
+      }
+    ],
+    "last_checked": "2026-07-23T19:45:44.229533+00:00",
+    "last_notified_price": 153.0,
+    "last_price": 153.0,
+    "mode": "voo",
+    "origin": "LIS",
+    "profile_name": "vsdv",
+    "return_date": "2026-09-13",
+    "status": "notified"
+  },
+  "LIS|BCN|2026-09-13|2026-09-17": {
+    "adults": 2,
+    "children_ages": [
+      13
+    ],
+    "currency": "EUR",
+    "depart_date": "2026-09-13",
+    "destination": "BCN",
+    "history": [
+      {
+        "checked_at": "2026-07-23T19:44:29.303115+00:00",
+        "price": 318.0
+      }
+    ],
+    "last_checked": "2026-07-23T19:44:29.303115+00:00",
+    "last_notified_price": 318.0,
+    "last_price": 318.0,
+    "mode": "voo",
+    "origin": "LIS",
+    "profile_name": "Barcelona",
+    "return_date": "2026-09-17",
+    "status": "notified"
+  },
+  "LIS|BCN|2026-09-13|2026-09-20": {
+    "adults": 1,
+    "children_ages": [],
+    "currency": "EUR",
+    "depart_date": "2026-09-13",
+    "destination": "BCN",
+    "history": [
+      {
+        "checked_at": "2026-07-23T19:45:47.229012+00:00",
+        "price": 126.0
+      }
+    ],
+    "last_checked": "2026-07-23T19:45:47.229012+00:00",
+    "last_notified_price": 126.0,
+    "last_price": 126.0,
+    "mode": "voo",
+    "origin": "LIS",
+    "profile_name": "vsdv",
+    "return_date": "2026-09-20",
+    "status": "notified"
+  },
+  "LIS|BCN|2026-09-20|2026-09-24": {
+    "adults": 2,
+    "children_ages": [
+      13
+    ],
+    "currency": "EUR",
+    "depart_date": "2026-09-20",
+    "destination": "BCN",
+    "history": [
+      {
+        "checked_at": "2026-07-23T19:44:32.324592+00:00",
+        "price": 360.0
+      }
+    ],
+    "last_checked": "2026-07-23T19:44:32.324592+00:00",
+    "last_notified_price": 360.0,
+    "last_price": 360.0,
+    "mode": "voo",
+    "origin": "LIS",
+    "profile_name": "Barcelona",
+    "return_date": "2026-09-24",
+    "status": "notified"
+  },
+  "LIS|BCN|2026-09-20|2026-09-27": {
+    "adults": 1,
+    "children_ages": [],
+    "currency": "EUR",
+    "depart_date": "2026-09-20",
+    "destination": "BCN",
+    "history": [
+      {
+        "checked_at": "2026-07-23T19:45:50.263064+00:00",
+        "price": 112.0
+      }
+    ],
+    "last_checked": "2026-07-23T19:45:50.263064+00:00",
+    "last_notified_price": 112.0,
+    "last_price": 112.0,
+    "mode": "voo",
+    "origin": "LIS",
+    "profile_name": "vsdv",
+    "return_date": "2026-09-27",
+    "status": "notified"
+  },
+  "LIS|BCN|2026-09-27|2026-10-01": {
+    "adults": 2,
+    "children_ages": [
+      13
+    ],
+    "currency": "EUR",
+    "depart_date": "2026-09-27",
+    "destination": "BCN",
+    "history": [
+      {
+        "checked_at": "2026-07-23T19:44:35.325457+00:00",
+        "price": 354.0
+      }
+    ],
+    "last_checked": "2026-07-23T19:44:35.325457+00:00",
+    "last_notified_price": 354.0,
+    "last_price": 354.0,
+    "mode": "voo",
+    "origin": "LIS",
+    "profile_name": "Barcelona",
+    "return_date": "2026-10-01",
+    "status": "notified"
+  },
+  "LIS|BCN|2026-09-27|2026-10-04": {
+    "adults": 1,
+    "children_ages": [],
+    "currency": "EUR",
+    "depart_date": "2026-09-27",
+    "destination": "BCN",
+    "history": [
+      {
+        "checked_at": "2026-07-23T19:45:53.208517+00:00",
+        "price": 150.0
+      }
+    ],
+    "last_checked": "2026-07-23T19:45:53.208517+00:00",
+    "last_notified_price": 150.0,
+    "last_price": 150.0,
+    "mode": "voo",
+    "origin": "LIS",
+    "profile_name": "vsdv",
+    "return_date": "2026-10-04",
+    "status": "notified"
+  },
+  "LIS|BCN|2026-10-04|2026-10-08": {
+    "adults": 2,
+    "children_ages": [
+      13
+    ],
+    "currency": "EUR",
+    "depart_date": "2026-10-04",
+    "destination": "BCN",
+    "history": [
+      {
+        "checked_at": "2026-07-23T19:44:38.355904+00:00",
+        "price": 294.0
+      }
+    ],
+    "last_checked": "2026-07-23T19:44:38.355904+00:00",
+    "last_notified_price": 294.0,
+    "last_price": 294.0,
+    "mode": "voo",
+    "origin": "LIS",
+    "profile_name": "Barcelona",
+    "return_date": "2026-10-08",
+    "status": "notified"
+  },
+  "LIS|BCN|2026-10-11|2026-10-15": {
+    "adults": 2,
+    "children_ages": [
+      13
+    ],
+    "currency": "EUR",
+    "depart_date": "2026-10-11",
+    "destination": "BCN",
+    "history": [
+      {
+        "checked_at": "2026-07-23T19:44:41.389027+00:00",
+        "price": 216.0
+      }
+    ],
+    "last_checked": "2026-07-23T19:44:41.389027+00:00",
+    "last_notified_price": 216.0,
+    "last_price": 216.0,
+    "mode": "voo",
+    "origin": "LIS",
+    "profile_name": "Barcelona",
+    "return_date": "2026-10-15",
+    "status": "notified"
+  },
+  "LIS|BCN|2026-10-11|2026-10-18": {
+    "adults": 1,
+    "children_ages": [],
+    "currency": "EUR",
+    "depart_date": "2026-10-11",
+    "destination": "BCN",
+    "history": [
+      {
+        "checked_at": "2026-07-23T19:45:58.472298+00:00",
+        "price": 76.0
+      }
+    ],
+    "last_checked": "2026-07-23T19:45:58.472298+00:00",
+    "last_notified_price": 76.0,
+    "last_price": 76.0,
+    "mode": "voo",
+    "origin": "LIS",
+    "profile_name": "vsdv",
+    "return_date": "2026-10-18",
+    "status": "notified"
+  },
+  "LIS|BCN|2026-10-18|2026-10-22": {
+    "adults": 2,
+    "children_ages": [
+      13
+    ],
+    "currency": "EUR",
+    "depart_date": "2026-10-18",
+    "destination": "BCN",
+    "history": [
+      {
+        "checked_at": "2026-07-23T19:44:44.534218+00:00",
+        "price": 249.0
+      }
+    ],
+    "last_checked": "2026-07-23T19:44:44.534218+00:00",
+    "last_notified_price": 249.0,
+    "last_price": 249.0,
+    "mode": "voo",
+    "origin": "LIS",
+    "profile_name": "Barcelona",
+    "return_date": "2026-10-22",
+    "status": "notified"
+  },
+  "LIS|BCN|2026-10-18|2026-10-25": {
+    "adults": 1,
+    "children_ages": [],
+    "currency": "EUR",
+    "depart_date": "2026-10-18",
+    "destination": "BCN",
+    "history": [
+      {
+        "checked_at": "2026-07-23T19:46:01.493025+00:00",
+        "price": 82.0
+      }
+    ],
+    "last_checked": "2026-07-23T19:46:01.493025+00:00",
+    "last_notified_price": 82.0,
+    "last_price": 82.0,
+    "mode": "voo",
+    "origin": "LIS",
+    "profile_name": "vsdv",
+    "return_date": "2026-10-25",
+    "status": "notified"
+  },
+  "LIS|COMBO:BCN-FCO|2026-09-10|2026-09-24": {
+    "adults": 2,
+    "children_ages": [],
+    "currency": "EUR",
+    "depart_date": "2026-09-10",
+    "destination": "COMBO:BCN-FCO",
+    "history": [
+      {
+        "checked_at": "2026-07-23T19:44:04.915758+00:00",
+        "price": 202.0
+      }
+    ],
+    "last_checked": "2026-07-23T19:44:04.915758+00:00",
+    "last_notified_price": 202.0,
+    "last_price": 202.0,
+    "mode": "combo",
+    "origin": "LIS",
+    "profile_name": "Mediterraneo voo+cruzeiro",
+    "return_date": "2026-09-24",
+    "status": "notified"
+  },
+  "LIS|ZRH|2026-07-26|2026-08-02": {
+    "adults": 2,
+    "children_ages": [
+      13
+    ],
+    "currency": "EUR",
+    "depart_date": "2026-07-26",
+    "destination": "ZRH",
+    "history": [
+      {
+        "checked_at": "2026-07-23T19:44:47.550067+00:00",
+        "price": 1113.0
+      }
+    ],
+    "last_checked": "2026-07-23T19:44:47.550067+00:00",
+    "last_notified_price": 1113.0,
+    "last_price": 1113.0,
+    "mode": "voo",
+    "origin": "LIS",
+    "profile_name": "Suíça",
+    "return_date": "2026-08-02",
+    "status": "notified"
+  },
+  "LIS|ZRH|2026-08-02|2026-08-09": {
+    "adults": 2,
+    "children_ages": [
+      13
+    ],
+    "currency": "EUR",
+    "depart_date": "2026-08-02",
+    "destination": "ZRH",
+    "history": [
+      {
+        "checked_at": "2026-07-23T19:44:50.458794+00:00",
+        "price": 965.0
+      }
+    ],
+    "last_checked": "2026-07-23T19:44:50.458794+00:00",
+    "last_notified_price": 965.0,
+    "last_price": 965.0,
+    "mode": "voo",
+    "origin": "LIS",
+    "profile_name": "Suíça",
+    "return_date": "2026-08-09",
+    "status": "notified"
+  },
+  "LIS|ZRH|2026-08-09|2026-08-16": {
+    "adults": 2,
+    "children_ages": [
+      13
+    ],
+    "currency": "EUR",
+    "depart_date": "2026-08-09",
+    "destination": "ZRH",
+    "history": [
+      {
+        "checked_at": "2026-07-23T19:44:53.502817+00:00",
+        "price": 1062.0
+      }
+    ],
+    "last_checked": "2026-07-23T19:44:53.502817+00:00",
+    "last_notified_price": 1062.0,
+    "last_price": 1062.0,
+    "mode": "voo",
+    "origin": "LIS",
+    "profile_name": "Suíça",
+    "return_date": "2026-08-16",
+    "status": "notified"
+  },
+  "LIS|ZRH|2026-08-16|2026-08-23": {
+    "adults": 2,
+    "children_ages": [
+      13
+    ],
+    "currency": "EUR",
+    "depart_date": "2026-08-16",
+    "destination": "ZRH",
+    "history": [
+      {
+        "checked_at": "2026-07-23T19:44:56.512548+00:00",
+        "price": 816.0
+      }
+    ],
+    "last_checked": "2026-07-23T19:44:56.512548+00:00",
+    "last_notified_price": 816.0,
+    "last_price": 816.0,
+    "mode": "voo",
+    "origin": "LIS",
+    "profile_name": "Suíça",
+    "return_date": "2026-08-23",
+    "status": "notified"
+  },
+  "LIS|ZRH|2026-08-23|2026-08-30": {
+    "adults": 2,
+    "children_ages": [
+      13
+    ],
+    "currency": "EUR",
+    "depart_date": "2026-08-23",
+    "destination": "ZRH",
+    "history": [
+      {
+        "checked_at": "2026-07-23T19:44:59.503900+00:00",
+        "price": 1062.0
+      }
+    ],
+    "last_checked": "2026-07-23T19:44:59.503900+00:00",
+    "last_notified_price": 1062.0,
+    "last_price": 1062.0,
+    "mode": "voo",
+    "origin": "LIS",
+    "profile_name": "Suíça",
+    "return_date": "2026-08-30",
+    "status": "notified"
+  },
+  "LIS|ZRH|2026-08-30|2026-09-06": {
+    "adults": 2,
+    "children_ages": [
+      13
+    ],
+    "currency": "EUR",
+    "depart_date": "2026-08-30",
+    "destination": "ZRH",
+    "history": [
+      {
+        "checked_at": "2026-07-23T19:45:02.466472+00:00",
+        "price": 956.0
+      }
+    ],
+    "last_checked": "2026-07-23T19:45:02.466472+00:00",
+    "last_notified_price": 956.0,
+    "last_price": 956.0,
+    "mode": "voo",
+    "origin": "LIS",
+    "profile_name": "Suíça",
+    "return_date": "2026-09-06",
+    "status": "notified"
+  },
+  "LIS|ZRH|2026-09-06|2026-09-13": {
+    "adults": 2,
+    "children_ages": [
+      13
+    ],
+    "currency": "EUR",
+    "depart_date": "2026-09-06",
+    "destination": "ZRH",
+    "history": [
+      {
+        "checked_at": "2026-07-23T19:45:05.485182+00:00",
+        "price": 747.0
+      }
+    ],
+    "last_checked": "2026-07-23T19:45:05.485182+00:00",
+    "last_notified_price": 747.0,
+    "last_price": 747.0,
+    "mode": "voo",
+    "origin": "LIS",
+    "profile_name": "Suíça",
+    "return_date": "2026-09-13",
+    "status": "notified"
+  },
+  "LIS|ZRH|2026-09-13|2026-09-20": {
+    "adults": 2,
+    "children_ages": [
+      13
+    ],
+    "currency": "EUR",
+    "depart_date": "2026-09-13",
+    "destination": "ZRH",
+    "history": [
+      {
+        "checked_at": "2026-07-23T19:45:08.617409+00:00",
+        "price": 914.0
+      }
+    ],
+    "last_checked": "2026-07-23T19:45:08.617409+00:00",
+    "last_notified_price": 914.0,
+    "last_price": 914.0,
+    "mode": "voo",
+    "origin": "LIS",
+    "profile_name": "Suíça",
+    "return_date": "2026-09-20",
+    "status": "notified"
+  },
+  "LIS|ZRH|2026-09-20|2026-09-27": {
+    "adults": 2,
+    "children_ages": [
+      13
+    ],
+    "currency": "EUR",
+    "depart_date": "2026-09-20",
+    "destination": "ZRH",
+    "history": [
+      {
+        "checked_at": "2026-07-23T19:45:11.539384+00:00",
+        "price": 819.0
+      }
+    ],
+    "last_checked": "2026-07-23T19:45:11.539384+00:00",
+    "last_notified_price": 819.0,
+    "last_price": 819.0,
+    "mode": "voo",
+    "origin": "LIS",
+    "profile_name": "Suíça",
+    "return_date": "2026-09-27",
+    "status": "notified"
+  },
+  "LIS|ZRH|2026-09-27|2026-10-04": {
+    "adults": 2,
+    "children_ages": [
+      13
+    ],
+    "currency": "EUR",
+    "depart_date": "2026-09-27",
+    "destination": "ZRH",
+    "history": [
+      {
+        "checked_at": "2026-07-23T19:45:14.442352+00:00",
+        "price": 956.0
+      }
+    ],
+    "last_checked": "2026-07-23T19:45:14.442352+00:00",
+    "last_notified_price": 956.0,
+    "last_price": 956.0,
+    "mode": "voo",
+    "origin": "LIS",
+    "profile_name": "Suíça",
+    "return_date": "2026-10-04",
+    "status": "notified"
+  },
+  "LIS|ZRH|2026-10-04|2026-10-11": {
+    "adults": 2,
+    "children_ages": [
+      13
+    ],
+    "currency": "EUR",
+    "depart_date": "2026-10-04",
+    "destination": "ZRH",
+    "history": [
+      {
+        "checked_at": "2026-07-23T19:45:17.337695+00:00",
+        "price": 723.0
+      }
+    ],
+    "last_checked": "2026-07-23T19:45:17.337695+00:00",
+    "last_notified_price": 723.0,
+    "last_price": 723.0,
+    "mode": "voo",
+    "origin": "LIS",
+    "profile_name": "Suíça",
+    "return_date": "2026-10-11",
+    "status": "notified"
+  },
+  "LIS|ZRH|2026-10-11|2026-10-18": {
+    "adults": 2,
+    "children_ages": [
+      13
+    ],
+    "currency": "EUR",
+    "depart_date": "2026-10-11",
+    "destination": "ZRH",
+    "history": [
+      {
+        "checked_at": "2026-07-23T19:45:20.225435+00:00",
+        "price": 798.0
+      }
+    ],
+    "last_checked": "2026-07-23T19:45:20.225435+00:00",
+    "last_notified_price": 798.0,
+    "last_price": 798.0,
+    "mode": "voo",
+    "origin": "LIS",
+    "profile_name": "Suíça",
+    "return_date": "2026-10-18",
+    "status": "notified"
+  },
+  "LIS|ZRH|2026-10-18|2026-10-25": {
+    "adults": 2,
+    "children_ages": [
+      13
+    ],
+    "currency": "EUR",
+    "depart_date": "2026-10-18",
+    "destination": "ZRH",
+    "history": [
+      {
+        "checked_at": "2026-07-23T19:45:23.237543+00:00",
+        "price": 747.0
+      }
+    ],
+    "last_checked": "2026-07-23T19:45:23.237543+00:00",
+    "last_notified_price": 747.0,
+    "last_price": 747.0,
+    "mode": "voo",
+    "origin": "LIS",
+    "profile_name": "Suíça",
+    "return_date": "2026-10-25",
+    "status": "notified"
+  }
+}
