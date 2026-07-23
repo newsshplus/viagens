@@ -63,6 +63,8 @@ def run_combo_profile(profile, history):
         c["outbound_flight_date"], c["return_flight_date"], offer["price_total"], notify,
         currency=profile["currency"], adults=profile["adults"],
         children_ages=profile.get("children_ages", []), mode="combo", profile_name=profile["name"],
+        booking_link=(offer["outbound_flight"] or {}).get("booking_link"),
+        airlines="voo+cruzeiro", source=offer.get("source"),
     )
 
     return [{"destination": pseudo_destination, "depart": c["outbound_flight_date"],
@@ -110,7 +112,9 @@ def run_profile(profile, history):
 
         store.record(history, profile["origin"], destination, depart_str, return_str, offer["price_total"], notify,
                      currency=profile["currency"], adults=profile["adults"],
-                     children_ages=children_ages, mode="voo", profile_name=profile["name"])
+                     children_ages=children_ages, mode="voo", profile_name=profile["name"],
+                     booking_link=offer.get("booking_link"), airlines=offer.get("airlines"),
+                     source=offer.get("source"))
         found.append({"destination": destination, "depart": depart_str, "return": return_str,
                       "price": offer["price_total"], "notified": notify})
 

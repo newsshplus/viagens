@@ -8,9 +8,10 @@ entao ele funciona como "banco de dados" persistente sem precisar de
 nada externo.
 
 Cada entrada guarda tudo que o painel web precisa exibir (rota, datas,
-passageiros, preco, status) e uma SERIE de precos ao longo do tempo
-(campo "history"), pra dar pra comparar o preco de hoje com a media de
-um periodo (7/30/90 dias) direto no painel - nao so o ultimo preco.
+passageiros, preco, status, link de compra, companhia aerea) e uma
+SERIE de precos ao longo do tempo (campo "history"), pra dar pra
+comparar o preco de hoje com a media de um periodo (7/30/90 dias)
+direto no painel - nao so o ultimo preco.
 """
 
 import json
@@ -49,7 +50,8 @@ def should_notify(history: dict, origin, destination, depart_date, return_date, 
 
 
 def record(history: dict, origin, destination, depart_date, return_date, price_total, notified: bool,
-           currency="EUR", adults=1, children_ages=None, mode="voo", profile_name=""):
+           currency="EUR", adults=1, children_ages=None, mode="voo", profile_name="",
+           booking_link=None, airlines=None, source=None):
     key = _key(origin, destination, depart_date, return_date)
     entry = history.get(key, {})
     previous_price = entry.get("last_price")
@@ -66,8 +68,10 @@ def record(history: dict, origin, destination, depart_date, return_date, price_t
     entry["profile_name"] = profile_name
     entry["last_price"] = price_total
     entry["last_checked"] = now_iso
+    entry["booking_link"] = booking_link
+    entry["airlines"] = airlines
+    entry["source"] = source
 
-    # serie de precos ao longo do tempo, pra comparar com a media de um periodo no painel
     series = entry.get("history", [])
     series.append({"checked_at": now_iso, "price": price_total})
     entry["history"] = series[-MAX_HISTORY_POINTS:]
