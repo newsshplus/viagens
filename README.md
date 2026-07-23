@@ -1,7 +1,7 @@
 # viagens
 
-Sistema de busca de passagens aereas baratas - funciona 100% gratis
-sem nenhuma chave, e fica ainda melhor se voce cadastrar a Kiwi Tequila
+Sistema de busca de passagens aereas baratas - **funciona 100% gratis
+sem nenhuma chave**, e fica ainda melhor se voce cadastrar a Kiwi Tequila
 API (tambem gratis). Roda sozinho em segundo plano via GitHub Actions, e
 avisa por WhatsApp (Evolution API) quando encontra algo dentro do seu
 teto de preco.
@@ -41,20 +41,19 @@ mais barata das duas para cada combinacao de rota/data:
   formulario do painel web).
 - `web/data/price_history.json` - historico de precos, commitado
   automaticamente pelo Action a cada execucao, e servido pelo proprio
-  painel web publicado (Netlify).
+  painel web publicado (Netlify ou Vercel).
 - `lib/google_flights.py` - busca via scraping (sempre ativa).
 - `lib/kiwi_source.py` - busca via Kiwi Tequila API (ativa so com `KIWI_API_KEY`).
 - `lib/search_sources.py` - roda as duas e fica com a mais barata.
 - `lib/destinations.py` - mapeamento continente -> lista de aeroportos.
 - `lib/combo.py` / `lib/cruise_source.py` - itinerarios combinados voo+cruzeiro.
 - `lib/whatsapp.py` - monta e envia a mensagem via Evolution API.
-- `lib/store.py` - guarda e atualiza o historico de precos.
+- `lib/store.py` - guarda e atualiza o historico de precos (com serie temporal).
 - `scripts/run_searches.py` - orquestra tudo, chamado pelo cron.
 - `.github/workflows/search.yml` - o cron (a cada 6h).
 - `web/index.html` - painel web com formulario de busca/cadastro.
-- `netlify/functions/add-profile.js` - funcao serverless que grava o
-  perfil no GitHub e dispara a busca a partir do painel.
-- `netlify.toml` - config da Netlify (pasta publicada + funcoes).
+- `netlify/functions/add-profile.js` + `netlify.toml` - versao Netlify da funcao serverless.
+- `api/add-profile.js` + `vercel.json` - versao Vercel da funcao serverless.
 
 ## Setup do backend (GitHub Actions)
 
@@ -87,49 +86,68 @@ voce preenche origem, destino, janela de datas, estadia, passageiros e
 teto de preco, aperta **"Adicionar e buscar agora"**, e isso:
 
 1. Grava um novo perfil em `config/profiles.json` direto no GitHub (via
-   API do GitHub, chamada por uma funcao serverless do Netlify).
+   API do GitHub, chamada por uma funcao serverless).
 2. Dispara o workflow de busca imediatamente (nao espera o proximo
    agendamento de 6h).
 3. O painel le `web/data/price_history.json` e mostra os resultados reais
    assim que a busca terminar - alguns minutos depois, nao instantaneo,
    porque roda no GitHub Actions, nao num servidor sempre ligado.
 
-### Configurar a funcao serverless (obrigatorio pro botao funcionar)
+O projeto tem **duas versoes da funcao serverless prontas** - o painel
+detecta sozinho (pelo dominio) qual endpoint chamar, entao voce escolhe
+onde hospedar sem precisar editar nada:
+
+- `netlify/functions/add-profile.js` + `netlify.toml` -> hospede no
+  **Netlify**.
+- `api/add-profile.js` + `vercel.json` -> hospede na **Vercel**.
+
+Pode ate publicar nas duas ao mesmo tempo (dois sites, mesmo repositorio)
+se quiser redundancia - ambos escrevem no mesmo `config/profiles.json`.
+
+### Configurar a funcao serverless no Netlify
 
 1. Crie um **fine-grained personal access token** no GitHub (Settings ->
    Developer settings -> Personal access tokens -> Fine-grained tokens):
    - Repository access: so o repositorio `viagens`.
    - Permissions: **Contents** -> Read and write, **Actions** -> Read and write.
-   - O token precisa pertencer a uma conta que tenha permissao de escrita no
-     repositorio. Se aparecer `Resource not accessible by personal access token`,
-     o token nao esta autorizado para esse repositorio ou nao possui **Contents:
-     Read and write**. Crie um novo token com essas permissoes e substitua
-     `GITHUB_TOKEN` no Netlify; nao basta fazer novo deploy.
 2. No Netlify: **Site configuration -> Environment variables**, adicione:
-   - `GITHUB_TOKEN` = o token que voce criou (marcado como **secret**)
+   - `GITHUB_TOKEN` = o token que voce criou
    - `GITHUB_REPO` = `newsshplus/viagens`
    - `GITHUB_BRANCH` = `main` (opcional, esse ja e o padrao)
-3. Trigger deploy de novo (Deploys -> Trigger deploy -> Deploy site) pra
-   a funcao pegar as variaveis novas.
+3. Trigger deploy de novo (Deploys -> Trigger deploy -> Deploy site) pra a
+   funcao pegar as variaveis novas.
 
-Sem isso configurado, o formulario mostra uma mensagem de erro clara em
-vez de falhar silenciosamente.
+### Configurar a funcao serverless na Vercel
+
+1. **New Project** na Vercel -> importe o repositorio `viagens` do GitHub.
+2. A Vercel detecta o `vercel.json` sozinha (pasta publicada = `web/`,
+   funcoes = tudo que estiver em `api/`). Nao precisa mexer em build
+   command nem output directory manualmente.
+3. **Project Settings -> Environment Variables**, adicione as mesmas tres:
+   - `GITHUB_TOKEN`
+   - `GITHUB_REPO` = `newsshplus/viagens`
+   - `GITHUB_BRANCH` = `main` (opcional)
+4. **Deployments -> (tres pontinhos no ultimo deploy) -> Redeploy**, pra
+   pegar as variaveis novas.
+
+Sem isso configurado (em qualquer uma das duas), o formulario mostra uma
+mensagem de erro clara em vez de falhar silenciosamente.
 
 ## Cruzeiro e itinerarios combinados (voo + cruzeiro)
 
-Seja direto sobre a limitacao real: nao existe hoje uma fonte gratuita
-de preco de cruzeiro equivalente ao que temos pra voo. As operadoras
+Seja direto sobre a limitacao real: **nao existe hoje uma fonte gratuita
+de preco de cruzeiro** equivalente ao que temos pra voo. As operadoras
 (MSC, Costa, Royal Caribbean etc.) nao expoem um endpoint leve como o do
 Google Flights - as opcoes de mercado sao servicos pagos de scraping por
 operadora (ex: Apify). Por isso `lib/cruise_source.py` esta pronto como
 interface, mas devolve "sem oferta" por enquanto.
 
-O que ja funciona: perfis com `"trip_type": "combo"` calculam os dois
-trechos de voo de um itinerario aberto (voa ate o porto de embarque,
-volta de voo a partir do porto de desembarque - ou o inverso) via
-scraping, somam o preco dos voos, e te mandam por WhatsApp com um
-lembrete pra conferir o valor do cruzeiro manualmente. Veja o exemplo
-"Mediterraneo voo+cruzeiro" em `config/profiles.json`.
+O que **ja funciona**: perfis com `"trip_type": "combo"` calculam os dois
+trechos de voo de um itinerario aberto (voa ate o porto de embarque, volta
+de voo a partir do porto de desembarque - ou o inverso) via scraping,
+somam o preco dos voos, e te mandam por WhatsApp com um lembrete pra
+conferir o valor do cruzeiro manualmente. Veja o exemplo "Mediterraneo
+voo+cruzeiro" em `config/profiles.json`.
 
 Quando voce quiser plugar uma fonte real de cruzeiro, tres caminhos (do
 mais simples ao mais robusto), documentados dentro de `lib/cruise_source.py`:
@@ -144,3 +162,11 @@ Google Flights. Se seu perfil gera muitas combinacoes:
 - diminua `window_end_days` (janela menor de datas),
 - aumente o `step_days` em `candidate_dates()` no script,
 - prefira `destination_type: "airport"` a `"continent"`.
+
+## Quando migrar pra API paga/com cadastro
+
+Se em algum momento voce quiser preco com taxas 100% discriminadas, mais
+estabilidade e volume maior de buscas, da pra plugar de volta fontes como
+Amadeus, Kiwi ou Travelpayouts - a estrutura do projeto foi pensada pra
+isso: e so trocar o conteudo de `lib/google_flights.py` por chamadas a
+essas APIs, o resto continua igual.
