@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>viagens — painel de tarifas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #10141B;
+    --panel: #1A2029;
+    --panel-line: #2B3341;
+    --board: #171D26;
+    --off-white: #EDEAE0;
+    --dim: #8A93A3;
+    --amber: #E8A33D;
+    --amber-dim: #6B5326;
+    --teal: #4E9184;
+    --teal-dim: #24443E;
+    --red: #C1544B;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--ink);
+    color: var(--off-white);
+    font-family: 'Archivo', sans-serif;
+    padding: 2.5rem 1.5rem 4rem;
+    min-height: 100vh;
+  }
+  .wrap { max-width: 920px; margin: 0 auto; }
+
+  .topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    border-bottom: 2px solid var(--panel-line);
+    padding-bottom: 1.25rem;
+    margin-bottom: 1.75rem;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .brand { display: flex; align-items: baseline; gap: 10px; }
+  .brand .mark {
+    font-family: 'Space Mono', monospace;
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 0.12em;
+    color: var(--amber);
+    border: 1px solid var(--amber-dim);
+    padding: 3px 8px;
+  }
+  .brand h1 {
+    font-family: 'Space Mono', monospace;
+    font-weight: 700;
+    font-size: 20px;
+    letter-spacing: 0.04em;
+    margin: 0;
+    text-transform: uppercase;
+  }
+  .clock {
+    font-family: 'Space Mono', monospace;
+    color: var(--dim);
+    font-size: 13px;
+    letter-spacing: 0.06em;
+    text-align: right;
+  }
+  .clock .origin { color: var(--off-white); }
+
+  .board {
+    background: var(--board);
+    border: 1px solid var(--panel-line);
+  }
+  .board-head, .row {
+    display: grid;
+    grid-template-columns: 1.4fr 0.9fr 0.9fr 0.9fr 0.6fr 1fr 1.3fr;
+    gap: 8px;
+    padding: 12px 16px;
+    align-items: center;
+  }
+  .board-head {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    color: var(--dim);
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--panel-line);
+  }
+  .row {
+    border-bottom: 1px solid var(--panel-line);
+    font-family: 'Space Mono', monospace;
+    font-size: 14px;
+  }
+  .row:last-child { border-bottom: none; }
+  .route { display: flex; flex-direction: column; gap: 2px; }
+  .route .codes { font-weight: 700; letter-spacing: 0.05em; font-size: 15px; }
+  .route .codes .arrow { color: var(--dim); margin: 0 6px; font-weight: 400; }
+  .route .name { font-family: 'Archivo', sans-serif; color: var(--dim); font-size: 12px; }
+  .pax { color: var(--dim); }
+  .mode {
+    font-family: 'Archivo', sans-serif;
+    font-size: 11px;
+    color: var(--dim);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+  .mode.combo { color: var(--teal); }
+  .price {
+    font-weight: 700;
+    font-size: 17px;
+    color: var(--amber);
+    display: inline-block;
+  }
+  .price.flip { animation: flip-in 0.5s ease-out; }
+  @keyframes flip-in {
+    0% { opacity: 0; transform: rotateX(70deg); }
+    100% { opacity: 1; transform: rotateX(0deg); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .price.flip { animation: none; }
+  }
+
+  .status {
+    font-family: 'Archivo', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    padding: 4px 9px;
+    border-radius: 3px;
+    text-transform: uppercase;
+    display: inline-block;
+    width: fit-content;
+  }
+  .status.notified { background: rgba(78,145,132,0.18); color: var(--teal); border: 1px solid var(--teal-dim); }
+  .status.watching { background: rgba(138,147,163,0.12); color: var(--dim); border: 1px solid var(--panel-line); }
+  .status.drop { background: rgba(232,163,61,0.15); color: var(--amber); border: 1px solid var(--amber-dim); }
+
+  .link { color: var(--dim); text-decoration: none; font-size: 12px; }
+  .link:hover { color: var(--amber); }
+
+  .foot {
+    margin-top: 1.25rem;
+    display: flex;
+    justify-content: space-between;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--dim);
+    letter-spacing: 0.05em;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .foot .live-dot {
+    display: inline-block;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--teal);
+    margin-right: 6px;
+    vertical-align: middle;
+  }
+
+  .note {
+    margin-top: 2rem;
+    border-top: 1px dashed var(--panel-line);
+    padding-top: 1rem;
+    font-size: 12px;
+    color: var(--dim);
+    line-height: 1.6;
+  }
+  .note code {
+    font-family: 'Space Mono', monospace;
+    background: var(--panel);
+    padding: 1px 5px;
+    border-radius: 2px;
+    color: var(--off-white);
+  }
+
+  @media (max-width: 720px) {
+    .board-head { display: none; }
+    .row {
+      grid-template-columns: 1fr;
+      row-gap: 6px;
+      padding: 14px 16px;
+    }
+    .pax::before { content: "Passageiros: "; color: var(--dim); }
+    .mode::before { content: "Modo: "; color: var(--dim); }
+    .price::before { content: "Tarifa: "; font-size: 11px; color: var(--dim); font-weight: 400; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <div class="brand">
+      <span class="mark">VGN</span>
+      <h1>viagens · quadro de tarifas</h1>
+    </div>
+    <div class="clock">
+      ORIGEM <span class="origin" id="origin-code">LIS</span><br>
+      <span id="clock-time">--:--:--</span>
+    </div>
+  </div>
+
+  <div class="board">
+    <div class="board-head">
+      <div>Destino</div>
+      <div>Modo</div>
+      <div>Ida</div>
+      <div>Volta</div>
+      <div>Pax</div>
+      <div>Tarifa</div>
+      <div>Status</div>
+    </div>
+    <div id="rows"></div>
+  </div>
+
+  <div class="foot">
+    <div><span class="live-dot"></span>última execução: <span id="last-run">—</span></div>
+    <div id="summary">— rotas monitoradas</div>
+  </div>
+
+  <div class="note">
+    Dados de exemplo embutidos neste arquivo (<code>SAMPLE_DATA</code> no
+    &lt;script&gt;, no fim do HTML) — pra ligar a dados reais, troque esse
+    bloco por um <code>fetch('data/price_history.json')</code> apontando
+    pro histórico gerado pelo <code>scripts/run_searches.py</code>, e
+    publique esta pasta <code>web/</code> via GitHub Pages.
+  </div>
+
+</div>
+
+<script>
+  const SAMPLE_DATA = [
+    { origin: "LIS", dest: "CDG", destName: "Paris", mode: "voo", depart: "2026-09-12", ret: "2026-09-19", adults: 1, children: 0, price: 178, currency: "EUR", status: "notified", link: "#" },
+    { origin: "LIS", dest: "BCN", destName: "Barcelona", mode: "voo", depart: "2026-10-03", ret: "2026-10-06", adults: 2, children: 0, price: 134, currency: "EUR", status: "notified", link: "#" },
+    { origin: "LIS", dest: "FCO", destName: "Roma", mode: "voo", depart: "2026-11-08", ret: "2026-11-15", adults: 1, children: 0, price: 221, currency: "EUR", status: "drop", link: "#" },
+    { origin: "LIS", dest: "JFK", destName: "Nova York", mode: "voo", depart: "2027-01-14", ret: "2027-01-28", adults: 1, children: 0, price: 612, currency: "EUR", status: "watching", link: "#" },
+    { origin: "LIS", dest: "BCN→FCO", destName: "Voo+cruzeiro Mediterrâneo", mode: "combo", depart: "2026-09-10", ret: "2026-09-24", adults: 2, children: 0, price: 340, currency: "EUR", status: "watching", link: "#", note: "só voos - cruzeiro ainda manual" },
+  ];
+
+  const MODE_LABEL = { voo: "Voo", combo: "Voo+cruzeiro", cruzeiro: "Cruzeiro" };
+
+  const STATUS_LABEL = { notified: "Notificado", drop: "Preço caiu", watching: "Monitorando" };
+
+  function fmtDate(iso) {
+    const [y, m, d] = iso.split("-");
+    return `${d}/${m}`;
+  }
+
+  function render(data) {
+    const rowsEl = document.getElementById("rows");
+    rowsEl.innerHTML = "";
+    data.forEach(r => {
+      const row = document.createElement("div");
+      row.className = "row";
+      row.innerHTML = `
+        <div class="route">
+          <div class="codes">${r.origin}<span class="arrow">→</span>${r.dest}</div>
+          <div class="name">${r.destName}</div>
+        </div>
+        <div class="mode ${r.mode === 'combo' ? 'combo' : ''}">${MODE_LABEL[r.mode] || r.mode}</div>
+        <div>${fmtDate(r.depart)}</div>
+        <div>${fmtDate(r.ret)}</div>
+        <div class="pax">${r.adults + r.children}</div>
+        <div><span class="price flip">${r.price.toFixed(0)} ${r.currency}</span>${r.note ? `<div style="font-size:10px; color:var(--dim); font-weight:400; margin-top:2px;">${r.note}</div>` : ''}</div>
+        <div><span class="status ${r.status}">${STATUS_LABEL[r.status] || r.status}</span></div>
+      `;
+      rowsEl.appendChild(row);
+    });
+
+    document.getElementById("summary").textContent = `${data.length} rota(s) monitorada(s)`;
+    document.getElementById("origin-code").textContent = data[0]?.origin || "—";
+  }
+
+  function tickClock() {
+    const now = new Date();
+    document.getElementById("clock-time").textContent = now.toLocaleTimeString("pt-PT");
+  }
+
+  render(SAMPLE_DATA);
+  document.getElementById("last-run").textContent = new Date().toLocaleString("pt-PT");
+  tickClock();
+  setInterval(tickClock, 1000);
+</script>
+</body>
+</html>

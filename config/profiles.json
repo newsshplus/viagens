@@ -1,0 +1,51 @@
+[
+  {
+    "name": "Paris barato",
+    "origin": "LIS",
+    "destination_type": "airport",
+    "destination_value": "CDG",
+    "window_start_days": 3,
+    "window_end_days": 90,
+    "min_stay_days": 7,
+    "adults": 1,
+    "children_ages": [],
+    "max_price": 200,
+    "currency": "EUR",
+    "whatsapp_number": "351912345678"
+  },
+  {
+    "name": "Barcelona fim de semana",
+    "origin": "LIS",
+    "destination_type": "airport",
+    "destination_value": "BCN",
+    "window_start_days": 3,
+    "window_end_days": 60,
+    "min_stay_days": 3,
+    "adults": 2,
+    "children_ages": [],
+    "max_price": 150,
+    "currency": "EUR",
+    "whatsapp_number": "351912345678"
+  }
+  ,
+  {
+    "name": "Mediterrâneo voo+cruzeiro",
+    "trip_type": "combo",
+    "origin": "LIS",
+    "adults": 2,
+    "children_ages": [],
+    "currency": "EUR",
+    "max_price": 900,
+    "whatsapp_number": "351912345678",
+    "combo": {
+      "embark_airport": "BCN",
+      "embark_city": "Barcelona",
+      "disembark_airport": "FCO",
+      "disembark_city": "Roma (Civitavecchia)",
+      "outbound_flight_date": "2026-09-10",
+      "return_flight_date": "2026-09-24",
+      "cruise_region": "Mediterrâneo",
+      "cabin_type": "interior"
+    }
+  }
+]
