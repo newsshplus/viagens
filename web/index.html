@@ -419,7 +419,7 @@
     registradas pra rota aparecer com avaliacao (antes disso mostra
     "sem dados"). O formulario grava um novo perfil direto no
     <code>config/profiles.json</code> do GitHub e ja dispara a busca,
-    via uma funcao serverless do Netlify.
+    via uma funcao serverless (Netlify ou Vercel, detectado automaticamente).
   </div>
 
 </div>
@@ -583,7 +583,10 @@
     const payload = Object.fromEntries(fd.entries());
 
     try {
-      const resp = await fetch("/.netlify/functions/add-profile", {
+      const endpoint = window.location.hostname.includes("netlify.app") || window.location.hostname.includes("netlify.com")
+        ? "/.netlify/functions/add-profile"
+        : "/api/add-profile";
+      const resp = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -600,7 +603,7 @@
       }
     } catch (err) {
       statusEl.className = "form-status err";
-      statusEl.textContent = "Nao consegui falar com a funcao do Netlify - confira se ela esta configurada (GITHUB_TOKEN / GITHUB_REPO).";
+      statusEl.textContent = "Nao consegui falar com a funcao serverless - confira se ela esta configurada (GITHUB_TOKEN / GITHUB_REPO), no Netlify ou na Vercel.";
     } finally {
       submitBtn.disabled = false;
       submitBtn.textContent = "Adicionar e buscar agora";
