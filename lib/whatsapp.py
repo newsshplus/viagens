@@ -7,16 +7,11 @@ EVOLUTION_INSTANCE = os.environ.get("EVOLUTION_INSTANCE")
 
 
 def send_whatsapp_message(number: str, text: str) -> bool:
-    """
-    Payload no formato mais comum da Evolution API (v1/v2).
-    Se a sua instância usa um schema diferente, ajuste o 'json=' abaixo
-    conforme o Swagger da sua própria instância — isso varia entre versões.
-    """
     if not number:
-        print("Número de WhatsApp não definido (configure a variável de ambiente WHATSAPP_NUMBER) - mensagem não enviada.")
+        print("Numero de WhatsApp nao definido (configure a variavel de ambiente WHATSAPP_NUMBER) - mensagem nao enviada.")
         return False
     if not (EVOLUTION_API_URL and EVOLUTION_API_KEY and EVOLUTION_INSTANCE):
-        print("Evolution API não configurada - mensagem não enviada.")
+        print("Evolution API nao configurada - mensagem nao enviada.")
         return False
 
     url = f"{EVOLUTION_API_URL}/message/sendText/{EVOLUTION_INSTANCE}"
@@ -35,27 +30,27 @@ def send_whatsapp_message(number: str, text: str) -> bool:
 def format_offer_message(profile_name, origin, destination, depart_date, return_date,
                           offer, adults, children_ages) -> str:
     lines = [
-        f"✈️ *{profile_name}* — preço encontrado!",
+        f"Passagem encontrada - {profile_name}",
         "",
-        f"*Rota:* {origin} → {destination} → {origin}",
-        f"*Ida:* {depart_date}   *Volta:* {return_date}",
-        f"*Passageiros:* {adults} adulto(s)" + (f" + {len(children_ages)} criança(s) ({', '.join(map(str, children_ages))} anos)" if children_ages else ""),
+        f"Rota: {origin} -> {destination} -> {origin}",
+        f"Ida: {depart_date}   Volta: {return_date}",
+        f"Passageiros: {adults} adulto(s)" + (f" + {len(children_ages)} crianca(s) ({', '.join(map(str, children_ages))} anos)" if children_ages else ""),
         "",
-        f"*Preço total: {offer['price_total']:.2f} {offer['currency']}*",
+        f"Preco total: {offer['price_total']:.2f} {offer['currency']}",
     ]
 
     if offer.get("price_base") is not None:
-        lines.append(f"  • Tarifa base: {offer['price_base']:.2f} {offer['currency']}")
+        lines.append(f"  - Tarifa base: {offer['price_base']:.2f} {offer['currency']}")
     for tax in offer.get("price_taxes", []) or []:
         if tax.get("amount") and float(tax["amount"]) > 0:
-            lines.append(f"  • Taxa {tax.get('code', '?')}: {tax['amount']} {offer['currency']}")
+            lines.append(f"  - Taxa {tax.get('code', '?')}: {tax['amount']} {offer['currency']}")
 
     if offer.get("airlines"):
-        lines.append(f"  • Companhia(s): {offer['airlines']}")
+        lines.append(f"  - Companhia(s): {offer['airlines']}")
 
     lines.append("")
     lines.append(f"Fonte: {offer['source']}")
     if offer.get("booking_link"):
-        lines.append(f"🔗 Comprar: {offer['booking_link']}")
+        lines.append(f"Comprar: {offer['booking_link']}")
 
     return "\n".join(lines)

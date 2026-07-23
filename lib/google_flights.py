@@ -1,19 +1,19 @@
 """
 Busca gratuita, sem chave de API nenhuma: usa a lib `fast-flights`, que
-consulta o mesmo endpoint interno que o site do Google Flights usa (não é
-um navegador automatizado, é mais leve e mais estável que isso).
+consulta o mesmo endpoint interno que o site do Google Flights usa (nao e
+um navegador automatizado, e mais leve e mais estavel que isso).
 
 Importante ser honesto sobre os limites disso:
-- O Google Flights mostra o preço TOTAL (já com taxas embutidas), mas não
-  discrimina cada taxa separadamente — isso o próprio site não expõe, só
-  aparece em GDS pagos (Amadeus, Sabre etc). Então aqui você recebe
-  "preço total com taxas incluídas", não uma lista item a item de taxas.
-- O link de compra não é um deep-link exato pra aquele voo específico
-  (isso exigiria um token de sessão que não é estável) — é um link de
-  busca no Google Flights já preenchido com origem/destino/datas, que
+- O Google Flights mostra o preco TOTAL (ja com taxas embutidas), mas nao
+  discrimina cada taxa separadamente - isso o proprio site nao expoe, so
+  aparece em GDS pagos (Amadeus, Sabre etc). Entao aqui voce recebe
+  "preco total com taxas incluidas", nao uma lista item a item de taxas.
+- O link de compra nao e um deep-link exato pra aquele voo especifico
+  (isso exigiria um token de sessao que nao e estavel) - e um link de
+  busca no Google Flights ja preenchido com origem/destino/datas, que
   abre com aquele voo entre os resultados.
-- Scraping pode falhar de vez em quando (mudança no site, rate limit).
-  O código já trata isso retornando None em vez de quebrar o resto da
+- Scraping pode falhar de vez em quando (mudanca no site, rate limit).
+  O codigo ja trata isso retornando None em vez de quebrar o resto da
   busca.
 """
 
@@ -47,7 +47,6 @@ def search_round_trip(origin, destination, depart_date, return_date,
     except FlightsNotFound:
         return None
     except Exception:
-        # scraping é frágil por natureza - nunca deixa isso derrubar o resto da busca
         return None
 
     if not results:
@@ -57,8 +56,8 @@ def search_round_trip(origin, destination, depart_date, return_date,
 
     return {
         "price_total": float(best.price),
-        "price_base": None,       # Google Flights não discrimina isso
-        "price_taxes": [],        # idem
+        "price_base": None,
+        "price_taxes": [],
         "currency": currency,
         "airlines": ", ".join(best.airlines) if best.airlines else "n/d",
         "booking_link": build_google_flights_link(origin, destination, depart_date, return_date, adults, children_ages),
@@ -67,7 +66,7 @@ def search_round_trip(origin, destination, depart_date, return_date,
 
 
 def search_one_way(origin, destination, depart_date, adults=1, children_ages=None, currency="EUR"):
-    """Usado nos trechos combinados voo+cruzeiro (só ida, ou só volta)."""
+    """Usado nos trechos combinados voo+cruzeiro (so ida, ou so volta)."""
     children_ages = children_ages or []
     try:
         query = create_query(

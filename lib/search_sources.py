@@ -1,14 +1,14 @@
 """
-Roda as duas fontes disponíveis para a mesma combinação (origem, destino,
+Roda as duas fontes disponiveis para a mesma combinacao (origem, destino,
 datas) e fica com a oferta mais barata:
 
-- Kiwi Tequila API: só entra em ação se KIWI_API_KEY estiver configurada.
-  Fonte oficial, mais estável, com link de compra confiável.
-- Google Flights (scraping): sempre disponível, sem chave nenhuma.
+- Kiwi Tequila API: so entra em acao se KIWI_API_KEY estiver configurada.
+  Fonte oficial, mais estavel, com link de compra confiavel.
+- Google Flights (scraping): sempre disponivel, sem chave nenhuma.
 
-Se as duas responderem, compara e fica com o menor preço. Se só uma
+Se as duas responderem, compara e fica com o menor preco. Se so uma
 responder, usa essa. Se nenhuma responder, devolve None (a busca daquela
-combinação simplesmente não rendeu resultado desta vez).
+combinacao simplesmente nao rendeu resultado desta vez).
 """
 
 from . import kiwi_source, google_flights
