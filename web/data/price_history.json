@@ -11,9 +11,13 @@
       {
         "checked_at": "2026-07-23T19:44:07.896936+00:00",
         "price": 681.0
+      },
+      {
+        "checked_at": "2026-07-23T19:59:54.193300+00:00",
+        "price": 681.0
       }
     ],
-    "last_checked": "2026-07-23T19:44:07.896936+00:00",
+    "last_checked": "2026-07-23T19:59:54.193300+00:00",
     "last_notified_price": 681.0,
     "last_price": 681.0,
     "mode": "voo",
@@ -23,8 +27,10 @@
     "status": "notified"
   },
   "LIS|BCN|2026-07-26|2026-08-02": {
-    "adults": 1,
-    "children_ages": [],
+    "adults": 2,
+    "children_ages": [
+      13
+    ],
     "currency": "EUR",
     "depart_date": "2026-07-26",
     "destination": "BCN",
@@ -32,14 +38,22 @@
       {
         "checked_at": "2026-07-23T19:45:26.131490+00:00",
         "price": 176.0
+      },
+      {
+        "checked_at": "2026-07-23T20:00:58.945154+00:00",
+        "price": 176.0
+      },
+      {
+        "checked_at": "2026-07-23T20:01:30.904577+00:00",
+        "price": 630.0
       }
     ],
-    "last_checked": "2026-07-23T19:45:26.131490+00:00",
+    "last_checked": "2026-07-23T20:01:30.904577+00:00",
     "last_notified_price": 176.0,
-    "last_price": 176.0,
+    "last_price": 630.0,
     "mode": "voo",
     "origin": "LIS",
-    "profile_name": "vsdv",
+    "profile_name": "Barcelona",
     "return_date": "2026-08-02",
     "status": "notified"
   },
@@ -55,9 +69,13 @@
       {
         "checked_at": "2026-07-23T19:44:10.989317+00:00",
         "price": 462.0
+      },
+      {
+        "checked_at": "2026-07-23T19:59:56.714061+00:00",
+        "price": 462.0
       }
     ],
-    "last_checked": "2026-07-23T19:44:10.989317+00:00",
+    "last_checked": "2026-07-23T19:59:56.714061+00:00",
     "last_notified_price": 462.0,
     "last_price": 462.0,
     "mode": "voo",
@@ -76,9 +94,13 @@
       {
         "checked_at": "2026-07-23T19:45:29.233602+00:00",
         "price": 148.0
+      },
+      {
+        "checked_at": "2026-07-23T20:01:01.426143+00:00",
+        "price": 148.0
       }
     ],
-    "last_checked": "2026-07-23T19:45:29.233602+00:00",
+    "last_checked": "2026-07-23T20:01:01.426143+00:00",
     "last_notified_price": 148.0,
     "last_price": 148.0,
     "mode": "voo",
@@ -99,9 +121,13 @@
       {
         "checked_at": "2026-07-23T19:44:14.127605+00:00",
         "price": 393.0
+      },
+      {
+        "checked_at": "2026-07-23T19:59:59.189481+00:00",
+        "price": 393.0
       }
     ],
-    "last_checked": "2026-07-23T19:44:14.127605+00:00",
+    "last_checked": "2026-07-23T19:59:59.189481+00:00",
     "last_notified_price": 393.0,
     "last_price": 393.0,
     "mode": "voo",
@@ -143,9 +169,13 @@
       {
         "checked_at": "2026-07-23T19:44:17.084877+00:00",
         "price": 468.0
+      },
+      {
+        "checked_at": "2026-07-23T20:00:01.751263+00:00",
+        "price": 468.0
       }
     ],
-    "last_checked": "2026-07-23T19:44:17.084877+00:00",
+    "last_checked": "2026-07-23T20:00:01.751263+00:00",
     "last_notified_price": 468.0,
     "last_price": 468.0,
     "mode": "voo",
@@ -155,8 +185,10 @@
     "status": "notified"
   },
   "LIS|BCN|2026-08-16|2026-08-23": {
-    "adults": 1,
-    "children_ages": [],
+    "adults": 2,
+    "children_ages": [
+      13
+    ],
     "currency": "EUR",
     "depart_date": "2026-08-16",
     "destination": "BCN",
@@ -164,14 +196,22 @@
       {
         "checked_at": "2026-07-23T19:45:35.078350+00:00",
         "price": 158.0
+      },
+      {
+        "checked_at": "2026-07-23T20:01:06.288300+00:00",
+        "price": 158.0
+      },
+      {
+        "checked_at": "2026-07-23T20:01:37.959983+00:00",
+        "price": 472.0
       }
     ],
-    "last_checked": "2026-07-23T19:45:35.078350+00:00",
+    "last_checked": "2026-07-23T20:01:37.959983+00:00",
     "last_notified_price": 158.0,
-    "last_price": 158.0,
+    "last_price": 472.0,
     "mode": "voo",
     "origin": "LIS",
-    "profile_name": "vsdv",
+    "profile_name": "Barcelona",
     "return_date": "2026-08-23",
     "status": "notified"
   },
@@ -187,9 +227,13 @@
       {
         "checked_at": "2026-07-23T19:44:20.207080+00:00",
         "price": 528.0
+      },
+      {
+        "checked_at": "2026-07-23T20:00:04.354183+00:00",
+        "price": 528.0
       }
     ],
-    "last_checked": "2026-07-23T19:44:20.207080+00:00",
+    "last_checked": "2026-07-23T20:00:04.354183+00:00",
     "last_notified_price": 528.0,
     "last_price": 528.0,
     "mode": "voo",
@@ -208,9 +252,13 @@
       {
         "checked_at": "2026-07-23T19:45:38.052969+00:00",
         "price": 195.0
+      },
+      {
+        "checked_at": "2026-07-23T20:01:08.765649+00:00",
+        "price": 195.0
       }
     ],
-    "last_checked": "2026-07-23T19:45:38.052969+00:00",
+    "last_checked": "2026-07-23T20:01:08.765649+00:00",
     "last_notified_price": 195.0,
     "last_price": 195.0,
     "mode": "voo",
@@ -231,9 +279,13 @@
       {
         "checked_at": "2026-07-23T19:44:23.296118+00:00",
         "price": 447.0
+      },
+      {
+        "checked_at": "2026-07-23T20:00:06.990776+00:00",
+        "price": 447.0
       }
     ],
-    "last_checked": "2026-07-23T19:44:23.296118+00:00",
+    "last_checked": "2026-07-23T20:00:06.990776+00:00",
     "last_notified_price": 447.0,
     "last_price": 447.0,
     "mode": "voo",
@@ -252,9 +304,13 @@
       {
         "checked_at": "2026-07-23T19:45:41.236342+00:00",
         "price": 161.0
+      },
+      {
+        "checked_at": "2026-07-23T20:01:11.179676+00:00",
+        "price": 161.0
       }
     ],
-    "last_checked": "2026-07-23T19:45:41.236342+00:00",
+    "last_checked": "2026-07-23T20:01:11.179676+00:00",
     "last_notified_price": 161.0,
     "last_price": 161.0,
     "mode": "voo",
@@ -275,9 +331,13 @@
       {
         "checked_at": "2026-07-23T19:44:26.227772+00:00",
         "price": 528.0
+      },
+      {
+        "checked_at": "2026-07-23T20:00:09.452748+00:00",
+        "price": 528.0
       }
     ],
-    "last_checked": "2026-07-23T19:44:26.227772+00:00",
+    "last_checked": "2026-07-23T20:00:09.452748+00:00",
     "last_notified_price": 528.0,
     "last_price": 528.0,
     "mode": "voo",
@@ -287,8 +347,10 @@
     "status": "notified"
   },
   "LIS|BCN|2026-09-06|2026-09-13": {
-    "adults": 1,
-    "children_ages": [],
+    "adults": 2,
+    "children_ages": [
+      13
+    ],
     "currency": "EUR",
     "depart_date": "2026-09-06",
     "destination": "BCN",
@@ -296,14 +358,22 @@
       {
         "checked_at": "2026-07-23T19:45:44.229533+00:00",
         "price": 153.0
+      },
+      {
+        "checked_at": "2026-07-23T20:01:13.660877+00:00",
+        "price": 153.0
+      },
+      {
+        "checked_at": "2026-07-23T20:01:44.888324+00:00",
+        "price": 459.0
       }
     ],
-    "last_checked": "2026-07-23T19:45:44.229533+00:00",
+    "last_checked": "2026-07-23T20:01:44.888324+00:00",
     "last_notified_price": 153.0,
-    "last_price": 153.0,
+    "last_price": 459.0,
     "mode": "voo",
     "origin": "LIS",
-    "profile_name": "vsdv",
+    "profile_name": "Barcelona",
     "return_date": "2026-09-13",
     "status": "notified"
   },
@@ -319,9 +389,13 @@
       {
         "checked_at": "2026-07-23T19:44:29.303115+00:00",
         "price": 318.0
+      },
+      {
+        "checked_at": "2026-07-23T20:00:11.889795+00:00",
+        "price": 318.0
       }
     ],
-    "last_checked": "2026-07-23T19:44:29.303115+00:00",
+    "last_checked": "2026-07-23T20:00:11.889795+00:00",
     "last_notified_price": 318.0,
     "last_price": 318.0,
     "mode": "voo",
@@ -340,9 +414,13 @@
       {
         "checked_at": "2026-07-23T19:45:47.229012+00:00",
         "price": 126.0
+      },
+      {
+        "checked_at": "2026-07-23T20:01:16.119252+00:00",
+        "price": 126.0
       }
     ],
-    "last_checked": "2026-07-23T19:45:47.229012+00:00",
+    "last_checked": "2026-07-23T20:01:16.119252+00:00",
     "last_notified_price": 126.0,
     "last_price": 126.0,
     "mode": "voo",
@@ -363,9 +441,13 @@
       {
         "checked_at": "2026-07-23T19:44:32.324592+00:00",
         "price": 360.0
+      },
+      {
+        "checked_at": "2026-07-23T20:00:14.684753+00:00",
+        "price": 360.0
       }
     ],
-    "last_checked": "2026-07-23T19:44:32.324592+00:00",
+    "last_checked": "2026-07-23T20:00:14.684753+00:00",
     "last_notified_price": 360.0,
     "last_price": 360.0,
     "mode": "voo",
@@ -384,9 +466,13 @@
       {
         "checked_at": "2026-07-23T19:45:50.263064+00:00",
         "price": 112.0
+      },
+      {
+        "checked_at": "2026-07-23T20:01:18.598774+00:00",
+        "price": 112.0
       }
     ],
-    "last_checked": "2026-07-23T19:45:50.263064+00:00",
+    "last_checked": "2026-07-23T20:01:18.598774+00:00",
     "last_notified_price": 112.0,
     "last_price": 112.0,
     "mode": "voo",
@@ -407,9 +493,13 @@
       {
         "checked_at": "2026-07-23T19:44:35.325457+00:00",
         "price": 354.0
+      },
+      {
+        "checked_at": "2026-07-23T20:00:17.166647+00:00",
+        "price": 354.0
       }
     ],
-    "last_checked": "2026-07-23T19:44:35.325457+00:00",
+    "last_checked": "2026-07-23T20:00:17.166647+00:00",
     "last_notified_price": 354.0,
     "last_price": 354.0,
     "mode": "voo",
@@ -428,9 +518,13 @@
       {
         "checked_at": "2026-07-23T19:45:53.208517+00:00",
         "price": 150.0
+      },
+      {
+        "checked_at": "2026-07-23T20:01:21.127134+00:00",
+        "price": 150.0
       }
     ],
-    "last_checked": "2026-07-23T19:45:53.208517+00:00",
+    "last_checked": "2026-07-23T20:01:21.127134+00:00",
     "last_notified_price": 150.0,
     "last_price": 150.0,
     "mode": "voo",
@@ -451,9 +545,13 @@
       {
         "checked_at": "2026-07-23T19:44:38.355904+00:00",
         "price": 294.0
+      },
+      {
+        "checked_at": "2026-07-23T20:00:19.615117+00:00",
+        "price": 294.0
       }
     ],
-    "last_checked": "2026-07-23T19:44:38.355904+00:00",
+    "last_checked": "2026-07-23T20:00:19.615117+00:00",
     "last_notified_price": 294.0,
     "last_price": 294.0,
     "mode": "voo",
@@ -474,9 +572,13 @@
       {
         "checked_at": "2026-07-23T19:44:41.389027+00:00",
         "price": 216.0
+      },
+      {
+        "checked_at": "2026-07-23T20:00:22.056594+00:00",
+        "price": 216.0
       }
     ],
-    "last_checked": "2026-07-23T19:44:41.389027+00:00",
+    "last_checked": "2026-07-23T20:00:22.056594+00:00",
     "last_notified_price": 216.0,
     "last_price": 216.0,
     "mode": "voo",
@@ -486,8 +588,10 @@
     "status": "notified"
   },
   "LIS|BCN|2026-10-11|2026-10-18": {
-    "adults": 1,
-    "children_ages": [],
+    "adults": 2,
+    "children_ages": [
+      13
+    ],
     "currency": "EUR",
     "depart_date": "2026-10-11",
     "destination": "BCN",
@@ -495,14 +599,22 @@
       {
         "checked_at": "2026-07-23T19:45:58.472298+00:00",
         "price": 76.0
+      },
+      {
+        "checked_at": "2026-07-23T20:01:25.951289+00:00",
+        "price": 76.0
+      },
+      {
+        "checked_at": "2026-07-23T20:01:56.295113+00:00",
+        "price": 246.0
       }
     ],
-    "last_checked": "2026-07-23T19:45:58.472298+00:00",
+    "last_checked": "2026-07-23T20:01:56.295113+00:00",
     "last_notified_price": 76.0,
-    "last_price": 76.0,
+    "last_price": 246.0,
     "mode": "voo",
     "origin": "LIS",
-    "profile_name": "vsdv",
+    "profile_name": "Barcelona",
     "return_date": "2026-10-18",
     "status": "notified"
   },
@@ -518,9 +630,13 @@
       {
         "checked_at": "2026-07-23T19:44:44.534218+00:00",
         "price": 249.0
+      },
+      {
+        "checked_at": "2026-07-23T20:00:24.585174+00:00",
+        "price": 249.0
       }
     ],
-    "last_checked": "2026-07-23T19:44:44.534218+00:00",
+    "last_checked": "2026-07-23T20:00:24.585174+00:00",
     "last_notified_price": 249.0,
     "last_price": 249.0,
     "mode": "voo",
@@ -530,8 +646,10 @@
     "status": "notified"
   },
   "LIS|BCN|2026-10-18|2026-10-25": {
-    "adults": 1,
-    "children_ages": [],
+    "adults": 2,
+    "children_ages": [
+      13
+    ],
     "currency": "EUR",
     "depart_date": "2026-10-18",
     "destination": "BCN",
@@ -539,14 +657,22 @@
       {
         "checked_at": "2026-07-23T19:46:01.493025+00:00",
         "price": 82.0
+      },
+      {
+        "checked_at": "2026-07-23T20:01:28.541037+00:00",
+        "price": 82.0
+      },
+      {
+        "checked_at": "2026-07-23T20:01:59.004321+00:00",
+        "price": 258.0
       }
     ],
-    "last_checked": "2026-07-23T19:46:01.493025+00:00",
+    "last_checked": "2026-07-23T20:01:59.004321+00:00",
     "last_notified_price": 82.0,
-    "last_price": 82.0,
+    "last_price": 258.0,
     "mode": "voo",
     "origin": "LIS",
-    "profile_name": "vsdv",
+    "profile_name": "Barcelona",
     "return_date": "2026-10-25",
     "status": "notified"
   },
@@ -560,9 +686,13 @@
       {
         "checked_at": "2026-07-23T19:44:04.915758+00:00",
         "price": 202.0
+      },
+      {
+        "checked_at": "2026-07-23T19:59:51.770809+00:00",
+        "price": 202.0
       }
     ],
-    "last_checked": "2026-07-23T19:44:04.915758+00:00",
+    "last_checked": "2026-07-23T19:59:51.770809+00:00",
     "last_notified_price": 202.0,
     "last_price": 202.0,
     "mode": "combo",
@@ -583,9 +713,13 @@
       {
         "checked_at": "2026-07-23T19:44:47.550067+00:00",
         "price": 1113.0
+      },
+      {
+        "checked_at": "2026-07-23T20:00:27.112705+00:00",
+        "price": 1113.0
       }
     ],
-    "last_checked": "2026-07-23T19:44:47.550067+00:00",
+    "last_checked": "2026-07-23T20:00:27.112705+00:00",
     "last_notified_price": 1113.0,
     "last_price": 1113.0,
     "mode": "voo",
@@ -606,9 +740,13 @@
       {
         "checked_at": "2026-07-23T19:44:50.458794+00:00",
         "price": 965.0
+      },
+      {
+        "checked_at": "2026-07-23T20:00:29.556513+00:00",
+        "price": 965.0
       }
     ],
-    "last_checked": "2026-07-23T19:44:50.458794+00:00",
+    "last_checked": "2026-07-23T20:00:29.556513+00:00",
     "last_notified_price": 965.0,
     "last_price": 965.0,
     "mode": "voo",
@@ -629,9 +767,13 @@
       {
         "checked_at": "2026-07-23T19:44:53.502817+00:00",
         "price": 1062.0
+      },
+      {
+        "checked_at": "2026-07-23T20:00:31.994950+00:00",
+        "price": 1062.0
       }
     ],
-    "last_checked": "2026-07-23T19:44:53.502817+00:00",
+    "last_checked": "2026-07-23T20:00:31.994950+00:00",
     "last_notified_price": 1062.0,
     "last_price": 1062.0,
     "mode": "voo",
@@ -652,9 +794,13 @@
       {
         "checked_at": "2026-07-23T19:44:56.512548+00:00",
         "price": 816.0
+      },
+      {
+        "checked_at": "2026-07-23T20:00:34.387515+00:00",
+        "price": 816.0
       }
     ],
-    "last_checked": "2026-07-23T19:44:56.512548+00:00",
+    "last_checked": "2026-07-23T20:00:34.387515+00:00",
     "last_notified_price": 816.0,
     "last_price": 816.0,
     "mode": "voo",
@@ -675,9 +821,13 @@
       {
         "checked_at": "2026-07-23T19:44:59.503900+00:00",
         "price": 1062.0
+      },
+      {
+        "checked_at": "2026-07-23T20:00:36.715563+00:00",
+        "price": 1062.0
       }
     ],
-    "last_checked": "2026-07-23T19:44:59.503900+00:00",
+    "last_checked": "2026-07-23T20:00:36.715563+00:00",
     "last_notified_price": 1062.0,
     "last_price": 1062.0,
     "mode": "voo",
@@ -698,9 +848,13 @@
       {
         "checked_at": "2026-07-23T19:45:02.466472+00:00",
         "price": 956.0
+      },
+      {
+        "checked_at": "2026-07-23T20:00:39.190014+00:00",
+        "price": 956.0
       }
     ],
-    "last_checked": "2026-07-23T19:45:02.466472+00:00",
+    "last_checked": "2026-07-23T20:00:39.190014+00:00",
     "last_notified_price": 956.0,
     "last_price": 956.0,
     "mode": "voo",
@@ -721,9 +875,13 @@
       {
         "checked_at": "2026-07-23T19:45:05.485182+00:00",
         "price": 747.0
+      },
+      {
+        "checked_at": "2026-07-23T20:00:41.576295+00:00",
+        "price": 747.0
       }
     ],
-    "last_checked": "2026-07-23T19:45:05.485182+00:00",
+    "last_checked": "2026-07-23T20:00:41.576295+00:00",
     "last_notified_price": 747.0,
     "last_price": 747.0,
     "mode": "voo",
@@ -744,9 +902,13 @@
       {
         "checked_at": "2026-07-23T19:45:08.617409+00:00",
         "price": 914.0
+      },
+      {
+        "checked_at": "2026-07-23T20:00:44.046844+00:00",
+        "price": 914.0
       }
     ],
-    "last_checked": "2026-07-23T19:45:08.617409+00:00",
+    "last_checked": "2026-07-23T20:00:44.046844+00:00",
     "last_notified_price": 914.0,
     "last_price": 914.0,
     "mode": "voo",
@@ -767,9 +929,13 @@
       {
         "checked_at": "2026-07-23T19:45:11.539384+00:00",
         "price": 819.0
+      },
+      {
+        "checked_at": "2026-07-23T20:00:46.624617+00:00",
+        "price": 819.0
       }
     ],
-    "last_checked": "2026-07-23T19:45:11.539384+00:00",
+    "last_checked": "2026-07-23T20:00:46.624617+00:00",
     "last_notified_price": 819.0,
     "last_price": 819.0,
     "mode": "voo",
@@ -790,9 +956,13 @@
       {
         "checked_at": "2026-07-23T19:45:14.442352+00:00",
         "price": 956.0
+      },
+      {
+        "checked_at": "2026-07-23T20:00:49.049340+00:00",
+        "price": 956.0
       }
     ],
-    "last_checked": "2026-07-23T19:45:14.442352+00:00",
+    "last_checked": "2026-07-23T20:00:49.049340+00:00",
     "last_notified_price": 956.0,
     "last_price": 956.0,
     "mode": "voo",
@@ -813,9 +983,13 @@
       {
         "checked_at": "2026-07-23T19:45:17.337695+00:00",
         "price": 723.0
+      },
+      {
+        "checked_at": "2026-07-23T20:00:51.540529+00:00",
+        "price": 723.0
       }
     ],
-    "last_checked": "2026-07-23T19:45:17.337695+00:00",
+    "last_checked": "2026-07-23T20:00:51.540529+00:00",
     "last_notified_price": 723.0,
     "last_price": 723.0,
     "mode": "voo",
@@ -836,9 +1010,13 @@
       {
         "checked_at": "2026-07-23T19:45:20.225435+00:00",
         "price": 798.0
+      },
+      {
+        "checked_at": "2026-07-23T20:00:53.933481+00:00",
+        "price": 798.0
       }
     ],
-    "last_checked": "2026-07-23T19:45:20.225435+00:00",
+    "last_checked": "2026-07-23T20:00:53.933481+00:00",
     "last_notified_price": 798.0,
     "last_price": 798.0,
     "mode": "voo",
@@ -859,9 +1037,13 @@
       {
         "checked_at": "2026-07-23T19:45:23.237543+00:00",
         "price": 747.0
+      },
+      {
+        "checked_at": "2026-07-23T20:00:56.369439+00:00",
+        "price": 747.0
       }
     ],
-    "last_checked": "2026-07-23T19:45:23.237543+00:00",
+    "last_checked": "2026-07-23T20:00:56.369439+00:00",
     "last_notified_price": 747.0,
     "last_price": 747.0,
     "mode": "voo",
