@@ -26,7 +26,7 @@
     "currency": "EUR"
   },
   {
-    "name": "Mediterrâneo voo+cruzeiro",
+    "name": "Mediterraneo voo+cruzeiro",
     "trip_type": "combo",
     "origin": "LIS",
     "adults": 2,
@@ -40,7 +40,7 @@
       "disembark_city": "Roma (Civitavecchia)",
       "outbound_flight_date": "2026-09-10",
       "return_flight_date": "2026-09-24",
-      "cruise_region": "Mediterrâneo",
+      "cruise_region": "Mediterraneo",
       "cabin_type": "interior"
     }
   }
