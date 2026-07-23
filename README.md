@@ -100,8 +100,13 @@ teto de preco, aperta **"Adicionar e buscar agora"**, e isso:
    Developer settings -> Personal access tokens -> Fine-grained tokens):
    - Repository access: so o repositorio `viagens`.
    - Permissions: **Contents** -> Read and write, **Actions** -> Read and write.
+   - O token precisa pertencer a uma conta que tenha permissao de escrita no
+     repositorio. Se aparecer `Resource not accessible by personal access token`,
+     o token nao esta autorizado para esse repositorio ou nao possui **Contents:
+     Read and write**. Crie um novo token com essas permissoes e substitua
+     `GITHUB_TOKEN` no Netlify; nao basta fazer novo deploy.
 2. No Netlify: **Site configuration -> Environment variables**, adicione:
-   - `GITHUB_TOKEN` = o token que voce criou
+   - `GITHUB_TOKEN` = o token que voce criou (marcado como **secret**)
    - `GITHUB_REPO` = `newsshplus/viagens`
    - `GITHUB_BRANCH` = `main` (opcional, esse ja e o padrao)
 3. Trigger deploy de novo (Deploys -> Trigger deploy -> Deploy site) pra

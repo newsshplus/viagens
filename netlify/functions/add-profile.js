@@ -7,13 +7,28 @@
  * (Site settings -> Environment variables):
  *   GITHUB_TOKEN  - fine-grained personal access token, com permissao
  *                   "Contents: read and write" e "Actions: read and write"
- *                   restrita ao repositorio viagens.
+ *                   restrita ao repositorio viagens. Nunca exponha esse
+ *                   token no navegador ou o adicione ao repositorio.
  *   GITHUB_REPO   - "usuario/repositorio", ex: "newsshplus/viagens"
  * Opcional:
  *   GITHUB_BRANCH - branch alvo (padrao "main")
  */
 
 const GITHUB_API = "https://api.github.com";
+
+function githubError(action, response, body) {
+  const acceptedPermissions = response.headers.get("x-accepted-github-permissions");
+  const details = body || `HTTP ${response.status}`;
+
+  if (response.status === 401 || response.status === 403) {
+    const hint = action === "salvar"
+      ? "Verifique GITHUB_TOKEN: ele deve ser um fine-grained PAT do dono do repositorio, limitado a newsshplus/viagens, com Contents: Read and write."
+      : "Verifique GITHUB_TOKEN: alem de Contents: Read and write, ele precisa de Actions: Read and write para disparar o workflow.";
+    return `${hint}${acceptedPermissions ? ` Permissoes aceitas pelo GitHub: ${acceptedPermissions}.` : ""}`;
+  }
+
+  return `Erro ao ${action}: ${details}`;
+}
 
 exports.handler = async (event) => {
   if (event.httpMethod !== "POST") {
@@ -65,9 +80,18 @@ exports.handler = async (event) => {
     currency: input.currency || "EUR",
   };
 
+  if (!["airport", "continent"].includes(newProfile.destination_type)) {
+    return { statusCode: 400, body: JSON.stringify({ ok: false, error: "destination_type deve ser airport ou continent." }) };
+  }
+  if (!/^[A-Z]{3}$/.test(newProfile.origin) ||
+      (newProfile.destination_type === "airport" && !/^[A-Z]{3}$/.test(newProfile.destination_value))) {
+    return { statusCode: 400, body: JSON.stringify({ ok: false, error: "Origem e destino por aeroporto devem usar codigos IATA de 3 letras (ex.: LIS)." }) };
+  }
+
   const authHeaders = {
     Authorization: `Bearer ${token}`,
     Accept: "application/vnd.github+json",
+    "X-GitHub-Api-Version": "2022-11-28",
     "User-Agent": "viagens-netlify-function",
   };
 
@@ -76,7 +100,7 @@ exports.handler = async (event) => {
     const getResp = await fetch(contentUrl, { headers: authHeaders });
     if (!getResp.ok) {
       const errText = await getResp.text();
-      return { statusCode: 502, body: JSON.stringify({ ok: false, error: `Erro ao ler profiles.json: ${errText}` }) };
+      return { statusCode: 502, body: JSON.stringify({ ok: false, error: githubError("ler profiles.json", getResp, errText) }) };
     }
     const getData = await getResp.json();
     const currentProfiles = JSON.parse(Buffer.from(getData.content, "base64").toString("utf-8"));
@@ -97,7 +121,7 @@ exports.handler = async (event) => {
 
     if (!putResp.ok) {
       const errText = await putResp.text();
-      return { statusCode: 502, body: JSON.stringify({ ok: false, error: `Erro ao salvar profiles.json: ${errText}` }) };
+      return { statusCode: 502, body: JSON.stringify({ ok: false, error: githubError("salvar", putResp, errText) }) };
     }
 
     const dispatchResp = await fetch(`${GITHUB_API}/repos/${repo}/actions/workflows/search.yml/dispatches`, {
@@ -106,13 +130,22 @@ exports.handler = async (event) => {
       body: JSON.stringify({ ref: branch }),
     });
 
+    if (!dispatchResp.ok) {
+      const errText = await dispatchResp.text();
+      return {
+        statusCode: 200,
+        body: JSON.stringify({
+          ok: true,
+          message: `Perfil salvo, mas a busca nao foi disparada agora. ${githubError("disparar o workflow", dispatchResp, errText)} Ela sera executada no proximo agendamento.`,
+        }),
+      };
+    }
+
     return {
       statusCode: 200,
       body: JSON.stringify({
         ok: true,
-        message: dispatchResp.ok
-          ? "Perfil salvo e busca disparada agora. Acompanhe a aba Actions do GitHub - os resultados aparecem no painel em alguns minutos."
-          : "Perfil salvo, mas nao consegui disparar a busca agora - ela roda no proximo agendamento (a cada 6h).",
+        message: "Perfil salvo e busca disparada agora. Acompanhe a aba Actions do GitHub - os resultados aparecem no painel em alguns minutos.",
       }),
     };
   } catch (err) {
