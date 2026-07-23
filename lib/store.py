@@ -8,7 +8,9 @@ entao ele funciona como "banco de dados" persistente sem precisar de
 nada externo.
 
 Cada entrada guarda tudo que o painel web precisa exibir (rota, datas,
-passageiros, preco, status) - nao so o preco.
+passageiros, preco, status) e uma SERIE de precos ao longo do tempo
+(campo "history"), pra dar pra comparar o preco de hoje com a media de
+um periodo (7/30/90 dias) direto no painel - nao so o ultimo preco.
 """
 
 import json
@@ -16,6 +18,8 @@ import os
 from datetime import datetime, timezone
 
 DATA_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "web", "data", "price_history.json")
+
+MAX_HISTORY_POINTS = 120  # trava de tamanho do arquivo - ~120 amostras por rota chega sobrando
 
 
 def _key(origin, destination, depart_date, return_date):
@@ -49,6 +53,7 @@ def record(history: dict, origin, destination, depart_date, return_date, price_t
     key = _key(origin, destination, depart_date, return_date)
     entry = history.get(key, {})
     previous_price = entry.get("last_price")
+    now_iso = datetime.now(timezone.utc).isoformat()
 
     entry["origin"] = origin
     entry["destination"] = destination
@@ -60,7 +65,12 @@ def record(history: dict, origin, destination, depart_date, return_date, price_t
     entry["mode"] = mode
     entry["profile_name"] = profile_name
     entry["last_price"] = price_total
-    entry["last_checked"] = datetime.now(timezone.utc).isoformat()
+    entry["last_checked"] = now_iso
+
+    # serie de precos ao longo do tempo, pra comparar com a media de um periodo no painel
+    series = entry.get("history", [])
+    series.append({"checked_at": now_iso, "price": price_total})
+    entry["history"] = series[-MAX_HISTORY_POINTS:]
 
     if notified:
         entry["last_notified_price"] = price_total
