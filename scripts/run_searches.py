@@ -1,7 +1,7 @@
 """
 Executa todos os perfis de config/profiles.json usando busca gratuita
 (scraping via Google Flights, sem chave de API nenhuma), notifica por
-WhatsApp e atualiza data/price_history.json.
+WhatsApp e atualiza web/data/price_history.json.
 
 Uso: python scripts/run_searches.py
 """
@@ -12,8 +12,8 @@ import json
 import time
 from datetime import date, timedelta
 
-MAX_SEARCHES_PER_PROFILE = 25   # trava de segurança: cada busca é uma requisição real ao Google Flights
-SLEEP_BETWEEN_SEARCHES = 2      # segundos - evita disparar muitas requisições em sequência rápido demais
+MAX_SEARCHES_PER_PROFILE = 25
+SLEEP_BETWEEN_SEARCHES = 2
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -24,28 +24,10 @@ PROFILES_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__f
 
 
 def get_whatsapp_number(profile):
-    """
-    Resolve o número de WhatsApp sem depender do que está versionado no
-    profiles.json (número de telefone não deve ficar num arquivo público
-    do repositório). Ordem de prioridade:
-    1. Campo "whatsapp_number" no próprio perfil, SE você quiser um número
-       diferente pra esse perfil específico (defina como secret também,
-       ex: WHATSAPP_NUMBER_PARIS, e referencie aqui se precisar).
-    2. Variável de ambiente WHATSAPP_NUMBER (o caminho padrão, único
-       número pra todos os perfis).
-    """
     return profile.get("whatsapp_number") or os.environ.get("WHATSAPP_NUMBER")
 
 
 def candidate_dates(profile, step_days=7):
-    """
-    Gera candidatos de (ida, volta) dentro da janela do perfil.
-    Como não temos mais o 'calendário barato' do Travelpayouts pra pré-
-    filtrar (isso exigia chave), varremos a janela em passos de
-    `step_days` dias — cada combinação é uma consulta real ao Google
-    Flights, então não exagere na janela/step pra não estourar o tempo
-    do workflow.
-    """
     start = date.today() + timedelta(days=profile["window_start_days"])
     end = date.today() + timedelta(days=profile["window_end_days"])
     stay = profile["min_stay_days"]
@@ -79,6 +61,8 @@ def run_combo_profile(profile, history):
     store.record(
         history, profile["origin"], pseudo_destination,
         c["outbound_flight_date"], c["return_flight_date"], offer["price_total"], notify,
+        currency=profile["currency"], adults=profile["adults"],
+        children_ages=profile.get("children_ages", []), mode="combo", profile_name=profile["name"],
     )
 
     return [{"destination": pseudo_destination, "depart": c["outbound_flight_date"],
@@ -95,9 +79,9 @@ def run_profile(profile, history):
 
     combos = [(dest, d, r) for dest in destinations for d, r in candidate_dates(profile)]
     if len(combos) > MAX_SEARCHES_PER_PROFILE:
-        print(f"[{profile['name']}] {len(combos)} combinações geradas, cortando pras "
-              f"{MAX_SEARCHES_PER_PROFILE} mais próximas no tempo (trava MAX_SEARCHES_PER_PROFILE).")
-        combos.sort(key=lambda c: c[1])  # prioriza as datas mais próximas
+        print(f"[{profile['name']}] {len(combos)} combinacoes geradas, cortando pras "
+              f"{MAX_SEARCHES_PER_PROFILE} mais proximas no tempo (trava MAX_SEARCHES_PER_PROFILE).")
+        combos.sort(key=lambda c: c[1])
         combos = combos[:MAX_SEARCHES_PER_PROFILE]
 
     for destination, depart_d, return_d in combos:
@@ -124,7 +108,9 @@ def run_profile(profile, history):
             )
             whatsapp.send_whatsapp_message(get_whatsapp_number(profile), text)
 
-        store.record(history, profile["origin"], destination, depart_str, return_str, offer["price_total"], notify)
+        store.record(history, profile["origin"], destination, depart_str, return_str, offer["price_total"], notify,
+                     currency=profile["currency"], adults=profile["adults"],
+                     children_ages=children_ages, mode="voo", profile_name=profile["name"])
         found.append({"destination": destination, "depart": depart_str, "return": return_str,
                       "price": offer["price_total"], "notified": notify})
 
