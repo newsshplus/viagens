@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>viagens — painel de tarifas</title>
+<title>viagens - painel de tarifas</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -175,6 +175,72 @@
     color: var(--off-white);
   }
 
+  .search-form {
+    background: var(--panel);
+    border: 1px solid var(--panel-line);
+    border-radius: 4px;
+    padding: 1.25rem;
+    margin-bottom: 1.5rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+    gap: 12px 14px;
+    align-items: end;
+  }
+  .search-form .field { display: flex; flex-direction: column; gap: 5px; }
+  .search-form .field.small { grid-column: span 2; }
+  .search-form .field.tiny { grid-column: span 1; min-width: 90px; }
+  .search-form .field.submit { grid-column: span 2; }
+  .search-form label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--dim);
+  }
+  .search-form input, .search-form select {
+    background: var(--board);
+    border: 1px solid var(--panel-line);
+    color: var(--off-white);
+    font-family: 'Archivo', sans-serif;
+    font-size: 13px;
+    padding: 8px 10px;
+    border-radius: 3px;
+  }
+  .search-form input:focus, .search-form select:focus {
+    outline: none;
+    border-color: var(--amber-dim);
+  }
+  .search-form button {
+    background: var(--amber);
+    color: var(--ink);
+    border: none;
+    font-family: 'Space Mono', monospace;
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: 10px 16px;
+    border-radius: 3px;
+    cursor: pointer;
+    width: 100%;
+  }
+  .search-form button:hover { background: #f0b155; }
+  .search-form button:disabled { background: var(--amber-dim); cursor: wait; }
+  .form-status {
+    grid-column: 1 / -1;
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.02em;
+    min-height: 16px;
+  }
+  .form-status.ok { color: var(--teal); }
+  .form-status.err { color: var(--red); }
+
+  @media (max-width: 640px) {
+    .search-form .field.small,
+    .search-form .field.submit { grid-column: 1 / -1; }
+  }
+
   @media (max-width: 720px) {
     .board-head { display: none; }
     .row {
@@ -194,13 +260,72 @@
   <div class="topbar">
     <div class="brand">
       <span class="mark">VGN</span>
-      <h1>viagens · quadro de tarifas</h1>
+      <h1>viagens - quadro de tarifas</h1>
     </div>
     <div class="clock">
       ORIGEM <span class="origin" id="origin-code">LIS</span><br>
       <span id="clock-time">--:--:--</span>
     </div>
   </div>
+
+  <form id="search-form" class="search-form">
+    <div class="field">
+      <label for="f-name">Nome da busca</label>
+      <input id="f-name" name="name" type="text" placeholder="Ex: Paris barato" required>
+    </div>
+    <div class="field small">
+      <label for="f-origin">Origem</label>
+      <input id="f-origin" name="origin" type="text" maxlength="3" placeholder="LIS" value="LIS" required style="text-transform:uppercase;">
+    </div>
+    <div class="field small">
+      <label for="f-dest-type">Tipo de destino</label>
+      <select id="f-dest-type" name="destination_type">
+        <option value="airport">Aeroporto</option>
+        <option value="continent">Continente</option>
+      </select>
+    </div>
+    <div class="field small">
+      <label for="f-dest-value">Destino</label>
+      <input id="f-dest-value" name="destination_value" type="text" maxlength="3" placeholder="CDG" style="text-transform:uppercase;" required>
+    </div>
+    <div class="field tiny">
+      <label for="f-window-start">A partir de (dias)</label>
+      <input id="f-window-start" name="window_start_days" type="number" min="1" value="3">
+    </div>
+    <div class="field tiny">
+      <label for="f-window-end">Ate (dias)</label>
+      <input id="f-window-end" name="window_end_days" type="number" min="1" value="90">
+    </div>
+    <div class="field tiny">
+      <label for="f-stay">Estadia (dias)</label>
+      <input id="f-stay" name="min_stay_days" type="number" min="1" value="7">
+    </div>
+    <div class="field tiny">
+      <label for="f-adults">Adultos</label>
+      <input id="f-adults" name="adults" type="number" min="1" value="1">
+    </div>
+    <div class="field small">
+      <label for="f-children">Idades das criancas</label>
+      <input id="f-children" name="children_ages" type="text" placeholder="ex: 8, 15">
+    </div>
+    <div class="field tiny">
+      <label for="f-max-price">Teto de preco</label>
+      <input id="f-max-price" name="max_price" type="number" min="1" placeholder="200">
+    </div>
+    <div class="field tiny">
+      <label for="f-currency">Moeda</label>
+      <select id="f-currency" name="currency">
+        <option value="EUR">EUR</option>
+        <option value="USD">USD</option>
+        <option value="BRL">BRL</option>
+        <option value="GBP">GBP</option>
+      </select>
+    </div>
+    <div class="field submit">
+      <button type="submit" id="submit-btn">Adicionar e buscar agora</button>
+    </div>
+    <div class="form-status" id="form-status"></div>
+  </form>
 
   <div class="board">
     <div class="board-head">
@@ -216,16 +341,17 @@
   </div>
 
   <div class="foot">
-    <div><span class="live-dot"></span>última execução: <span id="last-run">—</span></div>
-    <div id="summary">— rotas monitoradas</div>
+    <div><span class="live-dot"></span>ultima execucao: <span id="last-run">-</span></div>
+    <div id="summary">- rotas monitoradas</div>
   </div>
 
   <div class="note">
-    Dados de exemplo embutidos neste arquivo (<code>SAMPLE_DATA</code> no
-    &lt;script&gt;, no fim do HTML) — pra ligar a dados reais, troque esse
-    bloco por um <code>fetch('data/price_history.json')</code> apontando
-    pro histórico gerado pelo <code>scripts/run_searches.py</code>, e
-    publique esta pasta <code>web/</code> via GitHub Pages.
+    O painel le <code>data/price_history.json</code>, atualizado pelo
+    <code>scripts/run_searches.py</code> a cada execucao do GitHub Actions.
+    Se ainda nao rodou nenhuma busca, ou o arquivo nao carregar, ele cai
+    de volta pros dados de exemplo abaixo. O formulario acima grava um
+    novo perfil direto no <code>config/profiles.json</code> do GitHub e
+    ja dispara a busca, via uma funcao serverless do Netlify.
   </div>
 
 </div>
@@ -236,12 +362,12 @@
     { origin: "LIS", dest: "BCN", destName: "Barcelona", mode: "voo", depart: "2026-10-03", ret: "2026-10-06", adults: 2, children: 0, price: 134, currency: "EUR", status: "notified", link: "#" },
     { origin: "LIS", dest: "FCO", destName: "Roma", mode: "voo", depart: "2026-11-08", ret: "2026-11-15", adults: 1, children: 0, price: 221, currency: "EUR", status: "drop", link: "#" },
     { origin: "LIS", dest: "JFK", destName: "Nova York", mode: "voo", depart: "2027-01-14", ret: "2027-01-28", adults: 1, children: 0, price: 612, currency: "EUR", status: "watching", link: "#" },
-    { origin: "LIS", dest: "BCN→FCO", destName: "Voo+cruzeiro Mediterrâneo", mode: "combo", depart: "2026-09-10", ret: "2026-09-24", adults: 2, children: 0, price: 340, currency: "EUR", status: "watching", link: "#", note: "só voos - cruzeiro ainda manual" },
+    { origin: "LIS", dest: "BCN-FCO", destName: "Voo+cruzeiro Mediterraneo", mode: "combo", depart: "2026-09-10", ret: "2026-09-24", adults: 2, children: 0, price: 340, currency: "EUR", status: "watching", link: "#", note: "so voos - cruzeiro ainda manual" },
   ];
 
   const MODE_LABEL = { voo: "Voo", combo: "Voo+cruzeiro", cruzeiro: "Cruzeiro" };
 
-  const STATUS_LABEL = { notified: "Notificado", drop: "Preço caiu", watching: "Monitorando" };
+  const STATUS_LABEL = { notified: "Notificado", drop: "Preco caiu", watching: "Monitorando" };
 
   function fmtDate(iso) {
     const [y, m, d] = iso.split("-");
@@ -256,7 +382,7 @@
       row.className = "row";
       row.innerHTML = `
         <div class="route">
-          <div class="codes">${r.origin}<span class="arrow">→</span>${r.dest}</div>
+          <div class="codes">${r.origin}<span class="arrow">-></span>${r.dest}</div>
           <div class="name">${r.destName}</div>
         </div>
         <div class="mode ${r.mode === 'combo' ? 'combo' : ''}">${MODE_LABEL[r.mode] || r.mode}</div>
@@ -270,7 +396,7 @@
     });
 
     document.getElementById("summary").textContent = `${data.length} rota(s) monitorada(s)`;
-    document.getElementById("origin-code").textContent = data[0]?.origin || "—";
+    document.getElementById("origin-code").textContent = data[0]?.origin || "-";
   }
 
   function tickClock() {
@@ -279,9 +405,78 @@
   }
 
   render(SAMPLE_DATA);
-  document.getElementById("last-run").textContent = new Date().toLocaleString("pt-PT");
+  document.getElementById("summary").textContent = `${SAMPLE_DATA.length} rota(s) monitorada(s) (exemplo)`;
   tickClock();
   setInterval(tickClock, 1000);
+
+  function historyToRows(history) {
+    return Object.values(history).map(e => ({
+      origin: e.origin,
+      dest: e.destination,
+      destName: e.profile_name || e.destination,
+      mode: e.mode || "voo",
+      depart: e.depart_date,
+      ret: e.return_date,
+      adults: e.adults || 1,
+      children: (e.children_ages || []).length,
+      price: e.last_price,
+      currency: e.currency || "EUR",
+      status: e.status || "watching",
+      link: "#",
+    })).sort((a, b) => new Date(a.depart) - new Date(b.depart));
+  }
+
+  fetch("data/price_history.json", { cache: "no-store" })
+    .then(r => (r.ok ? r.json() : Promise.reject("sem arquivo ainda")))
+    .then(history => {
+      const rows = historyToRows(history);
+      if (rows.length === 0) return;
+      render(rows);
+      document.getElementById("last-run").textContent = new Date().toLocaleString("pt-PT");
+      document.getElementById("summary").textContent = `${rows.length} rota(s) monitorada(s)`;
+    })
+    .catch(() => {
+      document.getElementById("last-run").textContent = "ainda sem execucao real (mostrando exemplo)";
+    });
+
+  const form = document.getElementById("search-form");
+  const statusEl = document.getElementById("form-status");
+  const submitBtn = document.getElementById("submit-btn");
+
+  form.addEventListener("submit", async (ev) => {
+    ev.preventDefault();
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Enviando...";
+    statusEl.className = "form-status";
+    statusEl.textContent = "";
+
+    const fd = new FormData(form);
+    const payload = Object.fromEntries(fd.entries());
+
+    try {
+      const resp = await fetch("/.netlify/functions/add-profile", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const data = await resp.json();
+      if (resp.ok && data.ok) {
+        statusEl.className = "form-status ok";
+        statusEl.textContent = data.message;
+        form.reset();
+        document.getElementById("f-origin").value = "LIS";
+      } else {
+        statusEl.className = "form-status err";
+        statusEl.textContent = data.error || "Erro ao salvar o perfil.";
+      }
+    } catch (err) {
+      statusEl.className = "form-status err";
+      statusEl.textContent = "Nao consegui falar com a funcao do Netlify - confira se ela esta configurada (GITHUB_TOKEN / GITHUB_REPO).";
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Adicionar e buscar agora";
+    }
+  });
 </script>
 </body>
 </html>
