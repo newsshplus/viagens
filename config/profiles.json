@@ -101,5 +101,20 @@
     ],
     "max_price": null,
     "currency": "EUR"
+  },
+  {
+    "name": "Barcelona",
+    "origin": "LIS",
+    "destination_type": "airport",
+    "destination_value": "BCN",
+    "window_start_days": 3,
+    "window_end_days": 90,
+    "min_stay_days": 5,
+    "adults": 3,
+    "children_ages": [
+      13
+    ],
+    "max_price": null,
+    "currency": "EUR"
   }
 ]
