@@ -74,7 +74,7 @@
   }
   .board-head, .row {
     display: grid;
-    grid-template-columns: 1.4fr 0.9fr 0.9fr 0.9fr 0.6fr 1fr 1.3fr;
+    grid-template-columns: 1.2fr 0.7fr 0.8fr 0.8fr 0.5fr 0.9fr 1.1fr 1fr;
     gap: 8px;
     padding: 12px 16px;
     align-items: center;
@@ -135,6 +135,58 @@
   .status.notified { background: rgba(78,145,132,0.18); color: var(--teal); border: 1px solid var(--teal-dim); }
   .status.watching { background: rgba(138,147,163,0.12); color: var(--dim); border: 1px solid var(--panel-line); }
   .status.drop { background: rgba(232,163,61,0.15); color: var(--amber); border: 1px solid var(--amber-dim); }
+
+  .quality {
+    font-family: 'Archivo', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    padding: 3px 8px;
+    border-radius: 3px;
+    text-transform: uppercase;
+    display: inline-block;
+    width: fit-content;
+  }
+  .quality.great { background: rgba(78,145,132,0.18); color: var(--teal); border: 1px solid var(--teal-dim); }
+  .quality.normal { background: rgba(138,147,163,0.12); color: var(--dim); border: 1px solid var(--panel-line); }
+  .quality.high { background: rgba(193,84,75,0.15); color: var(--red); border: 1px solid rgba(193,84,75,0.4); }
+  .quality.unknown { background: rgba(138,147,163,0.08); color: var(--dim); border: 1px dashed var(--panel-line); }
+  .sparkline { color: var(--dim); margin-top: 3px; }
+  .sparkline.great { color: var(--teal); }
+  .sparkline.high { color: var(--red); }
+
+  .period-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 0.75rem;
+    flex-wrap: wrap;
+  }
+  .period-bar .period-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    color: var(--dim);
+    text-transform: uppercase;
+  }
+  .period-buttons { display: flex; gap: 6px; }
+  .period-buttons button {
+    background: var(--panel);
+    border: 1px solid var(--panel-line);
+    color: var(--dim);
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    padding: 5px 11px;
+    border-radius: 3px;
+    cursor: pointer;
+  }
+  .period-buttons button.active {
+    background: var(--amber);
+    color: var(--ink);
+    border-color: var(--amber);
+  }
 
   .link { color: var(--dim); text-decoration: none; font-size: 12px; }
   .link:hover { color: var(--amber); }
@@ -251,6 +303,7 @@
     .pax::before { content: "Passageiros: "; color: var(--dim); }
     .mode::before { content: "Modo: "; color: var(--dim); }
     .price::before { content: "Tarifa: "; font-size: 11px; color: var(--dim); font-weight: 400; }
+    .quality::before { content: "Avaliacao: "; }
   }
 </style>
 </head>
@@ -327,6 +380,16 @@
     <div class="form-status" id="form-status"></div>
   </form>
 
+  <div class="period-bar">
+    <span class="period-label">Avaliacao com base nos ultimos:</span>
+    <div class="period-buttons" id="period-buttons">
+      <button type="button" data-days="7">7 dias</button>
+      <button type="button" data-days="30" class="active">30 dias</button>
+      <button type="button" data-days="90">90 dias</button>
+      <button type="button" data-days="all">Tudo</button>
+    </div>
+  </div>
+
   <div class="board">
     <div class="board-head">
       <div>Destino</div>
@@ -335,6 +398,7 @@
       <div>Volta</div>
       <div>Pax</div>
       <div>Tarifa</div>
+      <div>Avaliacao</div>
       <div>Status</div>
     </div>
     <div id="rows"></div>
@@ -349,25 +413,76 @@
     O painel le <code>data/price_history.json</code>, atualizado pelo
     <code>scripts/run_searches.py</code> a cada execucao do GitHub Actions.
     Se ainda nao rodou nenhuma busca, ou o arquivo nao carregar, ele cai
-    de volta pros dados de exemplo abaixo. O formulario acima grava um
-    novo perfil direto no <code>config/profiles.json</code> do GitHub e
-    ja dispara a busca, via uma funcao serverless do Netlify.
+    de volta pros dados de exemplo abaixo. A coluna <strong>Avaliacao</strong>
+    compara o preco atual de cada rota com a media historica dela no
+    periodo selecionado acima - precisa de pelo menos 2 execucoes
+    registradas pra rota aparecer com avaliacao (antes disso mostra
+    "sem dados"). O formulario grava um novo perfil direto no
+    <code>config/profiles.json</code> do GitHub e ja dispara a busca,
+    via uma funcao serverless do Netlify.
   </div>
 
 </div>
 
 <script>
   const SAMPLE_DATA = [
-    { origin: "LIS", dest: "CDG", destName: "Paris", mode: "voo", depart: "2026-09-12", ret: "2026-09-19", adults: 1, children: 0, price: 178, currency: "EUR", status: "notified", link: "#" },
-    { origin: "LIS", dest: "BCN", destName: "Barcelona", mode: "voo", depart: "2026-10-03", ret: "2026-10-06", adults: 2, children: 0, price: 134, currency: "EUR", status: "notified", link: "#" },
-    { origin: "LIS", dest: "FCO", destName: "Roma", mode: "voo", depart: "2026-11-08", ret: "2026-11-15", adults: 1, children: 0, price: 221, currency: "EUR", status: "drop", link: "#" },
-    { origin: "LIS", dest: "JFK", destName: "Nova York", mode: "voo", depart: "2027-01-14", ret: "2027-01-28", adults: 1, children: 0, price: 612, currency: "EUR", status: "watching", link: "#" },
-    { origin: "LIS", dest: "BCN-FCO", destName: "Voo+cruzeiro Mediterraneo", mode: "combo", depart: "2026-09-10", ret: "2026-09-24", adults: 2, children: 0, price: 340, currency: "EUR", status: "watching", link: "#", note: "so voos - cruzeiro ainda manual" },
+    { origin: "LIS", dest: "CDG", destName: "Paris", mode: "voo", depart: "2026-09-12", ret: "2026-09-19", adults: 1, children: 0, price: 178, currency: "EUR", status: "notified", link: "#",
+      history: [{checked_at: daysAgoIso(28), price: 230}, {checked_at: daysAgoIso(20), price: 210}, {checked_at: daysAgoIso(12), price: 195}, {checked_at: daysAgoIso(4), price: 220}, {checked_at: daysAgoIso(0), price: 178}] },
+    { origin: "LIS", dest: "BCN", destName: "Barcelona", mode: "voo", depart: "2026-10-03", ret: "2026-10-06", adults: 2, children: 0, price: 134, currency: "EUR", status: "notified", link: "#",
+      history: [{checked_at: daysAgoIso(25), price: 150}, {checked_at: daysAgoIso(15), price: 145}, {checked_at: daysAgoIso(8), price: 140}, {checked_at: daysAgoIso(0), price: 134}] },
+    { origin: "LIS", dest: "FCO", destName: "Roma", mode: "voo", depart: "2026-11-08", ret: "2026-11-15", adults: 1, children: 0, price: 221, currency: "EUR", status: "drop", link: "#",
+      history: [{checked_at: daysAgoIso(20), price: 190}, {checked_at: daysAgoIso(10), price: 205}, {checked_at: daysAgoIso(3), price: 240}, {checked_at: daysAgoIso(0), price: 221}] },
+    { origin: "LIS", dest: "JFK", destName: "Nova York", mode: "voo", depart: "2027-01-14", ret: "2027-01-28", adults: 1, children: 0, price: 612, currency: "EUR", status: "watching", link: "#",
+      history: [{checked_at: daysAgoIso(6), price: 605}, {checked_at: daysAgoIso(0), price: 612}] },
+    { origin: "LIS", dest: "BCN-FCO", destName: "Voo+cruzeiro Mediterraneo", mode: "combo", depart: "2026-09-10", ret: "2026-09-24", adults: 2, children: 0, price: 340, currency: "EUR", status: "watching", link: "#", note: "so voos - cruzeiro ainda manual",
+      history: [{checked_at: daysAgoIso(0), price: 340}] },
   ];
 
   const MODE_LABEL = { voo: "Voo", combo: "Voo+cruzeiro", cruzeiro: "Cruzeiro" };
 
   const STATUS_LABEL = { notified: "Notificado", drop: "Preco caiu", watching: "Monitorando" };
+
+  function daysAgoIso(n) {
+    const d = new Date();
+    d.setDate(d.getDate() - n);
+    return d.toISOString();
+  }
+
+  let currentPeriodDays = 30;
+  let currentRows = [];
+
+  function filterByPeriod(history, periodDays) {
+    if (!history) return [];
+    if (periodDays === "all") return history;
+    const cutoff = Date.now() - Number(periodDays) * 24 * 3600 * 1000;
+    return history.filter(h => new Date(h.checked_at).getTime() >= cutoff);
+  }
+
+  function classifyPrice(currentPrice, history, periodDays) {
+    const filtered = filterByPeriod(history, periodDays);
+    if (filtered.length < 2) return { label: "Sem dados suficientes", cls: "unknown" };
+    const prices = filtered.map(h => h.price);
+    const avg = prices.reduce((a, b) => a + b, 0) / prices.length;
+    const ratio = currentPrice / avg;
+    if (ratio <= 0.92) return { label: "Otimo preco", cls: "great" };
+    if (ratio <= 1.03) return { label: "Preco normal", cls: "normal" };
+    return { label: "Acima da media", cls: "high" };
+  }
+
+  function sparklineSvg(history, periodDays, qualityCls) {
+    const filtered = filterByPeriod(history, periodDays);
+    if (filtered.length < 2) return "";
+    const prices = filtered.map(h => h.price);
+    const min = Math.min(...prices), max = Math.max(...prices);
+    const range = (max - min) || 1;
+    const w = 64, h = 18, pad = 2;
+    const pts = prices.map((p, i) => {
+      const x = pad + (i / (prices.length - 1)) * (w - 2 * pad);
+      const y = h - pad - ((p - min) / range) * (h - 2 * pad);
+      return `${x.toFixed(1)},${y.toFixed(1)}`;
+    }).join(" ");
+    return `<svg class="sparkline ${qualityCls}" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><polyline points="${pts}" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>`;
+  }
 
   function fmtDate(iso) {
     const [y, m, d] = iso.split("-");
@@ -375,11 +490,14 @@
   }
 
   function render(data) {
+    currentRows = data;
     const rowsEl = document.getElementById("rows");
     rowsEl.innerHTML = "";
     data.forEach(r => {
       const row = document.createElement("div");
       row.className = "row";
+      const quality = classifyPrice(r.price, r.history, currentPeriodDays);
+      const spark = sparklineSvg(r.history, currentPeriodDays, quality.cls);
       row.innerHTML = `
         <div class="route">
           <div class="codes">${r.origin}<span class="arrow">-></span>${r.dest}</div>
@@ -390,6 +508,7 @@
         <div>${fmtDate(r.ret)}</div>
         <div class="pax">${r.adults + r.children}</div>
         <div><span class="price flip">${r.price.toFixed(0)} ${r.currency}</span>${r.note ? `<div style="font-size:10px; color:var(--dim); font-weight:400; margin-top:2px;">${r.note}</div>` : ''}</div>
+        <div><span class="quality ${quality.cls}">${quality.label}</span>${spark}</div>
         <div><span class="status ${r.status}">${STATUS_LABEL[r.status] || r.status}</span></div>
       `;
       rowsEl.appendChild(row);
@@ -422,6 +541,7 @@
       price: e.last_price,
       currency: e.currency || "EUR",
       status: e.status || "watching",
+      history: e.history || [],
       link: "#",
     })).sort((a, b) => new Date(a.depart) - new Date(b.depart));
   }
@@ -438,6 +558,15 @@
     .catch(() => {
       document.getElementById("last-run").textContent = "ainda sem execucao real (mostrando exemplo)";
     });
+
+  document.getElementById("period-buttons").addEventListener("click", (ev) => {
+    const btn = ev.target.closest("button[data-days]");
+    if (!btn) return;
+    document.querySelectorAll("#period-buttons button").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    currentPeriodDays = btn.dataset.days === "all" ? "all" : Number(btn.dataset.days);
+    render(currentRows);
+  });
 
   const form = document.getElementById("search-form");
   const statusEl = document.getElementById("form-status");
