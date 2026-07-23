@@ -71,6 +71,10 @@ No GitHub: Settings → Secrets and variables → Actions → New repository sec
 
 Obrigatórios pra receber no WhatsApp (sem eles, o sistema roda e salva o
 histórico normalmente, só não envia — fica printado no log):
+- `WHATSAPP_NUMBER` — seu número, formato internacional só com números
+  (ex: `351912345678`). **Não vai mais no `config/profiles.json`** de
+  propósito: número de telefone real não deve ficar num arquivo
+  versionado/público do repositório, mesmo privado.
 - `EVOLUTION_API_URL`
 - `EVOLUTION_API_KEY`
 - `EVOLUTION_INSTANCE`
@@ -78,7 +82,9 @@ histórico normalmente, só não envia — fica printado no log):
 Opcional, pra ativar a Kiwi como segunda fonte:
 - `KIWI_API_KEY`
 
-### 3. Edite `config/profiles.json` com seus números de WhatsApp reais
+### 3. Edite `config/profiles.json` com suas rotas/preferências de busca
+(destino, datas, teto de preço etc. — o número de WhatsApp já foi
+resolvido no passo 2, via secret).
 
 ### 4. Teste manualmente
 Aba **Actions** → "Busca de passagens (scraping grátis)" → **Run workflow**.

@@ -23,6 +23,20 @@ from lib.destinations import expand_destinations
 PROFILES_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "config", "profiles.json")
 
 
+def get_whatsapp_number(profile):
+    """
+    Resolve o número de WhatsApp sem depender do que está versionado no
+    profiles.json (número de telefone não deve ficar num arquivo público
+    do repositório). Ordem de prioridade:
+    1. Campo "whatsapp_number" no próprio perfil, SE você quiser um número
+       diferente pra esse perfil específico (defina como secret também,
+       ex: WHATSAPP_NUMBER_PARIS, e referencie aqui se precisar).
+    2. Variável de ambiente WHATSAPP_NUMBER (o caminho padrão, único
+       número pra todos os perfis).
+    """
+    return profile.get("whatsapp_number") or os.environ.get("WHATSAPP_NUMBER")
+
+
 def candidate_dates(profile, step_days=7):
     """
     Gera candidatos de (ida, volta) dentro da janela do perfil.
@@ -60,7 +74,7 @@ def run_combo_profile(profile, history):
         text = combo_lib.format_combo_message(
             profile["name"], offer, profile["adults"], profile.get("children_ages", [])
         )
-        whatsapp.send_whatsapp_message(profile["whatsapp_number"], text)
+        whatsapp.send_whatsapp_message(get_whatsapp_number(profile), text)
 
     store.record(
         history, profile["origin"], pseudo_destination,
@@ -108,7 +122,7 @@ def run_profile(profile, history):
                 profile["name"], profile["origin"], destination,
                 depart_str, return_str, offer, profile["adults"], children_ages,
             )
-            whatsapp.send_whatsapp_message(profile["whatsapp_number"], text)
+            whatsapp.send_whatsapp_message(get_whatsapp_number(profile), text)
 
         store.record(history, profile["origin"], destination, depart_str, return_str, offer["price_total"], notify)
         found.append({"destination": destination, "depart": depart_str, "return": return_str,

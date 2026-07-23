@@ -10,8 +10,7 @@
     "adults": 1,
     "children_ages": [],
     "max_price": 200,
-    "currency": "EUR",
-    "whatsapp_number": "351912345678"
+    "currency": "EUR"
   },
   {
     "name": "Barcelona fim de semana",
@@ -24,10 +23,8 @@
     "adults": 2,
     "children_ages": [],
     "max_price": 150,
-    "currency": "EUR",
-    "whatsapp_number": "351912345678"
-  }
-  ,
+    "currency": "EUR"
+  },
   {
     "name": "Mediterrâneo voo+cruzeiro",
     "trip_type": "combo",
@@ -36,7 +33,6 @@
     "children_ages": [],
     "currency": "EUR",
     "max_price": 900,
-    "whatsapp_number": "351912345678",
     "combo": {
       "embark_airport": "BCN",
       "embark_city": "Barcelona",

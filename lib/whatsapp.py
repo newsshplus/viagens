@@ -12,6 +12,9 @@ def send_whatsapp_message(number: str, text: str) -> bool:
     Se a sua instância usa um schema diferente, ajuste o 'json=' abaixo
     conforme o Swagger da sua própria instância — isso varia entre versões.
     """
+    if not number:
+        print("Número de WhatsApp não definido (configure a variável de ambiente WHATSAPP_NUMBER) - mensagem não enviada.")
+        return False
     if not (EVOLUTION_API_URL and EVOLUTION_API_KEY and EVOLUTION_INSTANCE):
         print("Evolution API não configurada - mensagem não enviada.")
         return False
