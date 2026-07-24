@@ -26,121 +26,29 @@
     "currency": "EUR"
   },
   {
-    "name": "Mediterraneo voo+cruzeiro",
-    "trip_type": "combo",
+    "name": "Europa inteira barata",
     "origin": "LIS",
-    "adults": 2,
-    "children_ages": [],
-    "currency": "EUR",
-    "max_price": 900,
-    "combo": {
-      "embark_airport": "BCN",
-      "embark_city": "Barcelona",
-      "disembark_airport": "FCO",
-      "disembark_city": "Roma (Civitavecchia)",
-      "outbound_flight_date": "2026-09-10",
-      "return_flight_date": "2026-09-24",
-      "cruise_region": "Mediterraneo",
-      "cabin_type": "interior"
-    }
-  },
-  {
-    "name": "Barcelona",
-    "origin": "LIS",
-    "destination_type": "airport",
-    "destination_value": "BCN",
-    "window_start_days": 3,
-    "window_end_days": 90,
-    "min_stay_days": 4,
-    "adults": 2,
-    "children_ages": [
-      13
-    ],
-    "max_price": null,
-    "currency": "EUR"
-  },
-  {
-    "name": "Suíça",
-    "origin": "LIS",
-    "destination_type": "airport",
-    "destination_value": "ZRH",
-    "window_start_days": 3,
-    "window_end_days": 90,
-    "min_stay_days": 7,
-    "adults": 2,
-    "children_ages": [
-      13
-    ],
-    "max_price": null,
-    "currency": "EUR"
-  },
-  {
-    "name": "vsdv",
-    "origin": "LIS",
-    "destination_type": "airport",
-    "destination_value": "BCN",
-    "window_start_days": 3,
-    "window_end_days": 90,
-    "min_stay_days": 7,
-    "adults": 1,
-    "children_ages": [],
-    "max_price": null,
-    "currency": "EUR"
-  },
-  {
-    "name": "Barcelona",
-    "origin": "LIS",
-    "destination_type": "airport",
-    "destination_value": "BCN",
-    "window_start_days": 3,
-    "window_end_days": 90,
-    "min_stay_days": 7,
-    "adults": 2,
-    "children_ages": [
-      13
-    ],
-    "max_price": null,
-    "currency": "EUR"
-  },
-  {
-    "name": "Barcelona",
-    "origin": "LIS",
-    "destination_type": "airport",
-    "destination_value": "BCN",
-    "window_start_days": 3,
+    "destination_type": "continent",
+    "destination_value": "europe",
+    "window_start_days": 7,
     "window_end_days": 90,
     "min_stay_days": 5,
-    "adults": 3,
-    "children_ages": [
-      13
-    ],
-    "max_price": null,
+    "adults": 1,
+    "children_ages": [],
+    "max_price": 250,
     "currency": "EUR"
   },
   {
-    "name": "Barcelona",
+    "name": "Brasil (ida e volta)",
     "origin": "LIS",
     "destination_type": "airport",
-    "destination_value": "BCN",
-    "window_start_days": 3,
-    "window_end_days": 90,
-    "min_stay_days": 7,
-    "adults": 1,
-    "children_ages": [],
-    "max_price": null,
-    "currency": "EUR"
-  },
-  {
-    "name": "Narcelona",
-    "origin": "LIS",
-    "destination_type": "airport",
-    "destination_value": "BCN",
-    "window_start_days": 3,
-    "window_end_days": 90,
-    "min_stay_days": 7,
-    "adults": 1,
-    "children_ages": [],
-    "max_price": null,
+    "destination_value": "GRU",
+    "window_start_days": 14,
+    "window_end_days": 120,
+    "min_stay_days": 14,
+    "adults": 2,
+    "children_ages": [13],
+    "max_price": 800,
     "currency": "EUR"
   }
 ]

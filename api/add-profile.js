@@ -1,23 +1,17 @@
 /**
- * Versao Vercel da mesma funcao do Netlify (netlify/functions/add-profile.js).
- * Recebe o formulario do painel, grava um novo perfil em config/profiles.json
- * via API do GitHub, e dispara o workflow de busca imediatamente.
- *
- * Variaveis de ambiente (Vercel: Project Settings -> Environment Variables):
- *   GITHUB_TOKEN  - fine-grained personal access token, com permissao
- *                   "Contents: read and write" e "Actions: read and write"
- *                   restrita ao repositorio viagens.
- *   GITHUB_REPO   - "usuario/repositorio", ex: "newsshplus/viagens"
- * Opcional:
- *   GITHUB_BRANCH - branch alvo (padrao "main")
+ * Funcao serverless para Vercel.
+ * Adiciona um novo perfil de busca via formulário web.
+ * Grava no config/profiles.json via GitHub API e dispara o workflow.
  */
 
-const GITHUB_API = "https://api.github.com";
-
-module.exports = async (req, res) => {
+export default async function handler(req, res) {
   if (req.method !== "POST") {
-    res.status(405).json({ ok: false, error: "Metodo nao permitido." });
-    return;
+    return res.status(405).json({ error: "Method not allowed" });
+  }
+
+  const { profile } = req.body;
+  if (!profile || !profile.origin || !profile.destination_value) {
+    return res.status(400).json({ error: "Dados invalidos" });
   }
 
   const token = process.env.GITHUB_TOKEN;
@@ -25,93 +19,85 @@ module.exports = async (req, res) => {
   const branch = process.env.GITHUB_BRANCH || "main";
 
   if (!token || !repo) {
-    res.status(500).json({
-      ok: false,
-      error: "GITHUB_TOKEN ou GITHUB_REPO nao configurados nas variaveis de ambiente do Vercel.",
+    return res.status(500).json({
+      error: "Servidor nao configurado. Configure GITHUB_TOKEN e GITHUB_REPO.",
     });
-    return;
   }
-
-  const input = typeof req.body === "string" ? JSON.parse(req.body || "{}") : (req.body || {});
-
-  const required = ["name", "origin", "destination_type", "destination_value"];
-  const missing = required.filter((f) => !input[f]);
-  if (missing.length) {
-    res.status(400).json({ ok: false, error: `Campos obrigatorios faltando: ${missing.join(", ")}` });
-    return;
-  }
-
-  const childrenAges = String(input.children_ages || "")
-    .split(",")
-    .map((s) => s.trim())
-    .filter(Boolean)
-    .map(Number);
-
-  const newProfile = {
-    name: input.name,
-    origin: String(input.origin).toUpperCase(),
-    destination_type: input.destination_type,
-    destination_value:
-      input.destination_type === "airport" ? String(input.destination_value).toUpperCase() : input.destination_value,
-    window_start_days: Number(input.window_start_days || 3),
-    window_end_days: Number(input.window_end_days || 90),
-    min_stay_days: Number(input.min_stay_days || 7),
-    adults: Number(input.adults || 1),
-    children_ages: childrenAges,
-    max_price: input.max_price ? Number(input.max_price) : null,
-    currency: input.currency || "EUR",
-  };
-
-  const authHeaders = {
-    Authorization: `Bearer ${token}`,
-    Accept: "application/vnd.github+json",
-    "User-Agent": "viagens-vercel-function",
-  };
 
   try {
-    const contentUrl = `${GITHUB_API}/repos/${repo}/contents/config/profiles.json?ref=${branch}`;
-    const getResp = await fetch(contentUrl, { headers: authHeaders });
-    if (!getResp.ok) {
-      const errText = await getResp.text();
-      res.status(502).json({ ok: false, error: `Erro ao ler profiles.json: ${errText}` });
-      return;
-    }
-    const getData = await getResp.json();
-    const currentProfiles = JSON.parse(Buffer.from(getData.content, "base64").toString("utf-8"));
+    // Le profiles.json atual
+    const getRes = await fetch(
+      `https://api.github.com/repos/${repo}/contents/config/profiles.json?ref=${branch}`,
+      { headers: { Authorization: `token ${token}`, "User-Agent": "viagens-smart" } }
+    );
 
-    currentProfiles.push(newProfile);
-    const newContentB64 = Buffer.from(JSON.stringify(currentProfiles, null, 2), "utf-8").toString("base64");
+    let profiles = [];
+    let sha = null;
 
-    const putResp = await fetch(`${GITHUB_API}/repos/${repo}/contents/config/profiles.json`, {
-      method: "PUT",
-      headers: { ...authHeaders, "Content-Type": "application/json" },
-      body: JSON.stringify({
-        message: `Adiciona perfil de busca via painel: ${newProfile.name}`,
-        content: newContentB64,
-        sha: getData.sha,
-        branch,
-      }),
-    });
-
-    if (!putResp.ok) {
-      const errText = await putResp.text();
-      res.status(502).json({ ok: false, error: `Erro ao salvar profiles.json: ${errText}` });
-      return;
+    if (getRes.ok) {
+      const file = await getRes.json();
+      sha = file.sha;
+      const content = Buffer.from(file.content, "base64").toString("utf-8");
+      profiles = JSON.parse(content);
     }
 
-    const dispatchResp = await fetch(`${GITHUB_API}/repos/${repo}/actions/workflows/search.yml/dispatches`, {
-      method: "POST",
-      headers: { ...authHeaders, "Content-Type": "application/json" },
-      body: JSON.stringify({ ref: branch }),
+    // Adiciona novo perfil
+    profiles.push({
+      name: profile.name || `Perfil ${profiles.length + 1}`,
+      origin: profile.origin.toUpperCase(),
+      destination_type: profile.destination_type || "airport",
+      destination_value: profile.destination_value.toUpperCase(),
+      window_start_days: profile.window_start_days || 3,
+      window_end_days: profile.window_end_days || 90,
+      min_stay_days: profile.min_stay_days || 7,
+      adults: profile.adults || 1,
+      children_ages: profile.children_ages || [],
+      max_price: profile.max_price || null,
+      currency: profile.currency || "EUR",
     });
 
-    res.status(200).json({
-      ok: true,
-      message: dispatchResp.ok
-        ? "Perfil salvo e busca disparada agora. Acompanhe a aba Actions do GitHub - os resultados aparecem no painel em alguns minutos."
-        : "Perfil salvo, mas nao consegui disparar a busca agora - ela roda no proximo agendamento (a cada 6h).",
-    });
-  } catch (err) {
-    res.status(500).json({ ok: false, error: String(err) });
+    // Salva profiles.json
+    const body = {
+      message: `Adiciona perfil: ${profile.name || "novo perfil"}`,
+      content: Buffer.from(JSON.stringify(profiles, null, 2)).toString("base64"),
+      branch,
+    };
+    if (sha) body.sha = sha;
+
+    const putRes = await fetch(
+      `https://api.github.com/repos/${repo}/contents/config/profiles.json`,
+      {
+        method: "PUT",
+        headers: {
+          Authorization: `token ${token}`,
+          "User-Agent": "viagens-smart",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body),
+      }
+    );
+
+    if (!putRes.ok) {
+      const err = await putRes.text();
+      return res.status(500).json({ error: `Erro ao salvar: ${err}` });
+    }
+
+    // Dispara workflow de busca
+    await fetch(
+      `https://api.github.com/repos/${repo}/actions/workflows/search.yml/dispatches`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `token ${token}`,
+          "User-Agent": "viagens-smart",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ ref: branch }),
+      }
+    );
+
+    return res.status(200).json({ ok: true, message: "Perfil adicionado e busca iniciada." });
+  } catch (e) {
+    return res.status(500).json({ error: e.message });
   }
-};
+}

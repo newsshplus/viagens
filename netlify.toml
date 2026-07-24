@@ -2,4 +2,4 @@
   publish = "web"
 
 [functions]
-  directory = "netlify/functions"
+  directory = "api"

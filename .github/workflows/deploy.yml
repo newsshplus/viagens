@@ -1,0 +1,22 @@
+name: Deploy Web
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'web/**'
+      - 'api/**'
+      - 'netlify/**'
+      - 'vercel.json'
+      - 'netlify.toml'
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deploy info
+        run: echo "Deploy automatico via Vercel/Netlify - conecte o repositorio na plataforma"
