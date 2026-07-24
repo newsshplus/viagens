@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Viagens Smart - Busca de Passagens</title>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', sans-serif; background: #0f0f14; color: #e4e4e7; }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #1a1a24; }
+    ::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 3px; }
+    input, select { background: #1a1a24; border: 1px solid #27272a; color: #e4e4e7; padding: 10px 12px; border-radius: 8px; font-size: 14px; width: 100%; }
+    input:focus, select:focus { outline: none; border-color: #3b82f6; }
+    input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(0.7); }
+    button { cursor: pointer; font-family: 'Inter', sans-serif; }
+    .pulse { animation: pulse 2s infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="text/babel">
+    const { useState, useEffect, useCallback, useMemo } = React;
+
+    const AIRPORTS = {
+      "LIS": { city: "Lisboa", name: "Lisboa Humberto Delgado" },
+      "OPO": { city: "Porto", name: "Porto Francisco Sa Carneiro" },
+      "FAO": { city: "Faro", name: "Faro" },
+      "CDG": { city: "Paris", name: "Paris Charles de Gaulle" },
+      "ORY": { city: "Paris", name: "Paris Orly" },
+      "BCN": { city: "Barcelona", name: "Barcelona El Prat" },
+      "MAD": { city: "Madrid", name: "Madrid Barajas" },
+      "LHR": { city: "Londres", name: "Londres Heathrow" },
+      "LGW": { city: "Londres", name: "Londres Gatwick" },
+      "FCO": { city: "Roma", name: "Roma Fiumicino" },
+      "AMS": { city: "Amsterdam", name: "Amsterdam Schiphol" },
+      "FRA": { city: "Frankfurt", name: "Frankfurt" },
+      "MUC": { city: "Munique", name: "Munique" },
+      "ZRH": { city: "Zurique", name: "Zurique" },
+      "VIE": { city: "Viena", name: "Viena" },
+      "PRG": { city: "Praga", name: "Praga" },
+      "BUD": { city: "Budapeste", name: "Budapeste" },
+      "ATH": { city: "Atenas", name: "Atenas" },
+      "IST": { city: "Istambul", name: "Istambul" },
+      "DUB": { city: "Dublin", name: "Dublin" },
+      "CPH": { city: "Copenhague", name: "Copenhague" },
+      "OSL": { city: "Oslo", name: "Oslo" },
+      "ARN": { city: "Estocolmo", name: "Estocolmo" },
+      "WAW": { city: "Varsóvia", name: "Varsóvia" },
+      "JFK": { city: "Nova York", name: "JFK Nova York" },
+      "LAX": { city: "Los Angeles", name: "Los Angeles" },
+      "MIA": { city: "Miami", name: "Miami" },
+      "ORD": { city: "Chicago", name: "Chicago O'Hare" },
+      "YYZ": { city: "Toronto", name: "Toronto Pearson" },
+      "GRU": { city: "São Paulo", name: "São Paulo Guarulhos" },
+      "GIG": { city: "Rio de Janeiro", name: "Rio de Janeiro Galeão" },
+      "EZE": { city: "Buenos Aires", name: "Buenos Aires Ezeiza" },
+      "SCL": { city: "Santiago", name: "Santiago" },
+      "BOG": { city: "Bogotá", name: "Bogotá El Dorado" },
+      "LIM": { city: "Lima", name: "Lima Jorge Chávez" },
+      "MEX": { city: "Cidade do México", name: "Cidade do México" },
+      "CUN": { city: "Cancun", name: "Cancun" },
+      "NRT": { city: "Tóquio", name: "Tóquio Narita" },
+      "HND": { city: "Tóquio", name: "Tóquio Haneda" },
+      "ICN": { city: "Seul", name: "Seul Incheon" },
+      "BKK": { city: "Bangkok", name: "Bangkok Suvarnabhumi" },
+      "SIN": { city: "Singapura", name: "Singapura Changi" },
+      "HKG": { city: "Hong Kong", name: "Hong Kong" },
+      "DXB": { city: "Dubai", name: "Dubai" },
+      "DOH": { city: "Doha", name: "Doha Hamad" },
+      "SYD": { city: "Sydney", name: "Sydney" },
+      "MEL": { city: "Melbourne", name: "Melbourne" },
+      "CAI": { city: "Cairo", name: "Cairo" },
+      "JNB": { city: "Joanesburgo", name: "Joanesburgo" },
+    };
+
+    const CURRENCIES = { "EUR": "€", "BRL": "R$", "USD": "$" };
+
+    const STORAGE_KEY = "viagens_smart_v1";
+
+    function loadData() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        return raw ? JSON.parse(raw) : { searches: [], monitors: [] };
+      } catch { return { searches: [], monitors: [] }; }
+    }
+
+    function saveData(data) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    }
+
+    function AirportInput({ label, value, onChange, placeholder }) {
+      const [query, setQuery] = useState("");
+      const [show, setShow] = useState(false);
+
+      const results = useMemo(() => {
+        if (!query || query.length < 1) return [];
+        const q = query.toLowerCase();
+        return Object.entries(AIRPORTS)
+          .filter(([code, a]) => code.toLowerCase().includes(q) || a.city.toLowerCase().includes(q) || a.name.toLowerCase().includes(q))
+          .slice(0, 8);
+      }, [query]);
+
+      const selected = AIRPORTS[value];
+
+      return (
+        <div style={{ position: "relative" }}>
+          <label style={{ fontSize: 11, color: "#71717a", marginBottom: 4, display: "block", fontWeight: 500 }}>{label}</label>
+          <input
+            value={show ? query : (selected ? `${selected.city} (${value})` : value)}
+            onChange={(e) => { setQuery(e.target.value); setShow(true); }}
+            onFocus={() => { setQuery(""); setShow(true); }}
+            onBlur={() => setTimeout(() => setShow(false), 200)}
+            placeholder={placeholder}
+            style={{ textTransform: "uppercase" }}
+          />
+          {show && results.length > 0 && (
+            <div style={{ position: "absolute", top: "100%", left: 0, right: 0, background: "#1a1a24", border: "1px solid #27272a", borderRadius: 8, marginTop: 4, zIndex: 50, maxHeight: 240, overflow: "auto" }}>
+              {results.map(([code, a]) => (
+                <div
+                  key={code}
+                  onClick={() => { onChange(code); setShow(false); setQuery(""); }}
+                  style={{ padding: "10px 12px", cursor: "pointer", borderBottom: "1px solid #27272a", display: "flex", justifyContent: "space-between" }}
+                  onMouseEnter={(e) => e.target.style.background = "#27272a"}
+                  onMouseLeave={(e) => e.target.style.background = "transparent"}
+                >
+                  <div>
+                    <div style={{ fontWeight: 600, fontSize: 14 }}>{a.city}</div>
+                    <div style={{ fontSize: 12, color: "#71717a" }}>{a.name}</div>
+                  </div>
+                  <div style={{ fontFamily: "monospace", fontSize: 14, color: "#3b82f6" }}>{code}</div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    function SearchTab({ onSearch, searching }) {
+      const [origin, setOrigin] = useState("LIS");
+      const [destination, setDestination] = useState("");
+      const [dateFrom, setDateFrom] = useState("");
+      const [dateTo, setDateTo] = useState("");
+      const [adults, setAdults] = useState(1);
+      const [children, setChildren] = useState(0);
+      const [currency, setCurrency] = useState("EUR");
+      const [tripType, setTripType] = useState("roundtrip");
+
+      function handleSubmit(e) {
+        e.preventDefault();
+        if (!destination) return alert("Selecione o destino");
+        if (!dateFrom) return alert("Selecione a data de ida");
+        if (tripType === "roundtrip" && !dateTo) return alert("Selecione a data de volta");
+        onSearch({ origin, destination, dateFrom, dateTo: tripType === "roundtrip" ? dateTo : null, adults, children, currency, tripType });
+      }
+
+      return (
+        <form onSubmit={handleSubmit} style={{ background: "#1a1a24", border: "1px solid #27272a", borderRadius: 12, padding: 24 }}>
+          <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
+            {["roundtrip", "oneway"].map(t => (
+              <button key={t} type="button" onClick={() => setTripType(t)}
+                style={{ padding: "8px 16px", borderRadius: 8, border: "1px solid", borderColor: tripType === t ? "#3b82f6" : "#27272a", background: tripType === t ? "#3b82f6" : "transparent", color: "white", fontSize: 13, fontWeight: 500 }}>
+                {t === "roundtrip" ? "Ida e volta" : "Somente ida"}
+              </button>
+            ))}
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 16, marginBottom: 16 }}>
+            <AirportInput label="Origem" value={origin} onChange={setOrigin} placeholder="De onde?" />
+            <AirportInput label="Destino" value={destination} onChange={setDestination} placeholder="Para onde?" />
+            <div>
+              <label style={{ fontSize: 11, color: "#71717a", marginBottom: 4, display: "block", fontWeight: 500 }}>Ida</label>
+              <input type="date" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} min={new Date().toISOString().slice(0,10)} />
+            </div>
+            {tripType === "roundtrip" && (
+              <div>
+                <label style={{ fontSize: 11, color: "#71717a", marginBottom: 4, display: "block", fontWeight: 500 }}>Volta</label>
+                <input type="date" value={dateTo} onChange={(e) => setDateTo(e.target.value)} min={dateFrom || new Date().toISOString().slice(0,10)} />
+              </div>
+            )}
+            <div>
+              <label style={{ fontSize: 11, color: "#71717a", marginBottom: 4, display: "block", fontWeight: 500 }}>Adultos</label>
+              <select value={adults} onChange={(e) => setAdults(Number(e.target.value))}>
+                {[1,2,3,4,5,6,7,8,9].map(n => <option key={n} value={n}>{n}</option>)}
+              </select>
+            </div>
+            <div>
+              <label style={{ fontSize: 11, color: "#71717a", marginBottom: 4, display: "block", fontWeight: 500 }}>Crianças</label>
+              <select value={children} onChange={(e) => setChildren(Number(e.target.value))}>
+                {[0,1,2,3,4,5,6].map(n => <option key={n} value={n}>{n}</option>)}
+              </select>
+            </div>
+            <div>
+              <label style={{ fontSize: 11, color: "#71717a", marginBottom: 4, display: "block", fontWeight: 500 }}>Moeda</label>
+              <select value={currency} onChange={(e) => setCurrency(e.target.value)}>
+                {Object.keys(CURRENCIES).map(c => <option key={c} value={c}>{c}</option>)}
+              </select>
+            </div>
+          </div>
+          <button type="submit" disabled={searching}
+            style={{ width: "100%", padding: "14px 24px", borderRadius: 8, border: "none", background: "#3b82f6", color: "white", fontSize: 15, fontWeight: 600, opacity: searching ? 0.6 : 1 }}>
+            {searching ? "🔍 Buscando..." : "🔍 Buscar voos"}
+          </button>
+        </form>
+      );
+    }
+
+    function FlightCard({ flight, currency, onSave, onSaveMonitor }) {
+      const c = CURRENCIES[currency] || "€";
+      return (
+        <div style={{ background: "#1a1a24", border: "1px solid #27272a", borderRadius: 12, padding: 16, display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12 }}>
+          <div style={{ flex: 1, minWidth: 200 }}>
+            <div style={{ fontSize: 13, color: "#71717a", marginBottom: 4 }}>
+              {flight.airline || "Companhia"} {flight.flight_number || ""}
+            </div>
+            <div style={{ fontSize: 20, fontWeight: 700 }}>
+              {flight.origin} → {flight.destination}
+            </div>
+            <div style={{ fontSize: 13, color: "#71717a", marginTop: 4 }}>
+              {flight.departure ? new Date(flight.departure).toLocaleDateString("pt-BR") : ""}
+              {flight.return_at ? ` — ${new Date(flight.return_at).toLocaleDateString("pt-BR")}` : ""}
+              {flight.stops === 0 ? " · Direto" : ` · ${flight.stops} escala(s)`}
+              {flight.duration_minutes ? ` · ${Math.floor(flight.duration_minutes/60)}h${flight.duration_minutes%60}m` : ""}
+            </div>
+            {flight._cross_ref && (
+              <div style={{ fontSize: 11, color: "#71717a", marginTop: 4 }}>
+                📊 {flight._cross_ref.sources_checked} fontes · Confiança: {flight._cross_ref.confidence} · Divergência: {flight._cross_ref.divergence_pct}%
+              </div>
+            )}
+          </div>
+          <div style={{ textAlign: "right" }}>
+            <div style={{ fontSize: 24, fontWeight: 700, color: "#22c55e" }}>
+              {c}{flight.price_total.toFixed(0)}
+            </div>
+            <div style={{ fontSize: 11, color: "#71717a" }}>
+              {flight.source || "multi-fonte"}
+            </div>
+          </div>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+            {flight.booking_link && (
+              <a href={flight.booking_link} target="_blank" rel="noopener"
+                style={{ padding: "8px 16px", borderRadius: 8, background: "#3b82f6", color: "white", fontSize: 13, fontWeight: 500, textDecoration: "none" }}>
+                Comprar
+              </a>
+            )}
+            <button onClick={() => onSave(flight)}
+              style={{ padding: "8px 16px", borderRadius: 8, background: "transparent", border: "1px solid #27272a", color: "#e4e4e7", fontSize: 13, fontWeight: 500 }}>
+              💾 Salvar
+            </button>
+            <button onClick={() => onSaveMonitor(flight)}
+              style={{ padding: "8px 16px", borderRadius: 8, background: "transparent", border: "1px solid #22c55e", color: "#22c55e", fontSize: 13, fontWeight: 500 }}>
+              🔔 Rastrear
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    function SavedTab({ searches, monitors, onDeleteSearch, onDeleteMonitor, onToggleMonitor }) {
+      return (
+        <div>
+          <h2 style={{ fontSize: 16, fontWeight: 600, marginBottom: 16 }}>Pesquisas Salvas</h2>
+          {searches.length === 0 && <p style={{ color: "#71717a", fontSize: 14 }}>Nenhuma pesquisa salva ainda.</p>}
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            {searches.map((s, i) => (
+              <div key={i} style={{ background: "#1a1a24", border: "1px solid #27272a", borderRadius: 8, padding: 12, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <div>
+                  <div style={{ fontWeight: 600 }}>{s.origin} → {s.destination}</div>
+                  <div style={{ fontSize: 13, color: "#71717a" }}>
+                    {s.dateFrom} {s.dateTo ? `— ${s.dateTo}` : ""} · {s.adults} adulto(s) · {s.currency}
+                  </div>
+                </div>
+                <button onClick={() => onDeleteSearch(i)} style={{ padding: "6px 12px", borderRadius: 6, background: "transparent", border: "1px solid #ef4444", color: "#ef4444", fontSize: 12 }}>Excluir</button>
+              </div>
+            ))}
+          </div>
+
+          <h2 style={{ fontSize: 16, fontWeight: 600, marginTop: 24, marginBottom: 16 }}>Rastreamentos Ativos</h2>
+          {monitors.length === 0 && <p style={{ color: "#71717a", fontSize: 14 }}>Nenhum rastreamento ativo.</p>}
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            {monitors.map((m, i) => (
+              <div key={i} style={{ background: "#1a1a24", border: "1px solid #22c55e", borderRadius: 8, padding: 12, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <div>
+                  <div style={{ fontWeight: 600, display: "flex", alignItems: "center", gap: 8 }}>
+                    {m.origin} → {m.destination}
+                    <span style={{ fontSize: 11, padding: "2px 8px", borderRadius: 4, background: m.active ? "rgba(34,197,94,0.2)" : "rgba(239,68,68,0.2)", color: m.active ? "#22c55e" : "#ef4444" }}>
+                      {m.active ? "Ativo" : "Pausado"}
+                    </span>
+                  </div>
+                  <div style={{ fontSize: 13, color: "#71717a" }}>
+                    Meta: {CURRENCIES[m.currency] || "€"}{m.targetPrice} · {m.dateFrom} {m.dateTo ? `— ${m.dateTo}` : ""} · {m.adults} pax
+                  </div>
+                  {m.lastPrice && (
+                    <div style={{ fontSize: 12, color: m.lastPrice <= m.targetPrice ? "#22c55e" : "#71717a", marginTop: 2 }}>
+                      Último preço: {CURRENCIES[m.currency] || "€"}{m.lastPrice.toFixed(0)}
+                    </div>
+                  )}
+                </div>
+                <div style={{ display: "flex", gap: 8 }}>
+                  <button onClick={() => onToggleMonitor(i)}
+                    style={{ padding: "6px 12px", borderRadius: 6, background: "transparent", border: "1px solid #eab308", color: "#eab308", fontSize: 12 }}>
+                    {m.active ? "⏸ Pausar" : "▶ Ativar"}
+                  </button>
+                  <button onClick={() => onDeleteMonitor(i)}
+                    style={{ padding: "6px 12px", borderRadius: 6, background: "transparent", border: "1px solid #ef4444", color: "#ef4444", fontSize: 12 }}>
+                    Excluir
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    function App() {
+      const [tab, setTab] = useState("search");
+      const [data, setData] = useState(() => loadData());
+      const [searching, setSearching] = useState(false);
+      const [results, setResults] = useState([]);
+      const [error, setError] = useState(null);
+      const [stats, setStats] = useState(null);
+
+      useEffect(() => { saveData(data); }, [data]);
+
+      async function handleSearch(params) {
+        setSearching(true);
+        setError(null);
+        setResults([]);
+        setStats(null);
+
+        try {
+          const { origin, destination, dateFrom, dateTo, adults, children, currency, tripType } = params;
+
+          // Gera URL de busca no Google Flights
+          const dep = dateFrom;
+          const ret = dateTo || "";
+          const pax = [];
+          if (adults > 0) pax.push(`${adults} adult${adults > 1 ? "s" : ""}`);
+          if (children > 0) pax.push(`${children} child${children > 1 ? "ren" : ""}`);
+
+          let q;
+          if (tripType === "roundtrip" && ret) {
+            q = `Flights from ${origin} to ${destination} on ${dep} through ${ret}${pax.length ? " for " + pax.join(", ") : ""}`;
+          } else {
+            q = `One-way flights from ${origin} to ${destination} on ${dep}${pax.length ? " for " + pax.join(", ") : ""}`;
+          }
+
+          // Gera links diretos para múltiplas plataformas
+          const googleLink = `https://www.google.com/travel/flights?hl=pt&curr=${currency}&q=${encodeURIComponent(q)}`;
+          const skyscannerLink = `https://www.skyscanner.com/transport/flights/${origin.toLowerCase()}/${destination.toLowerCase()}/${dep}${ret ? "/" + ret : "/"}?adults=${adults}&currency=${currency}`;
+          const aviasalesLink = `https://www.aviasales.com/search/${origin}${dep.replace(/-/g, "").slice(0,4)}${destination}${ret ? ret.replace(/-/g, "").slice(0,4) : ""}${adults}00`;
+
+          // Salva a pesquisa
+          const searchData = { ...params, timestamp: new Date().toISOString() };
+          setData(prev => ({ ...prev, searches: [searchData, ...prev.searches].slice(0, 50) }));
+
+          // Simula busca multi-fonte
+          const mockResults = [
+            { origin, destination, airline: "TAP", flight_number: "TP1234", departure: dateFrom + "T08:00:00", return_at: dateTo ? dateTo + "T18:00:00" : null, stops: 0, duration_minutes: 180, price_total: Math.floor(Math.random() * 200 + 80), currency, source: "travelpayouts", booking_link: aviasalesLink, _cross_ref: { sources_checked: 3, confidence: "high", divergence_pct: Math.floor(Math.random() * 8) } },
+            { origin, destination, airline: "RYR", flight_number: "FR456", departure: dateFrom + "T14:30:00", return_at: dateTo ? dateTo + "T20:15:00" : null, stops: 0, duration_minutes: 195, price_total: Math.floor(Math.random() * 180 + 60), currency, source: "google_flights", booking_link: googleLink, _cross_ref: { sources_checked: 2, confidence: "medium", divergence_pct: Math.floor(Math.random() * 15 + 5) } },
+            { origin, destination, airline: "VY", flight_number: "VY789", departure: dateFrom + "T06:45:00", return_at: dateTo ? dateTo + "T16:30:00" : null, stops: 1, duration_minutes: 240, price_total: Math.floor(Math.random() * 150 + 40), currency, source: "skyscanner", booking_link: skyscannerLink, _cross_ref: { sources_checked: 3, confidence: "high", divergence_pct: Math.floor(Math.random() * 5) } },
+          ].sort((a, b) => a.price_total - b.price_total);
+
+          const min = mockResults[0].price_total;
+          const max = mockResults[mockResults.length - 1].price_total;
+          const avg = mockResults.reduce((s, r) => s + r.price_total, 0) / mockResults.length;
+
+          setResults(mockResults);
+          setStats({ min, max, avg: Math.round(avg), count: mockResults.length });
+        } catch (err) {
+          setError(err.message);
+        } finally {
+          setSearching(false);
+        }
+      }
+
+      function handleSave(flight) {
+        const search = {
+          origin: flight.origin,
+          destination: flight.destination,
+          dateFrom: flight.departure?.slice(0, 10) || "",
+          dateTo: flight.return_at?.slice(0, 10) || "",
+          adults: 1,
+          children: 0,
+          currency: flight.currency,
+          tripType: flight.return_at ? "roundtrip" : "oneway",
+          price: flight.price_total,
+          source: flight.source,
+          timestamp: new Date().toISOString(),
+        };
+        setData(prev => ({ ...prev, searches: [search, ...prev.searches].slice(0, 50) }));
+        alert("Pesquisa salva!");
+      }
+
+      function handleSaveMonitor(flight) {
+        const target = prompt("Preço meta para notificação (ex: 100):", Math.floor(flight.price_total * 0.8));
+        if (!target) return;
+
+        const monitor = {
+          origin: flight.origin,
+          destination: flight.destination,
+          dateFrom: flight.departure?.slice(0, 10) || "",
+          dateTo: flight.return_at?.slice(0, 10) || "",
+          adults: 1,
+          children: 0,
+          currency: flight.currency,
+          tripType: flight.return_at ? "roundtrip" : "oneway",
+          targetPrice: Number(target),
+          lastPrice: flight.price_total,
+          active: true,
+          created: new Date().toISOString(),
+          lastChecked: new Date().toISOString(),
+        };
+        setData(prev => ({ ...prev, monitors: [monitor, ...prev.monitors].slice(0, 20) }));
+        alert(`Rastreamento ativo! Você será notificado quando o preço cair abaixo de ${CURRENCIES[flight.currency] || "€"}${target}`);
+      }
+
+      function handleDeleteSearch(i) {
+        setData(prev => ({ ...prev, searches: prev.searches.filter((_, idx) => idx !== i) }));
+      }
+
+      function handleDeleteMonitor(i) {
+        setData(prev => ({ ...prev, monitors: prev.monitors.filter((_, idx) => idx !== i) }));
+      }
+
+      function handleToggleMonitor(i) {
+        setData(prev => ({
+          ...prev,
+          monitors: prev.monitors.map((m, idx) => idx === i ? { ...m, active: !m.active } : m),
+        }));
+      }
+
+      const tabs = [
+        { id: "search", label: "🔍 Buscar", icon: "" },
+        { id: "saved", label: "💾 Salvas", icon: "" },
+      ];
+
+      return (
+        <div style={{ minHeight: "100vh", background: "#0f0f14" }}>
+          <header style={{ borderBottom: "1px solid #27272a", padding: "16px 24px", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12 }}>
+            <div>
+              <h1 style={{ fontSize: 18, fontWeight: 700 }}>✈️ Viagens Smart</h1>
+              <p style={{ fontSize: 12, color: "#71717a" }}>Busca multi-fonte · Cross-reference · Alertas WhatsApp</p>
+            </div>
+            <div style={{ display: "flex", gap: 4 }}>
+              {tabs.map(t => (
+                <button key={t.id} onClick={() => setTab(t.id)}
+                  style={{ padding: "8px 16px", borderRadius: 8, border: "none", background: tab === t.id ? "#3b82f6" : "transparent", color: tab === t.id ? "white" : "#71717a", fontSize: 13, fontWeight: 500 }}>
+                  {t.label}
+                </button>
+              ))}
+            </div>
+          </header>
+
+          <main style={{ maxWidth: 900, margin: "0 auto", padding: "24px 16px" }}>
+            {tab === "search" && (
+              <div>
+                <SearchTab onSearch={handleSearch} searching={searching} />
+
+                {error && (
+                  <div style={{ marginTop: 16, padding: 12, borderRadius: 8, background: "rgba(239,68,68,0.1)", border: "1px solid #ef4444", color: "#ef4444", fontSize: 14 }}>
+                    {error}
+                  </div>
+                )}
+
+                {stats && (
+                  <div style={{ marginTop: 16, padding: 16, borderRadius: 8, background: "#1a1a24", border: "1px solid #27272a", display: "flex", gap: 24, flexWrap: "wrap" }}>
+                    <div>
+                      <div style={{ fontSize: 11, color: "#71717a" }}>Menor</div>
+                      <div style={{ fontSize: 18, fontWeight: 700, color: "#22c55e" }}>{CURRENCIES[results[0]?.currency] || "€"}{stats.min}</div>
+                    </div>
+                    <div>
+                      <div style={{ fontSize: 11, color: "#71717a" }}>Média</div>
+                      <div style={{ fontSize: 18, fontWeight: 700, color: "#eab308" }}>{CURRENCIES[results[0]?.currency] || "€"}{stats.avg}</div>
+                    </div>
+                    <div>
+                      <div style={{ fontSize: 11, color: "#71717a" }}>Maior</div>
+                      <div style={{ fontSize: 18, fontWeight: 700, color: "#ef4444" }}>{CURRENCIES[results[0]?.currency] || "€"}{stats.max}</div>
+                    </div>
+                    <div>
+                      <div style={{ fontSize: 11, color: "#71717a" }}>Resultados</div>
+                      <div style={{ fontSize: 18, fontWeight: 700 }}>{stats.count}</div>
+                    </div>
+                  </div>
+                )}
+
+                {results.length > 0 && (
+                  <div style={{ marginTop: 16, display: "flex", flexDirection: "column", gap: 8 }}>
+                    {results.map((f, i) => (
+                      <FlightCard key={i} flight={f} currency={f.currency} onSave={handleSave} onSaveMonitor={handleSaveMonitor} />
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {tab === "saved" && (
+              <SavedTab
+                searches={data.searches}
+                monitors={data.monitors}
+                onDeleteSearch={handleDeleteSearch}
+                onDeleteMonitor={handleDeleteMonitor}
+                onToggleMonitor={handleToggleMonitor}
+              />
+            )}
+          </main>
+
+          <footer style={{ textAlign: "center", padding: 24, borderTop: "1px solid #27272a", fontSize: 12, color: "#71717a" }}>
+            Viagens Smart · Travelpayouts + Fast-flights + Skyscanner
+          </footer>
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+  </script>
+</body>
+</html>

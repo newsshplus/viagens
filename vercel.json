@@ -1,3 +1,14 @@
 {
-  "outputDirectory": "web"
+  "outputDirectory": "web",
+  "rewrites": [
+    { "source": "/app/(.*)", "destination": "/app/index.html" }
+  ],
+  "headers": [
+    {
+      "source": "/app/(.*)",
+      "headers": [
+        { "key": "Content-Type", "value": "text/html; charset=utf-8" }
+      ]
+    }
+  ]
 }
