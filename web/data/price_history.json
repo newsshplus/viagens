@@ -127,6 +127,94 @@
     "source": "google_flights (scraping)",
     "status": "drop"
   },
+  "LIS|BCN|2026-07-27|2026-07-31": {
+    "adults": 2,
+    "airlines": "Vueling",
+    "booking_link": "https://www.google.com/travel/flights?q=Flights%20from%20LIS%20to%20BCN%20on%202026-07-27%20through%202026-07-31",
+    "children_ages": [
+      13
+    ],
+    "currency": "EUR",
+    "depart_date": "2026-07-27",
+    "destination": "BCN",
+    "history": [
+      {
+        "checked_at": "2026-07-24T03:33:51.562859+00:00",
+        "price": 792.0
+      }
+    ],
+    "last_checked": "2026-07-24T03:33:51.562859+00:00",
+    "last_notified_price": 792.0,
+    "last_price": 792.0,
+    "mode": "voo",
+    "origin": "LIS",
+    "profile_name": "Barcelona",
+    "return_date": "2026-07-31",
+    "source": "google_flights (scraping)",
+    "status": "notified"
+  },
+  "LIS|BCN|2026-07-27|2026-08-01": {
+    "adults": 3,
+    "airlines": "Vueling",
+    "booking_link": "https://www.google.com/travel/flights?q=Flights%20from%20LIS%20to%20BCN%20on%202026-07-27%20through%202026-08-01",
+    "children_ages": [
+      13
+    ],
+    "currency": "EUR",
+    "depart_date": "2026-07-27",
+    "destination": "BCN",
+    "history": [
+      {
+        "checked_at": "2026-07-24T03:36:18.260978+00:00",
+        "price": 1007.0
+      }
+    ],
+    "last_checked": "2026-07-24T03:36:18.260978+00:00",
+    "last_notified_price": 1007.0,
+    "last_price": 1007.0,
+    "mode": "voo",
+    "origin": "LIS",
+    "profile_name": "Barcelona",
+    "return_date": "2026-08-01",
+    "source": "google_flights (scraping)",
+    "status": "notified"
+  },
+  "LIS|BCN|2026-07-27|2026-08-03": {
+    "adults": 1,
+    "airlines": "SWISS",
+    "booking_link": "https://www.google.com/travel/flights?q=Flights%20from%20LIS%20to%20BCN%20on%202026-07-27%20through%202026-08-03",
+    "children_ages": [],
+    "currency": "EUR",
+    "depart_date": "2026-07-27",
+    "destination": "BCN",
+    "history": [
+      {
+        "checked_at": "2026-07-24T03:35:08.677425+00:00",
+        "price": 236.0
+      },
+      {
+        "checked_at": "2026-07-24T03:35:46.525787+00:00",
+        "price": 758.0
+      },
+      {
+        "checked_at": "2026-07-24T03:36:56.748852+00:00",
+        "price": 236.0
+      },
+      {
+        "checked_at": "2026-07-24T03:37:27.557828+00:00",
+        "price": 236.0
+      }
+    ],
+    "last_checked": "2026-07-24T03:37:27.557828+00:00",
+    "last_notified_price": 236.0,
+    "last_price": 236.0,
+    "mode": "voo",
+    "origin": "LIS",
+    "profile_name": "Narcelona",
+    "return_date": "2026-08-03",
+    "source": "google_flights (scraping)",
+    "status": "drop"
+  },
   "LIS|BCN|2026-08-02|2026-08-06": {
     "adults": 2,
     "airlines": "Vueling",
@@ -251,6 +339,94 @@
     "source": "google_flights (scraping)",
     "status": "drop"
   },
+  "LIS|BCN|2026-08-03|2026-08-07": {
+    "adults": 2,
+    "airlines": "Vueling",
+    "booking_link": "https://www.google.com/travel/flights?q=Flights%20from%20LIS%20to%20BCN%20on%202026-08-03%20through%202026-08-07",
+    "children_ages": [
+      13
+    ],
+    "currency": "EUR",
+    "depart_date": "2026-08-03",
+    "destination": "BCN",
+    "history": [
+      {
+        "checked_at": "2026-07-24T03:33:54.636321+00:00",
+        "price": 474.0
+      }
+    ],
+    "last_checked": "2026-07-24T03:33:54.636321+00:00",
+    "last_notified_price": 474.0,
+    "last_price": 474.0,
+    "mode": "voo",
+    "origin": "LIS",
+    "profile_name": "Barcelona",
+    "return_date": "2026-08-07",
+    "source": "google_flights (scraping)",
+    "status": "notified"
+  },
+  "LIS|BCN|2026-08-03|2026-08-08": {
+    "adults": 3,
+    "airlines": "Vueling",
+    "booking_link": "https://www.google.com/travel/flights?q=Flights%20from%20LIS%20to%20BCN%20on%202026-08-03%20through%202026-08-08",
+    "children_ages": [
+      13
+    ],
+    "currency": "EUR",
+    "depart_date": "2026-08-03",
+    "destination": "BCN",
+    "history": [
+      {
+        "checked_at": "2026-07-24T03:36:21.450360+00:00",
+        "price": 535.0
+      }
+    ],
+    "last_checked": "2026-07-24T03:36:21.450360+00:00",
+    "last_notified_price": 535.0,
+    "last_price": 535.0,
+    "mode": "voo",
+    "origin": "LIS",
+    "profile_name": "Barcelona",
+    "return_date": "2026-08-08",
+    "source": "google_flights (scraping)",
+    "status": "notified"
+  },
+  "LIS|BCN|2026-08-03|2026-08-10": {
+    "adults": 1,
+    "airlines": "Vueling",
+    "booking_link": "https://www.google.com/travel/flights?q=Flights%20from%20LIS%20to%20BCN%20on%202026-08-03%20through%202026-08-10",
+    "children_ages": [],
+    "currency": "EUR",
+    "depart_date": "2026-08-03",
+    "destination": "BCN",
+    "history": [
+      {
+        "checked_at": "2026-07-24T03:35:11.737328+00:00",
+        "price": 146.0
+      },
+      {
+        "checked_at": "2026-07-24T03:35:49.058087+00:00",
+        "price": 438.0
+      },
+      {
+        "checked_at": "2026-07-24T03:36:59.115356+00:00",
+        "price": 146.0
+      },
+      {
+        "checked_at": "2026-07-24T03:37:30.006671+00:00",
+        "price": 146.0
+      }
+    ],
+    "last_checked": "2026-07-24T03:37:30.006671+00:00",
+    "last_notified_price": 146.0,
+    "last_price": 146.0,
+    "mode": "voo",
+    "origin": "LIS",
+    "profile_name": "Narcelona",
+    "return_date": "2026-08-10",
+    "source": "google_flights (scraping)",
+    "status": "drop"
+  },
   "LIS|BCN|2026-08-09|2026-08-13": {
     "adults": 2,
     "airlines": "Vueling",
@@ -368,6 +544,94 @@
     "origin": "LIS",
     "profile_name": "Narcelona",
     "return_date": "2026-08-16",
+    "source": "google_flights (scraping)",
+    "status": "drop"
+  },
+  "LIS|BCN|2026-08-10|2026-08-14": {
+    "adults": 2,
+    "airlines": "Vueling",
+    "booking_link": "https://www.google.com/travel/flights?q=Flights%20from%20LIS%20to%20BCN%20on%202026-08-10%20through%202026-08-14",
+    "children_ages": [
+      13
+    ],
+    "currency": "EUR",
+    "depart_date": "2026-08-10",
+    "destination": "BCN",
+    "history": [
+      {
+        "checked_at": "2026-07-24T03:33:57.525506+00:00",
+        "price": 558.0
+      }
+    ],
+    "last_checked": "2026-07-24T03:33:57.525506+00:00",
+    "last_notified_price": 558.0,
+    "last_price": 558.0,
+    "mode": "voo",
+    "origin": "LIS",
+    "profile_name": "Barcelona",
+    "return_date": "2026-08-14",
+    "source": "google_flights (scraping)",
+    "status": "notified"
+  },
+  "LIS|BCN|2026-08-10|2026-08-15": {
+    "adults": 3,
+    "airlines": "Vueling",
+    "booking_link": "https://www.google.com/travel/flights?q=Flights%20from%20LIS%20to%20BCN%20on%202026-08-10%20through%202026-08-15",
+    "children_ages": [
+      13
+    ],
+    "currency": "EUR",
+    "depart_date": "2026-08-10",
+    "destination": "BCN",
+    "history": [
+      {
+        "checked_at": "2026-07-24T03:36:24.361818+00:00",
+        "price": 562.0
+      }
+    ],
+    "last_checked": "2026-07-24T03:36:24.361818+00:00",
+    "last_notified_price": 562.0,
+    "last_price": 562.0,
+    "mode": "voo",
+    "origin": "LIS",
+    "profile_name": "Barcelona",
+    "return_date": "2026-08-15",
+    "source": "google_flights (scraping)",
+    "status": "notified"
+  },
+  "LIS|BCN|2026-08-10|2026-08-17": {
+    "adults": 1,
+    "airlines": "Vueling",
+    "booking_link": "https://www.google.com/travel/flights?q=Flights%20from%20LIS%20to%20BCN%20on%202026-08-10%20through%202026-08-17",
+    "children_ages": [],
+    "currency": "EUR",
+    "depart_date": "2026-08-10",
+    "destination": "BCN",
+    "history": [
+      {
+        "checked_at": "2026-07-24T03:35:14.617162+00:00",
+        "price": 160.0
+      },
+      {
+        "checked_at": "2026-07-24T03:35:51.430145+00:00",
+        "price": 579.0
+      },
+      {
+        "checked_at": "2026-07-24T03:37:01.464326+00:00",
+        "price": 160.0
+      },
+      {
+        "checked_at": "2026-07-24T03:37:32.395848+00:00",
+        "price": 160.0
+      }
+    ],
+    "last_checked": "2026-07-24T03:37:32.395848+00:00",
+    "last_notified_price": 160.0,
+    "last_price": 160.0,
+    "mode": "voo",
+    "origin": "LIS",
+    "profile_name": "Narcelona",
+    "return_date": "2026-08-17",
     "source": "google_flights (scraping)",
     "status": "drop"
   },
@@ -499,6 +763,94 @@
     "source": "google_flights (scraping)",
     "status": "drop"
   },
+  "LIS|BCN|2026-08-17|2026-08-21": {
+    "adults": 2,
+    "airlines": "Vueling",
+    "booking_link": "https://www.google.com/travel/flights?q=Flights%20from%20LIS%20to%20BCN%20on%202026-08-17%20through%202026-08-21",
+    "children_ages": [
+      13
+    ],
+    "currency": "EUR",
+    "depart_date": "2026-08-17",
+    "destination": "BCN",
+    "history": [
+      {
+        "checked_at": "2026-07-24T03:34:00.672864+00:00",
+        "price": 402.0
+      }
+    ],
+    "last_checked": "2026-07-24T03:34:00.672864+00:00",
+    "last_notified_price": 402.0,
+    "last_price": 402.0,
+    "mode": "voo",
+    "origin": "LIS",
+    "profile_name": "Barcelona",
+    "return_date": "2026-08-21",
+    "source": "google_flights (scraping)",
+    "status": "notified"
+  },
+  "LIS|BCN|2026-08-17|2026-08-22": {
+    "adults": 3,
+    "airlines": "Vueling",
+    "booking_link": "https://www.google.com/travel/flights?q=Flights%20from%20LIS%20to%20BCN%20on%202026-08-17%20through%202026-08-22",
+    "children_ages": [
+      13
+    ],
+    "currency": "EUR",
+    "depart_date": "2026-08-17",
+    "destination": "BCN",
+    "history": [
+      {
+        "checked_at": "2026-07-24T03:36:27.592381+00:00",
+        "price": 544.0
+      }
+    ],
+    "last_checked": "2026-07-24T03:36:27.592381+00:00",
+    "last_notified_price": 544.0,
+    "last_price": 544.0,
+    "mode": "voo",
+    "origin": "LIS",
+    "profile_name": "Barcelona",
+    "return_date": "2026-08-22",
+    "source": "google_flights (scraping)",
+    "status": "notified"
+  },
+  "LIS|BCN|2026-08-17|2026-08-24": {
+    "adults": 1,
+    "airlines": "Vueling",
+    "booking_link": "https://www.google.com/travel/flights?q=Flights%20from%20LIS%20to%20BCN%20on%202026-08-17%20through%202026-08-24",
+    "children_ages": [],
+    "currency": "EUR",
+    "depart_date": "2026-08-17",
+    "destination": "BCN",
+    "history": [
+      {
+        "checked_at": "2026-07-24T03:35:17.817388+00:00",
+        "price": 139.0
+      },
+      {
+        "checked_at": "2026-07-24T03:35:53.856650+00:00",
+        "price": 415.0
+      },
+      {
+        "checked_at": "2026-07-24T03:37:03.843771+00:00",
+        "price": 139.0
+      },
+      {
+        "checked_at": "2026-07-24T03:37:34.759857+00:00",
+        "price": 139.0
+      }
+    ],
+    "last_checked": "2026-07-24T03:37:34.759857+00:00",
+    "last_notified_price": 139.0,
+    "last_price": 139.0,
+    "mode": "voo",
+    "origin": "LIS",
+    "profile_name": "Narcelona",
+    "return_date": "2026-08-24",
+    "source": "google_flights (scraping)",
+    "status": "drop"
+  },
   "LIS|BCN|2026-08-23|2026-08-27": {
     "adults": 2,
     "airlines": "Vueling",
@@ -616,6 +968,94 @@
     "origin": "LIS",
     "profile_name": "Narcelona",
     "return_date": "2026-08-30",
+    "source": "google_flights (scraping)",
+    "status": "drop"
+  },
+  "LIS|BCN|2026-08-24|2026-08-28": {
+    "adults": 2,
+    "airlines": "SWISS",
+    "booking_link": "https://www.google.com/travel/flights?q=Flights%20from%20LIS%20to%20BCN%20on%202026-08-24%20through%202026-08-28",
+    "children_ages": [
+      13
+    ],
+    "currency": "EUR",
+    "depart_date": "2026-08-24",
+    "destination": "BCN",
+    "history": [
+      {
+        "checked_at": "2026-07-24T03:34:03.692909+00:00",
+        "price": 515.0
+      }
+    ],
+    "last_checked": "2026-07-24T03:34:03.692909+00:00",
+    "last_notified_price": 515.0,
+    "last_price": 515.0,
+    "mode": "voo",
+    "origin": "LIS",
+    "profile_name": "Barcelona",
+    "return_date": "2026-08-28",
+    "source": "google_flights (scraping)",
+    "status": "notified"
+  },
+  "LIS|BCN|2026-08-24|2026-08-29": {
+    "adults": 3,
+    "airlines": "SWISS",
+    "booking_link": "https://www.google.com/travel/flights?q=Flights%20from%20LIS%20to%20BCN%20on%202026-08-24%20through%202026-08-29",
+    "children_ages": [
+      13
+    ],
+    "currency": "EUR",
+    "depart_date": "2026-08-24",
+    "destination": "BCN",
+    "history": [
+      {
+        "checked_at": "2026-07-24T03:36:30.681217+00:00",
+        "price": 692.0
+      }
+    ],
+    "last_checked": "2026-07-24T03:36:30.681217+00:00",
+    "last_notified_price": 692.0,
+    "last_price": 692.0,
+    "mode": "voo",
+    "origin": "LIS",
+    "profile_name": "Barcelona",
+    "return_date": "2026-08-29",
+    "source": "google_flights (scraping)",
+    "status": "notified"
+  },
+  "LIS|BCN|2026-08-24|2026-08-31": {
+    "adults": 1,
+    "airlines": "Vueling",
+    "booking_link": "https://www.google.com/travel/flights?q=Flights%20from%20LIS%20to%20BCN%20on%202026-08-24%20through%202026-08-31",
+    "children_ages": [],
+    "currency": "EUR",
+    "depart_date": "2026-08-24",
+    "destination": "BCN",
+    "history": [
+      {
+        "checked_at": "2026-07-24T03:35:20.729175+00:00",
+        "price": 141.0
+      },
+      {
+        "checked_at": "2026-07-24T03:35:56.205868+00:00",
+        "price": 515.0
+      },
+      {
+        "checked_at": "2026-07-24T03:37:06.252481+00:00",
+        "price": 141.0
+      },
+      {
+        "checked_at": "2026-07-24T03:37:37.129687+00:00",
+        "price": 141.0
+      }
+    ],
+    "last_checked": "2026-07-24T03:37:37.129687+00:00",
+    "last_notified_price": 141.0,
+    "last_price": 141.0,
+    "mode": "voo",
+    "origin": "LIS",
+    "profile_name": "Narcelona",
+    "return_date": "2026-08-31",
     "source": "google_flights (scraping)",
     "status": "drop"
   },
@@ -743,6 +1183,94 @@
     "source": "google_flights (scraping)",
     "status": "drop"
   },
+  "LIS|BCN|2026-08-31|2026-09-04": {
+    "adults": 2,
+    "airlines": "Vueling",
+    "booking_link": "https://www.google.com/travel/flights?q=Flights%20from%20LIS%20to%20BCN%20on%202026-08-31%20through%202026-09-04",
+    "children_ages": [
+      13
+    ],
+    "currency": "EUR",
+    "depart_date": "2026-08-31",
+    "destination": "BCN",
+    "history": [
+      {
+        "checked_at": "2026-07-24T03:34:06.869381+00:00",
+        "price": 375.0
+      }
+    ],
+    "last_checked": "2026-07-24T03:34:06.869381+00:00",
+    "last_notified_price": 375.0,
+    "last_price": 375.0,
+    "mode": "voo",
+    "origin": "LIS",
+    "profile_name": "Barcelona",
+    "return_date": "2026-09-04",
+    "source": "google_flights (scraping)",
+    "status": "notified"
+  },
+  "LIS|BCN|2026-08-31|2026-09-05": {
+    "adults": 3,
+    "airlines": "Vueling",
+    "booking_link": "https://www.google.com/travel/flights?q=Flights%20from%20LIS%20to%20BCN%20on%202026-08-31%20through%202026-09-05",
+    "children_ages": [
+      13
+    ],
+    "currency": "EUR",
+    "depart_date": "2026-08-31",
+    "destination": "BCN",
+    "history": [
+      {
+        "checked_at": "2026-07-24T03:36:33.847714+00:00",
+        "price": 516.0
+      }
+    ],
+    "last_checked": "2026-07-24T03:36:33.847714+00:00",
+    "last_notified_price": 516.0,
+    "last_price": 516.0,
+    "mode": "voo",
+    "origin": "LIS",
+    "profile_name": "Barcelona",
+    "return_date": "2026-09-05",
+    "source": "google_flights (scraping)",
+    "status": "notified"
+  },
+  "LIS|BCN|2026-08-31|2026-09-07": {
+    "adults": 1,
+    "airlines": "Vueling",
+    "booking_link": "https://www.google.com/travel/flights?q=Flights%20from%20LIS%20to%20BCN%20on%202026-08-31%20through%202026-09-07",
+    "children_ages": [],
+    "currency": "EUR",
+    "depart_date": "2026-08-31",
+    "destination": "BCN",
+    "history": [
+      {
+        "checked_at": "2026-07-24T03:35:23.681176+00:00",
+        "price": 138.0
+      },
+      {
+        "checked_at": "2026-07-24T03:35:58.587933+00:00",
+        "price": 414.0
+      },
+      {
+        "checked_at": "2026-07-24T03:37:08.630847+00:00",
+        "price": 138.0
+      },
+      {
+        "checked_at": "2026-07-24T03:37:39.509067+00:00",
+        "price": 138.0
+      }
+    ],
+    "last_checked": "2026-07-24T03:37:39.509067+00:00",
+    "last_notified_price": 138.0,
+    "last_price": 138.0,
+    "mode": "voo",
+    "origin": "LIS",
+    "profile_name": "Narcelona",
+    "return_date": "2026-09-07",
+    "source": "google_flights (scraping)",
+    "status": "drop"
+  },
   "LIS|BCN|2026-09-06|2026-09-10": {
     "adults": 2,
     "airlines": "Vueling",
@@ -864,6 +1392,94 @@
     "origin": "LIS",
     "profile_name": "Narcelona",
     "return_date": "2026-09-13",
+    "source": "google_flights (scraping)",
+    "status": "drop"
+  },
+  "LIS|BCN|2026-09-07|2026-09-11": {
+    "adults": 2,
+    "airlines": "Vueling",
+    "booking_link": "https://www.google.com/travel/flights?q=Flights%20from%20LIS%20to%20BCN%20on%202026-09-07%20through%202026-09-11",
+    "children_ages": [
+      13
+    ],
+    "currency": "EUR",
+    "depart_date": "2026-09-07",
+    "destination": "BCN",
+    "history": [
+      {
+        "checked_at": "2026-07-24T03:34:09.785223+00:00",
+        "price": 360.0
+      }
+    ],
+    "last_checked": "2026-07-24T03:34:09.785223+00:00",
+    "last_notified_price": 360.0,
+    "last_price": 360.0,
+    "mode": "voo",
+    "origin": "LIS",
+    "profile_name": "Barcelona",
+    "return_date": "2026-09-11",
+    "source": "google_flights (scraping)",
+    "status": "notified"
+  },
+  "LIS|BCN|2026-09-07|2026-09-12": {
+    "adults": 3,
+    "airlines": "Vueling",
+    "booking_link": "https://www.google.com/travel/flights?q=Flights%20from%20LIS%20to%20BCN%20on%202026-09-07%20through%202026-09-12",
+    "children_ages": [
+      13
+    ],
+    "currency": "EUR",
+    "depart_date": "2026-09-07",
+    "destination": "BCN",
+    "history": [
+      {
+        "checked_at": "2026-07-24T03:36:36.739304+00:00",
+        "price": 466.0
+      }
+    ],
+    "last_checked": "2026-07-24T03:36:36.739304+00:00",
+    "last_notified_price": 466.0,
+    "last_price": 466.0,
+    "mode": "voo",
+    "origin": "LIS",
+    "profile_name": "Barcelona",
+    "return_date": "2026-09-12",
+    "source": "google_flights (scraping)",
+    "status": "notified"
+  },
+  "LIS|BCN|2026-09-07|2026-09-14": {
+    "adults": 1,
+    "airlines": "Vueling",
+    "booking_link": "https://www.google.com/travel/flights?q=Flights%20from%20LIS%20to%20BCN%20on%202026-09-07%20through%202026-09-14",
+    "children_ages": [],
+    "currency": "EUR",
+    "depart_date": "2026-09-07",
+    "destination": "BCN",
+    "history": [
+      {
+        "checked_at": "2026-07-24T03:35:26.660839+00:00",
+        "price": 102.0
+      },
+      {
+        "checked_at": "2026-07-24T03:36:00.931325+00:00",
+        "price": 360.0
+      },
+      {
+        "checked_at": "2026-07-24T03:37:10.978773+00:00",
+        "price": 102.0
+      },
+      {
+        "checked_at": "2026-07-24T03:37:41.874175+00:00",
+        "price": 102.0
+      }
+    ],
+    "last_checked": "2026-07-24T03:37:41.874175+00:00",
+    "last_notified_price": 102.0,
+    "last_price": 102.0,
+    "mode": "voo",
+    "origin": "LIS",
+    "profile_name": "Narcelona",
+    "return_date": "2026-09-14",
     "source": "google_flights (scraping)",
     "status": "drop"
   },
@@ -991,6 +1607,94 @@
     "source": "google_flights (scraping)",
     "status": "drop"
   },
+  "LIS|BCN|2026-09-14|2026-09-18": {
+    "adults": 2,
+    "airlines": "Vueling",
+    "booking_link": "https://www.google.com/travel/flights?q=Flights%20from%20LIS%20to%20BCN%20on%202026-09-14%20through%202026-09-18",
+    "children_ages": [
+      13
+    ],
+    "currency": "EUR",
+    "depart_date": "2026-09-14",
+    "destination": "BCN",
+    "history": [
+      {
+        "checked_at": "2026-07-24T03:34:12.720861+00:00",
+        "price": 321.0
+      }
+    ],
+    "last_checked": "2026-07-24T03:34:12.720861+00:00",
+    "last_notified_price": 321.0,
+    "last_price": 321.0,
+    "mode": "voo",
+    "origin": "LIS",
+    "profile_name": "Barcelona",
+    "return_date": "2026-09-18",
+    "source": "google_flights (scraping)",
+    "status": "notified"
+  },
+  "LIS|BCN|2026-09-14|2026-09-19": {
+    "adults": 3,
+    "airlines": "easyJet",
+    "booking_link": "https://www.google.com/travel/flights?q=Flights%20from%20LIS%20to%20BCN%20on%202026-09-14%20through%202026-09-19",
+    "children_ages": [
+      13
+    ],
+    "currency": "EUR",
+    "depart_date": "2026-09-14",
+    "destination": "BCN",
+    "history": [
+      {
+        "checked_at": "2026-07-24T03:36:39.694758+00:00",
+        "price": 466.0
+      }
+    ],
+    "last_checked": "2026-07-24T03:36:39.694758+00:00",
+    "last_notified_price": 466.0,
+    "last_price": 466.0,
+    "mode": "voo",
+    "origin": "LIS",
+    "profile_name": "Barcelona",
+    "return_date": "2026-09-19",
+    "source": "google_flights (scraping)",
+    "status": "notified"
+  },
+  "LIS|BCN|2026-09-14|2026-09-21": {
+    "adults": 1,
+    "airlines": "easyJet",
+    "booking_link": "https://www.google.com/travel/flights?q=Flights%20from%20LIS%20to%20BCN%20on%202026-09-14%20through%202026-09-21",
+    "children_ages": [],
+    "currency": "EUR",
+    "depart_date": "2026-09-14",
+    "destination": "BCN",
+    "history": [
+      {
+        "checked_at": "2026-07-24T03:35:29.577605+00:00",
+        "price": 101.0
+      },
+      {
+        "checked_at": "2026-07-24T03:36:03.286276+00:00",
+        "price": 327.0
+      },
+      {
+        "checked_at": "2026-07-24T03:37:13.390541+00:00",
+        "price": 101.0
+      },
+      {
+        "checked_at": "2026-07-24T03:37:44.317730+00:00",
+        "price": 101.0
+      }
+    ],
+    "last_checked": "2026-07-24T03:37:44.317730+00:00",
+    "last_notified_price": 101.0,
+    "last_price": 101.0,
+    "mode": "voo",
+    "origin": "LIS",
+    "profile_name": "Narcelona",
+    "return_date": "2026-09-21",
+    "source": "google_flights (scraping)",
+    "status": "drop"
+  },
   "LIS|BCN|2026-09-20|2026-09-24": {
     "adults": 2,
     "airlines": "Vueling",
@@ -1112,6 +1816,94 @@
     "origin": "LIS",
     "profile_name": "Narcelona",
     "return_date": "2026-09-27",
+    "source": "google_flights (scraping)",
+    "status": "drop"
+  },
+  "LIS|BCN|2026-09-21|2026-09-25": {
+    "adults": 2,
+    "airlines": "Vueling",
+    "booking_link": "https://www.google.com/travel/flights?q=Flights%20from%20LIS%20to%20BCN%20on%202026-09-21%20through%202026-09-25",
+    "children_ages": [
+      13
+    ],
+    "currency": "EUR",
+    "depart_date": "2026-09-21",
+    "destination": "BCN",
+    "history": [
+      {
+        "checked_at": "2026-07-24T03:34:15.997767+00:00",
+        "price": 294.0
+      }
+    ],
+    "last_checked": "2026-07-24T03:34:15.997767+00:00",
+    "last_notified_price": 294.0,
+    "last_price": 294.0,
+    "mode": "voo",
+    "origin": "LIS",
+    "profile_name": "Barcelona",
+    "return_date": "2026-09-25",
+    "source": "google_flights (scraping)",
+    "status": "notified"
+  },
+  "LIS|BCN|2026-09-21|2026-09-26": {
+    "adults": 3,
+    "airlines": "easyJet",
+    "booking_link": "https://www.google.com/travel/flights?q=Flights%20from%20LIS%20to%20BCN%20on%202026-09-21%20through%202026-09-26",
+    "children_ages": [
+      13
+    ],
+    "currency": "EUR",
+    "depart_date": "2026-09-21",
+    "destination": "BCN",
+    "history": [
+      {
+        "checked_at": "2026-07-24T03:36:42.767219+00:00",
+        "price": 334.0
+      }
+    ],
+    "last_checked": "2026-07-24T03:36:42.767219+00:00",
+    "last_notified_price": 334.0,
+    "last_price": 334.0,
+    "mode": "voo",
+    "origin": "LIS",
+    "profile_name": "Barcelona",
+    "return_date": "2026-09-26",
+    "source": "google_flights (scraping)",
+    "status": "notified"
+  },
+  "LIS|BCN|2026-09-21|2026-09-28": {
+    "adults": 1,
+    "airlines": "easyJet",
+    "booking_link": "https://www.google.com/travel/flights?q=Flights%20from%20LIS%20to%20BCN%20on%202026-09-21%20through%202026-09-28",
+    "children_ages": [],
+    "currency": "EUR",
+    "depart_date": "2026-09-21",
+    "destination": "BCN",
+    "history": [
+      {
+        "checked_at": "2026-07-24T03:35:32.526088+00:00",
+        "price": 90.0
+      },
+      {
+        "checked_at": "2026-07-24T03:36:05.697238+00:00",
+        "price": 279.0
+      },
+      {
+        "checked_at": "2026-07-24T03:37:15.724274+00:00",
+        "price": 90.0
+      },
+      {
+        "checked_at": "2026-07-24T03:37:46.703408+00:00",
+        "price": 90.0
+      }
+    ],
+    "last_checked": "2026-07-24T03:37:46.703408+00:00",
+    "last_notified_price": 90.0,
+    "last_price": 90.0,
+    "mode": "voo",
+    "origin": "LIS",
+    "profile_name": "Narcelona",
+    "return_date": "2026-09-28",
     "source": "google_flights (scraping)",
     "status": "drop"
   },
@@ -1239,6 +2031,94 @@
     "source": "google_flights (scraping)",
     "status": "drop"
   },
+  "LIS|BCN|2026-09-28|2026-10-02": {
+    "adults": 2,
+    "airlines": "Vueling",
+    "booking_link": "https://www.google.com/travel/flights?q=Flights%20from%20LIS%20to%20BCN%20on%202026-09-28%20through%202026-10-02",
+    "children_ages": [
+      13
+    ],
+    "currency": "EUR",
+    "depart_date": "2026-09-28",
+    "destination": "BCN",
+    "history": [
+      {
+        "checked_at": "2026-07-24T03:34:18.933111+00:00",
+        "price": 315.0
+      }
+    ],
+    "last_checked": "2026-07-24T03:34:18.933111+00:00",
+    "last_notified_price": 315.0,
+    "last_price": 315.0,
+    "mode": "voo",
+    "origin": "LIS",
+    "profile_name": "Barcelona",
+    "return_date": "2026-10-02",
+    "source": "google_flights (scraping)",
+    "status": "notified"
+  },
+  "LIS|BCN|2026-09-28|2026-10-03": {
+    "adults": 3,
+    "airlines": "easyJet",
+    "booking_link": "https://www.google.com/travel/flights?q=Flights%20from%20LIS%20to%20BCN%20on%202026-09-28%20through%202026-10-03",
+    "children_ages": [
+      13
+    ],
+    "currency": "EUR",
+    "depart_date": "2026-09-28",
+    "destination": "BCN",
+    "history": [
+      {
+        "checked_at": "2026-07-24T03:36:45.727429+00:00",
+        "price": 436.0
+      }
+    ],
+    "last_checked": "2026-07-24T03:36:45.727429+00:00",
+    "last_notified_price": 436.0,
+    "last_price": 436.0,
+    "mode": "voo",
+    "origin": "LIS",
+    "profile_name": "Barcelona",
+    "return_date": "2026-10-03",
+    "source": "google_flights (scraping)",
+    "status": "notified"
+  },
+  "LIS|BCN|2026-09-28|2026-10-05": {
+    "adults": 1,
+    "airlines": "Vueling",
+    "booking_link": "https://www.google.com/travel/flights?q=Flights%20from%20LIS%20to%20BCN%20on%202026-09-28%20through%202026-10-05",
+    "children_ages": [],
+    "currency": "EUR",
+    "depart_date": "2026-09-28",
+    "destination": "BCN",
+    "history": [
+      {
+        "checked_at": "2026-07-24T03:35:35.398042+00:00",
+        "price": 152.0
+      },
+      {
+        "checked_at": "2026-07-24T03:36:08.047501+00:00",
+        "price": 560.0
+      },
+      {
+        "checked_at": "2026-07-24T03:37:18.059901+00:00",
+        "price": 152.0
+      },
+      {
+        "checked_at": "2026-07-24T03:37:49.063070+00:00",
+        "price": 152.0
+      }
+    ],
+    "last_checked": "2026-07-24T03:37:49.063070+00:00",
+    "last_notified_price": 152.0,
+    "last_price": 152.0,
+    "mode": "voo",
+    "origin": "LIS",
+    "profile_name": "Narcelona",
+    "return_date": "2026-10-05",
+    "source": "google_flights (scraping)",
+    "status": "drop"
+  },
   "LIS|BCN|2026-10-04|2026-10-08": {
     "adults": 2,
     "airlines": "Vueling",
@@ -1352,6 +2232,94 @@
     "origin": "LIS",
     "profile_name": "Narcelona",
     "return_date": "2026-10-11",
+    "source": "google_flights (scraping)",
+    "status": "drop"
+  },
+  "LIS|BCN|2026-10-05|2026-10-09": {
+    "adults": 2,
+    "airlines": "easyJet",
+    "booking_link": "https://www.google.com/travel/flights?q=Flights%20from%20LIS%20to%20BCN%20on%202026-10-05%20through%202026-10-09",
+    "children_ages": [
+      13
+    ],
+    "currency": "EUR",
+    "depart_date": "2026-10-05",
+    "destination": "BCN",
+    "history": [
+      {
+        "checked_at": "2026-07-24T03:34:21.894942+00:00",
+        "price": 315.0
+      }
+    ],
+    "last_checked": "2026-07-24T03:34:21.894942+00:00",
+    "last_notified_price": 315.0,
+    "last_price": 315.0,
+    "mode": "voo",
+    "origin": "LIS",
+    "profile_name": "Barcelona",
+    "return_date": "2026-10-09",
+    "source": "google_flights (scraping)",
+    "status": "notified"
+  },
+  "LIS|BCN|2026-10-05|2026-10-10": {
+    "adults": 3,
+    "airlines": "Vueling",
+    "booking_link": "https://www.google.com/travel/flights?q=Flights%20from%20LIS%20to%20BCN%20on%202026-10-05%20through%202026-10-10",
+    "children_ages": [
+      13
+    ],
+    "currency": "EUR",
+    "depart_date": "2026-10-05",
+    "destination": "BCN",
+    "history": [
+      {
+        "checked_at": "2026-07-24T03:36:48.625112+00:00",
+        "price": 479.0
+      }
+    ],
+    "last_checked": "2026-07-24T03:36:48.625112+00:00",
+    "last_notified_price": 479.0,
+    "last_price": 479.0,
+    "mode": "voo",
+    "origin": "LIS",
+    "profile_name": "Barcelona",
+    "return_date": "2026-10-10",
+    "source": "google_flights (scraping)",
+    "status": "notified"
+  },
+  "LIS|BCN|2026-10-05|2026-10-12": {
+    "adults": 1,
+    "airlines": "easyJet",
+    "booking_link": "https://www.google.com/travel/flights?q=Flights%20from%20LIS%20to%20BCN%20on%202026-10-05%20through%202026-10-12",
+    "children_ages": [],
+    "currency": "EUR",
+    "depart_date": "2026-10-05",
+    "destination": "BCN",
+    "history": [
+      {
+        "checked_at": "2026-07-24T03:35:38.369666+00:00",
+        "price": 87.0
+      },
+      {
+        "checked_at": "2026-07-24T03:36:10.401731+00:00",
+        "price": 360.0
+      },
+      {
+        "checked_at": "2026-07-24T03:37:20.418316+00:00",
+        "price": 87.0
+      },
+      {
+        "checked_at": "2026-07-24T03:37:51.433119+00:00",
+        "price": 87.0
+      }
+    ],
+    "last_checked": "2026-07-24T03:37:51.433119+00:00",
+    "last_notified_price": 87.0,
+    "last_price": 87.0,
+    "mode": "voo",
+    "origin": "LIS",
+    "profile_name": "Narcelona",
+    "return_date": "2026-10-12",
     "source": "google_flights (scraping)",
     "status": "drop"
   },
@@ -1476,6 +2444,94 @@
     "origin": "LIS",
     "profile_name": "Narcelona",
     "return_date": "2026-10-18",
+    "source": "google_flights (scraping)",
+    "status": "drop"
+  },
+  "LIS|BCN|2026-10-12|2026-10-16": {
+    "adults": 2,
+    "airlines": "Vueling",
+    "booking_link": "https://www.google.com/travel/flights?q=Flights%20from%20LIS%20to%20BCN%20on%202026-10-12%20through%202026-10-16",
+    "children_ages": [
+      13
+    ],
+    "currency": "EUR",
+    "depart_date": "2026-10-12",
+    "destination": "BCN",
+    "history": [
+      {
+        "checked_at": "2026-07-24T03:34:24.798356+00:00",
+        "price": 378.0
+      }
+    ],
+    "last_checked": "2026-07-24T03:34:24.798356+00:00",
+    "last_notified_price": 378.0,
+    "last_price": 378.0,
+    "mode": "voo",
+    "origin": "LIS",
+    "profile_name": "Barcelona",
+    "return_date": "2026-10-16",
+    "source": "google_flights (scraping)",
+    "status": "notified"
+  },
+  "LIS|BCN|2026-10-12|2026-10-17": {
+    "adults": 3,
+    "airlines": "Vueling",
+    "booking_link": "https://www.google.com/travel/flights?q=Flights%20from%20LIS%20to%20BCN%20on%202026-10-12%20through%202026-10-17",
+    "children_ages": [
+      13
+    ],
+    "currency": "EUR",
+    "depart_date": "2026-10-12",
+    "destination": "BCN",
+    "history": [
+      {
+        "checked_at": "2026-07-24T03:36:51.527594+00:00",
+        "price": 503.0
+      }
+    ],
+    "last_checked": "2026-07-24T03:36:51.527594+00:00",
+    "last_notified_price": 503.0,
+    "last_price": 503.0,
+    "mode": "voo",
+    "origin": "LIS",
+    "profile_name": "Barcelona",
+    "return_date": "2026-10-17",
+    "source": "google_flights (scraping)",
+    "status": "notified"
+  },
+  "LIS|BCN|2026-10-12|2026-10-19": {
+    "adults": 1,
+    "airlines": "Vueling",
+    "booking_link": "https://www.google.com/travel/flights?q=Flights%20from%20LIS%20to%20BCN%20on%202026-10-12%20through%202026-10-19",
+    "children_ages": [],
+    "currency": "EUR",
+    "depart_date": "2026-10-12",
+    "destination": "BCN",
+    "history": [
+      {
+        "checked_at": "2026-07-24T03:35:41.227614+00:00",
+        "price": 126.0
+      },
+      {
+        "checked_at": "2026-07-24T03:36:12.739954+00:00",
+        "price": 378.0
+      },
+      {
+        "checked_at": "2026-07-24T03:37:22.771627+00:00",
+        "price": 126.0
+      },
+      {
+        "checked_at": "2026-07-24T03:37:53.923254+00:00",
+        "price": 126.0
+      }
+    ],
+    "last_checked": "2026-07-24T03:37:53.923254+00:00",
+    "last_notified_price": 126.0,
+    "last_price": 126.0,
+    "mode": "voo",
+    "origin": "LIS",
+    "profile_name": "Narcelona",
+    "return_date": "2026-10-19",
     "source": "google_flights (scraping)",
     "status": "drop"
   },
@@ -1607,6 +2663,118 @@
     "source": "google_flights (scraping)",
     "status": "drop"
   },
+  "LIS|BCN|2026-10-19|2026-10-23": {
+    "adults": 2,
+    "airlines": "Vueling",
+    "booking_link": "https://www.google.com/travel/flights?q=Flights%20from%20LIS%20to%20BCN%20on%202026-10-19%20through%202026-10-23",
+    "children_ages": [
+      13
+    ],
+    "currency": "EUR",
+    "depart_date": "2026-10-19",
+    "destination": "BCN",
+    "history": [
+      {
+        "checked_at": "2026-07-24T03:34:27.704269+00:00",
+        "price": 306.0
+      }
+    ],
+    "last_checked": "2026-07-24T03:34:27.704269+00:00",
+    "last_notified_price": 306.0,
+    "last_price": 306.0,
+    "mode": "voo",
+    "origin": "LIS",
+    "profile_name": "Barcelona",
+    "return_date": "2026-10-23",
+    "source": "google_flights (scraping)",
+    "status": "notified"
+  },
+  "LIS|BCN|2026-10-19|2026-10-24": {
+    "adults": 3,
+    "airlines": "Vueling",
+    "booking_link": "https://www.google.com/travel/flights?q=Flights%20from%20LIS%20to%20BCN%20on%202026-10-19%20through%202026-10-24",
+    "children_ages": [
+      13
+    ],
+    "currency": "EUR",
+    "depart_date": "2026-10-19",
+    "destination": "BCN",
+    "history": [
+      {
+        "checked_at": "2026-07-24T03:36:54.387921+00:00",
+        "price": 311.0
+      }
+    ],
+    "last_checked": "2026-07-24T03:36:54.387921+00:00",
+    "last_notified_price": 311.0,
+    "last_price": 311.0,
+    "mode": "voo",
+    "origin": "LIS",
+    "profile_name": "Barcelona",
+    "return_date": "2026-10-24",
+    "source": "google_flights (scraping)",
+    "status": "notified"
+  },
+  "LIS|BCN|2026-10-19|2026-10-26": {
+    "adults": 1,
+    "airlines": "easyJet",
+    "booking_link": "https://www.google.com/travel/flights?q=Flights%20from%20LIS%20to%20BCN%20on%202026-10-19%20through%202026-10-26",
+    "children_ages": [],
+    "currency": "EUR",
+    "depart_date": "2026-10-19",
+    "destination": "BCN",
+    "history": [
+      {
+        "checked_at": "2026-07-24T03:35:44.127766+00:00",
+        "price": 77.0
+      },
+      {
+        "checked_at": "2026-07-24T03:36:15.138136+00:00",
+        "price": 261.0
+      },
+      {
+        "checked_at": "2026-07-24T03:37:25.196743+00:00",
+        "price": 77.0
+      },
+      {
+        "checked_at": "2026-07-24T03:37:56.242275+00:00",
+        "price": 77.0
+      }
+    ],
+    "last_checked": "2026-07-24T03:37:56.242275+00:00",
+    "last_notified_price": 77.0,
+    "last_price": 77.0,
+    "mode": "voo",
+    "origin": "LIS",
+    "profile_name": "Narcelona",
+    "return_date": "2026-10-26",
+    "source": "google_flights (scraping)",
+    "status": "drop"
+  },
+  "LIS|CDG|2026-08-10|2026-08-17": {
+    "adults": 1,
+    "airlines": "SWISS",
+    "booking_link": "https://www.google.com/travel/flights?q=Flights%20from%20LIS%20to%20CDG%20on%202026-08-10%20through%202026-08-17",
+    "children_ages": [],
+    "currency": "EUR",
+    "depart_date": "2026-08-10",
+    "destination": "CDG",
+    "history": [
+      {
+        "checked_at": "2026-07-24T03:33:01.139649+00:00",
+        "price": 186.0
+      }
+    ],
+    "last_checked": "2026-07-24T03:33:01.139649+00:00",
+    "last_notified_price": 186.0,
+    "last_price": 186.0,
+    "mode": "voo",
+    "origin": "LIS",
+    "profile_name": "Paris barato",
+    "return_date": "2026-08-17",
+    "source": "google_flights (scraping)",
+    "status": "notified"
+  },
   "LIS|COMBO:BCN-FCO|2026-09-10|2026-09-24": {
     "adults": 2,
     "airlines": "voo+cruzeiro",
@@ -1631,9 +2799,13 @@
       {
         "checked_at": "2026-07-23T23:22:43.209938+00:00",
         "price": 202.0
+      },
+      {
+        "checked_at": "2026-07-24T03:33:48.312178+00:00",
+        "price": 202.0
       }
     ],
-    "last_checked": "2026-07-23T23:22:43.209938+00:00",
+    "last_checked": "2026-07-24T03:33:48.312178+00:00",
     "last_notified_price": 202.0,
     "last_price": 202.0,
     "mode": "combo",
@@ -1681,6 +2853,32 @@
     "source": "google_flights (scraping)",
     "status": "notified"
   },
+  "LIS|ZRH|2026-07-27|2026-08-03": {
+    "adults": 2,
+    "airlines": "Lufthansa",
+    "booking_link": "https://www.google.com/travel/flights?q=Flights%20from%20LIS%20to%20ZRH%20on%202026-07-27%20through%202026-08-03",
+    "children_ages": [
+      13
+    ],
+    "currency": "EUR",
+    "depart_date": "2026-07-27",
+    "destination": "ZRH",
+    "history": [
+      {
+        "checked_at": "2026-07-24T03:34:30.570411+00:00",
+        "price": 956.0
+      }
+    ],
+    "last_checked": "2026-07-24T03:34:30.570411+00:00",
+    "last_notified_price": 956.0,
+    "last_price": 956.0,
+    "mode": "voo",
+    "origin": "LIS",
+    "profile_name": "Suíça",
+    "return_date": "2026-08-03",
+    "source": "google_flights (scraping)",
+    "status": "notified"
+  },
   "LIS|ZRH|2026-08-02|2026-08-09": {
     "adults": 2,
     "airlines": "Iberia",
@@ -1716,6 +2914,32 @@
     "origin": "LIS",
     "profile_name": "Suíça",
     "return_date": "2026-08-09",
+    "source": "google_flights (scraping)",
+    "status": "notified"
+  },
+  "LIS|ZRH|2026-08-03|2026-08-10": {
+    "adults": 2,
+    "airlines": "KLM",
+    "booking_link": "https://www.google.com/travel/flights?q=Flights%20from%20LIS%20to%20ZRH%20on%202026-08-03%20through%202026-08-10",
+    "children_ages": [
+      13
+    ],
+    "currency": "EUR",
+    "depart_date": "2026-08-03",
+    "destination": "ZRH",
+    "history": [
+      {
+        "checked_at": "2026-07-24T03:34:33.606841+00:00",
+        "price": 847.0
+      }
+    ],
+    "last_checked": "2026-07-24T03:34:33.606841+00:00",
+    "last_notified_price": 847.0,
+    "last_price": 847.0,
+    "mode": "voo",
+    "origin": "LIS",
+    "profile_name": "Suíça",
+    "return_date": "2026-08-10",
     "source": "google_flights (scraping)",
     "status": "notified"
   },
@@ -1757,6 +2981,32 @@
     "source": "google_flights (scraping)",
     "status": "notified"
   },
+  "LIS|ZRH|2026-08-10|2026-08-17": {
+    "adults": 2,
+    "airlines": "Vueling",
+    "booking_link": "https://www.google.com/travel/flights?q=Flights%20from%20LIS%20to%20ZRH%20on%202026-08-10%20through%202026-08-17",
+    "children_ages": [
+      13
+    ],
+    "currency": "EUR",
+    "depart_date": "2026-08-10",
+    "destination": "ZRH",
+    "history": [
+      {
+        "checked_at": "2026-07-24T03:34:36.583915+00:00",
+        "price": 842.0
+      }
+    ],
+    "last_checked": "2026-07-24T03:34:36.583915+00:00",
+    "last_notified_price": 842.0,
+    "last_price": 842.0,
+    "mode": "voo",
+    "origin": "LIS",
+    "profile_name": "Suíça",
+    "return_date": "2026-08-17",
+    "source": "google_flights (scraping)",
+    "status": "notified"
+  },
   "LIS|ZRH|2026-08-16|2026-08-23": {
     "adults": 2,
     "airlines": "KLM",
@@ -1792,6 +3042,32 @@
     "origin": "LIS",
     "profile_name": "Suíça",
     "return_date": "2026-08-23",
+    "source": "google_flights (scraping)",
+    "status": "notified"
+  },
+  "LIS|ZRH|2026-08-17|2026-08-24": {
+    "adults": 2,
+    "airlines": "Vueling",
+    "booking_link": "https://www.google.com/travel/flights?q=Flights%20from%20LIS%20to%20ZRH%20on%202026-08-17%20through%202026-08-24",
+    "children_ages": [
+      13
+    ],
+    "currency": "EUR",
+    "depart_date": "2026-08-17",
+    "destination": "ZRH",
+    "history": [
+      {
+        "checked_at": "2026-07-24T03:34:39.443778+00:00",
+        "price": 872.0
+      }
+    ],
+    "last_checked": "2026-07-24T03:34:39.443778+00:00",
+    "last_notified_price": 872.0,
+    "last_price": 872.0,
+    "mode": "voo",
+    "origin": "LIS",
+    "profile_name": "Suíça",
+    "return_date": "2026-08-24",
     "source": "google_flights (scraping)",
     "status": "notified"
   },
@@ -1833,6 +3109,32 @@
     "source": "google_flights (scraping)",
     "status": "notified"
   },
+  "LIS|ZRH|2026-08-24|2026-08-31": {
+    "adults": 2,
+    "airlines": "KLM",
+    "booking_link": "https://www.google.com/travel/flights?q=Flights%20from%20LIS%20to%20ZRH%20on%202026-08-24%20through%202026-08-31",
+    "children_ages": [
+      13
+    ],
+    "currency": "EUR",
+    "depart_date": "2026-08-24",
+    "destination": "ZRH",
+    "history": [
+      {
+        "checked_at": "2026-07-24T03:34:42.313252+00:00",
+        "price": 729.0
+      }
+    ],
+    "last_checked": "2026-07-24T03:34:42.313252+00:00",
+    "last_notified_price": 729.0,
+    "last_price": 729.0,
+    "mode": "voo",
+    "origin": "LIS",
+    "profile_name": "Suíça",
+    "return_date": "2026-08-31",
+    "source": "google_flights (scraping)",
+    "status": "notified"
+  },
   "LIS|ZRH|2026-08-30|2026-09-06": {
     "adults": 2,
     "airlines": "Lufthansa",
@@ -1868,6 +3170,32 @@
     "origin": "LIS",
     "profile_name": "Suíça",
     "return_date": "2026-09-06",
+    "source": "google_flights (scraping)",
+    "status": "notified"
+  },
+  "LIS|ZRH|2026-08-31|2026-09-07": {
+    "adults": 2,
+    "airlines": "KLM",
+    "booking_link": "https://www.google.com/travel/flights?q=Flights%20from%20LIS%20to%20ZRH%20on%202026-08-31%20through%202026-09-07",
+    "children_ages": [
+      13
+    ],
+    "currency": "EUR",
+    "depart_date": "2026-08-31",
+    "destination": "ZRH",
+    "history": [
+      {
+        "checked_at": "2026-07-24T03:34:45.223216+00:00",
+        "price": 693.0
+      }
+    ],
+    "last_checked": "2026-07-24T03:34:45.223216+00:00",
+    "last_notified_price": 693.0,
+    "last_price": 693.0,
+    "mode": "voo",
+    "origin": "LIS",
+    "profile_name": "Suíça",
+    "return_date": "2026-09-07",
     "source": "google_flights (scraping)",
     "status": "notified"
   },
@@ -1909,6 +3237,32 @@
     "source": "google_flights (scraping)",
     "status": "notified"
   },
+  "LIS|ZRH|2026-09-07|2026-09-14": {
+    "adults": 2,
+    "airlines": "Vueling",
+    "booking_link": "https://www.google.com/travel/flights?q=Flights%20from%20LIS%20to%20ZRH%20on%202026-09-07%20through%202026-09-14",
+    "children_ages": [
+      13
+    ],
+    "currency": "EUR",
+    "depart_date": "2026-09-07",
+    "destination": "ZRH",
+    "history": [
+      {
+        "checked_at": "2026-07-24T03:34:48.125817+00:00",
+        "price": 566.0
+      }
+    ],
+    "last_checked": "2026-07-24T03:34:48.125817+00:00",
+    "last_notified_price": 566.0,
+    "last_price": 566.0,
+    "mode": "voo",
+    "origin": "LIS",
+    "profile_name": "Suíça",
+    "return_date": "2026-09-14",
+    "source": "google_flights (scraping)",
+    "status": "notified"
+  },
   "LIS|ZRH|2026-09-13|2026-09-20": {
     "adults": 2,
     "airlines": "Air France",
@@ -1944,6 +3298,32 @@
     "origin": "LIS",
     "profile_name": "Suíça",
     "return_date": "2026-09-20",
+    "source": "google_flights (scraping)",
+    "status": "notified"
+  },
+  "LIS|ZRH|2026-09-14|2026-09-21": {
+    "adults": 2,
+    "airlines": "Air Europa",
+    "booking_link": "https://www.google.com/travel/flights?q=Flights%20from%20LIS%20to%20ZRH%20on%202026-09-14%20through%202026-09-21",
+    "children_ages": [
+      13
+    ],
+    "currency": "EUR",
+    "depart_date": "2026-09-14",
+    "destination": "ZRH",
+    "history": [
+      {
+        "checked_at": "2026-07-24T03:34:51.220397+00:00",
+        "price": 595.0
+      }
+    ],
+    "last_checked": "2026-07-24T03:34:51.220397+00:00",
+    "last_notified_price": 595.0,
+    "last_price": 595.0,
+    "mode": "voo",
+    "origin": "LIS",
+    "profile_name": "Suíça",
+    "return_date": "2026-09-21",
     "source": "google_flights (scraping)",
     "status": "notified"
   },
@@ -1985,6 +3365,32 @@
     "source": "google_flights (scraping)",
     "status": "notified"
   },
+  "LIS|ZRH|2026-09-21|2026-09-28": {
+    "adults": 2,
+    "airlines": "Vueling",
+    "booking_link": "https://www.google.com/travel/flights?q=Flights%20from%20LIS%20to%20ZRH%20on%202026-09-21%20through%202026-09-28",
+    "children_ages": [
+      13
+    ],
+    "currency": "EUR",
+    "depart_date": "2026-09-21",
+    "destination": "ZRH",
+    "history": [
+      {
+        "checked_at": "2026-07-24T03:34:54.110362+00:00",
+        "price": 593.0
+      }
+    ],
+    "last_checked": "2026-07-24T03:34:54.110362+00:00",
+    "last_notified_price": 593.0,
+    "last_price": 593.0,
+    "mode": "voo",
+    "origin": "LIS",
+    "profile_name": "Suíça",
+    "return_date": "2026-09-28",
+    "source": "google_flights (scraping)",
+    "status": "notified"
+  },
   "LIS|ZRH|2026-09-27|2026-10-04": {
     "adults": 2,
     "airlines": "Lufthansa",
@@ -2020,6 +3426,32 @@
     "origin": "LIS",
     "profile_name": "Suíça",
     "return_date": "2026-10-04",
+    "source": "google_flights (scraping)",
+    "status": "notified"
+  },
+  "LIS|ZRH|2026-09-28|2026-10-05": {
+    "adults": 2,
+    "airlines": "Vueling",
+    "booking_link": "https://www.google.com/travel/flights?q=Flights%20from%20LIS%20to%20ZRH%20on%202026-09-28%20through%202026-10-05",
+    "children_ages": [
+      13
+    ],
+    "currency": "EUR",
+    "depart_date": "2026-09-28",
+    "destination": "ZRH",
+    "history": [
+      {
+        "checked_at": "2026-07-24T03:34:56.952399+00:00",
+        "price": 683.0
+      }
+    ],
+    "last_checked": "2026-07-24T03:34:56.952399+00:00",
+    "last_notified_price": 683.0,
+    "last_price": 683.0,
+    "mode": "voo",
+    "origin": "LIS",
+    "profile_name": "Suíça",
+    "return_date": "2026-10-05",
     "source": "google_flights (scraping)",
     "status": "notified"
   },
@@ -2061,6 +3493,32 @@
     "source": "google_flights (scraping)",
     "status": "notified"
   },
+  "LIS|ZRH|2026-10-05|2026-10-12": {
+    "adults": 2,
+    "airlines": "SWISS",
+    "booking_link": "https://www.google.com/travel/flights?q=Flights%20from%20LIS%20to%20ZRH%20on%202026-10-05%20through%202026-10-12",
+    "children_ages": [
+      13
+    ],
+    "currency": "EUR",
+    "depart_date": "2026-10-05",
+    "destination": "ZRH",
+    "history": [
+      {
+        "checked_at": "2026-07-24T03:34:59.839242+00:00",
+        "price": 686.0
+      }
+    ],
+    "last_checked": "2026-07-24T03:34:59.839242+00:00",
+    "last_notified_price": 686.0,
+    "last_price": 686.0,
+    "mode": "voo",
+    "origin": "LIS",
+    "profile_name": "Suíça",
+    "return_date": "2026-10-12",
+    "source": "google_flights (scraping)",
+    "status": "notified"
+  },
   "LIS|ZRH|2026-10-11|2026-10-18": {
     "adults": 2,
     "airlines": "Air Europa",
@@ -2099,6 +3557,32 @@
     "source": "google_flights (scraping)",
     "status": "notified"
   },
+  "LIS|ZRH|2026-10-12|2026-10-19": {
+    "adults": 2,
+    "airlines": "Vueling",
+    "booking_link": "https://www.google.com/travel/flights?q=Flights%20from%20LIS%20to%20ZRH%20on%202026-10-12%20through%202026-10-19",
+    "children_ages": [
+      13
+    ],
+    "currency": "EUR",
+    "depart_date": "2026-10-12",
+    "destination": "ZRH",
+    "history": [
+      {
+        "checked_at": "2026-07-24T03:35:02.817621+00:00",
+        "price": 579.0
+      }
+    ],
+    "last_checked": "2026-07-24T03:35:02.817621+00:00",
+    "last_notified_price": 579.0,
+    "last_price": 579.0,
+    "mode": "voo",
+    "origin": "LIS",
+    "profile_name": "Suíça",
+    "return_date": "2026-10-19",
+    "source": "google_flights (scraping)",
+    "status": "notified"
+  },
   "LIS|ZRH|2026-10-18|2026-10-25": {
     "adults": 2,
     "airlines": "Air Europa",
@@ -2134,6 +3618,32 @@
     "origin": "LIS",
     "profile_name": "Suíça",
     "return_date": "2026-10-25",
+    "source": "google_flights (scraping)",
+    "status": "notified"
+  },
+  "LIS|ZRH|2026-10-19|2026-10-26": {
+    "adults": 2,
+    "airlines": "Vueling",
+    "booking_link": "https://www.google.com/travel/flights?q=Flights%20from%20LIS%20to%20ZRH%20on%202026-10-19%20through%202026-10-26",
+    "children_ages": [
+      13
+    ],
+    "currency": "EUR",
+    "depart_date": "2026-10-19",
+    "destination": "ZRH",
+    "history": [
+      {
+        "checked_at": "2026-07-24T03:35:05.777337+00:00",
+        "price": 639.0
+      }
+    ],
+    "last_checked": "2026-07-24T03:35:05.777337+00:00",
+    "last_notified_price": 639.0,
+    "last_price": 639.0,
+    "mode": "voo",
+    "origin": "LIS",
+    "profile_name": "Suíça",
+    "return_date": "2026-10-26",
     "source": "google_flights (scraping)",
     "status": "notified"
   }
