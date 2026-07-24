@@ -1,4 +1,6 @@
+import { useRef, useCallback } from 'react';
 import type { SearchParams } from '../types';
+import AirportSearch from './AirportSearch';
 
 interface Props {
   onSearch: (params: SearchParams) => void;
@@ -6,25 +8,31 @@ interface Props {
 }
 
 const POPULAR_ROUTES = [
-  { origin: "GRU", dest: "CDG", label: "GRU → CDG" },
-  { origin: "GRU", dest: "BCN", label: "GRU → BCN" },
-  { origin: "GRU", dest: "LIS", label: "GRU → LIS" },
-  { origin: "GRU", dest: "LHR", label: "GRU → LHR" },
-  { origin: "GRU", dest: "JFK", label: "GRU → JFK" },
-  { origin: "CGH", dest: "MIA", label: "CGH → MIA" },
-  { origin: "GRU", dest: "FCO", label: "GRU → FCO" },
-  { origin: "GRU", dest: "AMS", label: "GRU → AMS" },
+  { origin: "GRU", dest: "CDG", label: "São Paulo → Paris" },
+  { origin: "GRU", dest: "BCN", label: "São Paulo → Barcelona" },
+  { origin: "GRU", dest: "LIS", label: "São Paulo → Lisboa" },
+  { origin: "GRU", dest: "LHR", label: "São Paulo → Londres" },
+  { origin: "GRU", dest: "JFK", label: "São Paulo → Nova York" },
+  { origin: "CGH", dest: "MIA", label: "São Paulo → Miami" },
+  { origin: "GRU", dest: "FCO", label: "São Paulo → Roma" },
+  { origin: "GRU", dest: "AMS", label: "São Paulo → Amsterdã" },
 ];
 
 export default function SearchForm({ onSearch, loading }: Props) {
+  const formRef = useRef<HTMLFormElement>(null);
+
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
     const tripType = fd.get("tripType") as string;
+    const originIata = fd.get("origin_iata") as string;
+    const destIata = fd.get("destination_iata") as string;
+
+    if (!originIata || !destIata) return;
 
     const params: SearchParams = {
-      origin: (fd.get("origin") as string).toUpperCase(),
-      destination: (fd.get("destination") as string).toUpperCase(),
+      origin: originIata,
+      destination: destIata,
       dateFrom: fd.get("dateFrom") as string,
       dateTo: tripType === "roundtrip" ? (fd.get("dateTo") as string) : undefined,
       adults: Number(fd.get("adults")) || 1,
@@ -38,6 +46,28 @@ export default function SearchForm({ onSearch, loading }: Props) {
     onSearch(params);
   };
 
+  const handlePopularRoute = useCallback((origin: string, dest: string) => {
+    if (!formRef.current) return;
+    const fd = new FormData(formRef.current);
+
+    // Find the airports by IATA to get city names for display
+    const originInput = formRef.current.querySelector('input[name="origin"]') as HTMLInputElement;
+    const destInput = formRef.current.querySelector('input[name="destination"]') as HTMLInputElement;
+    const originIataInput = formRef.current.querySelector('input[name="origin_iata"]') as HTMLInputElement;
+    const destIataInput = formRef.current.querySelector('input[name="destination_iata"]') as HTMLInputElement;
+
+    // Set the IATA values directly
+    if (originIataInput) originIataInput.value = origin;
+    if (destIataInput) destIataInput.value = dest;
+
+    // Set visible text to IATA codes for popular routes
+    if (originInput) originInput.value = origin;
+    if (destInput) destInput.value = dest;
+
+    // Submit
+    formRef.current.requestSubmit();
+  }, []);
+
   return (
     <div className="glass rounded-2xl p-6">
       <div className="flex items-center gap-2 mb-5">
@@ -50,28 +80,22 @@ export default function SearchForm({ onSearch, loading }: Props) {
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="grid grid-cols-2 gap-3">
-          <div>
-            <label className="block text-xs text-dark-400 mb-1.5 uppercase tracking-wider">Origem</label>
-            <input
-              name="origin"
-              required
-              placeholder="GRU"
-              maxLength={3}
-              className="w-full bg-dark-800/80 border border-dark-600 rounded-lg px-3 py-2.5 text-sm font-mono text-dark-50 placeholder-dark-500 focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/20 transition-all"
-            />
-          </div>
-          <div>
-            <label className="block text-xs text-dark-400 mb-1.5 uppercase tracking-wider">Destino</label>
-            <input
-              name="destination"
-              required
-              placeholder="CDG"
-              maxLength={3}
-              className="w-full bg-dark-800/80 border border-dark-600 rounded-lg px-3 py-2.5 text-sm font-mono text-dark-50 placeholder-dark-500 focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/20 transition-all"
-            />
-          </div>
+      <form ref={formRef} onSubmit={handleSubmit} className="space-y-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <AirportSearch
+            name="origin"
+            label="Origem"
+            placeholder="Digite a cidade de saída..."
+            required
+            onChange={() => {}}
+          />
+          <AirportSearch
+            name="destination"
+            label="Destino"
+            placeholder="Digite a cidade de destino..."
+            required
+            onChange={() => {}}
+          />
         </div>
 
         <div className="grid grid-cols-3 gap-3">
@@ -158,16 +182,9 @@ export default function SearchForm({ onSearch, loading }: Props) {
         <div className="flex flex-wrap gap-1.5">
           {POPULAR_ROUTES.map((r) => (
             <button
-              key={r.label}
-              onClick={() => {
-                const form = document.querySelector("form") as HTMLFormElement;
-                if (form) {
-                  (form.elements.namedItem("origin") as HTMLInputElement).value = r.origin;
-                  (form.elements.namedItem("destination") as HTMLInputElement).value = r.dest;
-                  form.requestSubmit();
-                }
-              }}
-              className="px-2.5 py-1 text-xs bg-dark-700/50 hover:bg-dark-600/50 text-dark-300 hover:text-dark-100 rounded-md border border-dark-600/50 hover:border-dark-500/50 transition-all font-mono"
+              key={`${r.origin}-${r.dest}`}
+              onClick={() => handlePopularRoute(r.origin, r.dest)}
+              className="px-2.5 py-1 text-xs bg-dark-700/50 hover:bg-dark-600/50 text-dark-300 hover:text-dark-100 rounded-md border border-dark-600/50 hover:border-dark-500/50 transition-all"
             >
               {r.label}
             </button>
