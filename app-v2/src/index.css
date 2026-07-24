@@ -1,0 +1,17 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * { @apply border-dark-600; }
+  body { @apply bg-dark-950 text-dark-50 font-sans; }
+}
+
+@layer components {
+  .glass { @apply bg-dark-700/60 backdrop-blur-xl border border-dark-600/50; }
+  .glass-hover { @apply hover:bg-dark-600/60 hover:border-dark-500/50 transition-all duration-200; }
+  .glow-green { box-shadow: 0 0 20px rgba(34, 197, 94, 0.15); }
+  .glow-red { box-shadow: 0 0 20px rgba(239, 68, 68, 0.15); }
+  .glow-blue { box-shadow: 0 0 20px rgba(59, 130, 246, 0.15); }
+  .text-gradient { @apply bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-emerald-400; }
+}
