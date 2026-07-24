@@ -9,132 +9,57 @@ interface Props {
   onMonitor: () => void;
 }
 
-function TabButton({ active, children, onClick }: { active: boolean; children: React.ReactNode; onClick: () => void }) {
+function Tab({ active, children, onClick }: { active: boolean; children: React.ReactNode; onClick: () => void }) {
   return (
-    <button
-      onClick={onClick}
-      className={`px-4 py-2 text-sm font-medium rounded-lg transition-all ${
-        active
-          ? "bg-blue-500/20 text-blue-400 border border-blue-500/30"
-          : "text-dark-300 hover:text-dark-100 hover:bg-dark-600/50"
-      }`}
-    >
+    <button onClick={onClick} className={`px-4 py-2 text-sm font-medium rounded-lg transition-all ${active ? "bg-blue-500/20 text-blue-400 border border-blue-500/30" : "text-dark-300 hover:text-dark-100 hover:bg-dark-600/50"}`}>
       {children}
     </button>
   );
 }
 
-function formatPrice(price: number, currency: string): string {
-  const symbols: Record<string, string> = { EUR: "€", USD: "$", BRL: "R$" };
-  return `${symbols[currency] || currency} ${price}`;
-}
+function fp(p: number, c: string): string { const s: Record<string,string>={EUR:"€",USD:"$",BRL:"R$"}; return `${s[c]||c} ${p}`; }
 
-function SearchLinkModal({ offer, onClose }: { offer: FlightOffer; onClose: () => void }) {
-  const links = [
-    { name: "Google Flights", url: offer.bookingLink, icon: "🟢", desc: "Pesquisa direta no Google Flights" },
-    ...(offer.deepLink ? [{ name: "Skyscanner", url: offer.deepLink, icon: "🔵", desc: "Comparar preços no Skyscanner" }] : []),
-  ];
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative bg-dark-800 border border-dark-600/50 rounded-2xl w-full max-w-lg animate-slide-up p-6">
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h2 className="text-lg font-bold text-dark-50">Busca real de voos</h2>
-            <p className="text-sm text-dark-400">{offer.origin} → {offer.destination} • {offer.outboundLegs[0].departure.slice(0, 10)}</p>
-          </div>
-          <button onClick={onClose} className="text-dark-400 hover:text-dark-100 text-2xl leading-none">&times;</button>
-        </div>
-
-        <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-4 mb-4">
-          <p className="text-sm text-blue-400">
-            Esta pesquisa conecta diretamente às plataformas de busca para encontrar os voos reais e preços atualizados para esta rota e data.
-          </p>
-        </div>
-
-        <div className="space-y-3">
-          {links.map((link) => (
-            <a
-              key={link.name}
-              href={link.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-4 p-4 rounded-xl bg-dark-700/50 border border-dark-600/50 hover:border-blue-500/30 hover:bg-dark-700/80 transition-all group"
-            >
-              <span className="text-2xl">{link.icon}</span>
-              <div className="flex-1">
-                <div className="text-sm font-semibold text-dark-50 group-hover:text-blue-400 transition-colors">{link.name}</div>
-                <div className="text-xs text-dark-400">{link.desc}</div>
-              </div>
-              <svg className="w-5 h-5 text-dark-400 group-hover:text-blue-400 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-              </svg>
-            </a>
-          ))}
-        </div>
-
-        <button
-          onClick={onClose}
-          className="w-full mt-4 py-2.5 text-sm text-dark-300 border border-dark-600 rounded-xl hover:bg-dark-700 transition-all"
-        >
-          Fechar
-        </button>
-      </div>
-    </div>
-  );
-}
-
-function ItineraryTab({ legs, currency }: { legs: FlightOffer['outboundLegs']; currency: string }) {
+function ItineraryTab({ legs }: { legs: FlightOffer['outboundLegs'] }) {
   return (
     <div className="space-y-4">
       {legs.map((leg, i) => (
-        <div key={i} className="bg-dark-800/50 rounded-xl p-4">
-          <div className="flex items-center justify-between mb-3">
+        <div key={i} className="bg-dark-800/50 rounded-xl p-5">
+          <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
-              <span className="font-semibold text-dark-50">{leg.airlineName}</span>
-              <span className="text-xs text-dark-400 font-mono">{leg.flightNumber}</span>
+              <span className="font-bold text-dark-50 text-base">{leg.airlineName}</span>
+              <span className="text-xs text-dark-400 font-mono bg-dark-700 px-2 py-0.5 rounded">{leg.flightNumber}</span>
             </div>
             <span className="text-xs text-dark-400">{leg.aircraft}</span>
           </div>
 
           <div className="flex items-center gap-4">
             <div className="text-center">
-              <div className="text-2xl font-bold font-mono">{leg.departure.slice(11, 16)}</div>
-              <div className="text-sm text-dark-300">{leg.departureAirport}</div>
-              <div className="text-xs text-dark-500">Terminal {leg.departureTerminal || "—"}</div>
+              <div className="text-3xl font-bold font-mono text-dark-50">{leg.departure.slice(11, 16)}</div>
+              <div className="text-sm text-dark-300 font-semibold mt-1">{leg.departureAirport}</div>
+              {leg.departureTerminal && <div className="text-xs text-dark-500">Terminal {leg.departureTerminal}</div>}
             </div>
 
             <div className="flex-1 flex flex-col items-center gap-2">
-              <div className="text-xs text-dark-300">{formatDuration(leg.durationMinutes)}</div>
+              <div className="text-xs text-dark-300 font-medium">{formatDuration(leg.durationMinutes)}</div>
               <div className="w-full relative">
                 <div className="h-px bg-dark-500 w-full" />
                 {leg.stops > 0 && leg.stopAirports?.map((ap, j) => (
-                  <div
-                    key={j}
-                    className="absolute top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-yellow-400"
-                    style={{ left: `${((j + 1) / (leg.stops + 1)) * 100}%` }}
-                    title={`${ap} — ${leg.stopDurations?.[j] || 0}min`}
-                  />
+                  <div key={j} className="absolute top-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full bg-yellow-400 border-2 border-dark-800" style={{ left: `${((j + 1) / (leg.stops + 1)) * 100}%` }} title={ap} />
                 ))}
               </div>
               <div className="text-xs text-dark-400">
-                {leg.stops === 0 ? "Voo direto" : `${leg.stops} escala${leg.stops > 1 ? "s" : ""} (${leg.stopAirports?.join(", ")})`}
+                {leg.stops === 0 ? "Voo direto" : `${leg.stops} escala${leg.stops > 1 ? "s" : ""}`}
               </div>
             </div>
 
             <div className="text-center">
-              <div className="text-2xl font-bold font-mono">{leg.arrival.slice(11, 16)}</div>
-              <div className="text-sm text-dark-300">{leg.arrivalAirport}</div>
-              <div className="text-xs text-dark-500">Terminal {leg.arrivalTerminal || "—"}</div>
+              <div className="text-3xl font-bold font-mono text-dark-50">{leg.arrival.slice(11, 16)}</div>
+              <div className="text-sm text-dark-300 font-semibold mt-1">{leg.arrivalAirport}</div>
+              {leg.arrivalTerminal && <div className="text-xs text-dark-500">Terminal {leg.arrivalTerminal}</div>}
             </div>
           </div>
 
-          {leg.operatingCarrier && (
-            <div className="mt-3 text-xs text-dark-500">
-              Operado por: {leg.operatingCarrier}
-            </div>
-          )}
+          {leg.operatingCarrier && <div className="mt-3 text-xs text-dark-500">Operado por: {leg.operatingCarrier}</div>}
         </div>
       ))}
     </div>
@@ -142,42 +67,29 @@ function ItineraryTab({ legs, currency }: { legs: FlightOffer['outboundLegs']; c
 }
 
 function FareTab({ fare, currency }: { fare: FlightOffer['fareBreakdown']; currency: string }) {
-  const items = [
-    ["Tarifa base", fare.baseFare],
-    ["Taxas aeroportuárias", fare.airportTax],
-    ["Impostos locais", fare.localTaxes],
-    ["Taxa de serviço", fare.serviceFee],
-  ];
-
+  const items = [["Tarifa base", fare.baseFare], ["Taxas aeroportuárias", fare.airportTax], ["Impostos locais", fare.localTaxes], ["Taxa de serviço", fare.serviceFee]];
   return (
     <div className="space-y-4">
-      <div className="bg-dark-800/50 rounded-xl p-4">
-        <h4 className="text-sm font-semibold text-dark-200 mb-3">Composição do Preço</h4>
-        <div className="space-y-2">
-          {items.map(([label, val]) => (
-            <div key={label} className="flex justify-between text-sm">
-              <span className="text-dark-300">{label}</span>
-              <span className="font-mono text-dark-100">{formatPrice(val as number, currency)}</span>
+      <div className="bg-dark-800/50 rounded-xl p-5">
+        <h4 className="text-sm font-bold text-dark-200 mb-3">Composição do Preço</h4>
+        <div className="space-y-2.5">
+          {items.map(([l, v]) => (
+            <div key={l as string} className="flex justify-between text-sm">
+              <span className="text-dark-300">{l}</span>
+              <span className="font-mono text-dark-100">{fp(v as number, currency)}</span>
             </div>
           ))}
-          <div className="border-t border-dark-600 pt-2 flex justify-between font-semibold">
-            <span className="text-dark-50">Total</span>
-            <span className="text-gradient font-mono">{formatPrice(fare.totalFees, currency)}</span>
+          <div className="border-t border-dark-600 pt-2.5 flex justify-between font-bold">
+            <span className="text-dark-50">Total taxas</span>
+            <span className="text-gradient font-mono">{fp(fare.totalFees, currency)}</span>
           </div>
         </div>
       </div>
-
-      <div className="bg-dark-800/50 rounded-xl p-4">
-        <h4 className="text-sm font-semibold text-dark-200 mb-3">Bagagem</h4>
+      <div className="bg-dark-800/50 rounded-xl p-5">
+        <h4 className="text-sm font-bold text-dark-200 mb-3">Bagagem</h4>
         <div className="space-y-2">
-          <div className="flex justify-between text-sm">
-            <span className="text-dark-300">Mão</span>
-            <span className="text-dark-100">{fare.baggageHand}</span>
-          </div>
-          <div className="flex justify-between text-sm">
-            <span className="text-dark-300">Despacho</span>
-            <span className="text-dark-100">{fare.baggageChecked}</span>
-          </div>
+          <div className="flex justify-between text-sm"><span className="text-dark-300">Mão</span><span className="text-dark-100">{fare.baggageHand}</span></div>
+          <div className="flex justify-between text-sm"><span className="text-dark-300">Despacho</span><span className="text-dark-100">{fare.baggageChecked}</span></div>
         </div>
       </div>
     </div>
@@ -185,22 +97,14 @@ function FareTab({ fare, currency }: { fare: FlightOffer['fareBreakdown']; curre
 }
 
 function RulesTab({ rules }: { rules: FlightOffer['ticketRules'] }) {
-  const items = [
-    ["Cancelamento", rules.cancellation],
-    ["Reembolso", rules.refund],
-    ["Alteração", rules.change],
-    ["Bagagem despacho", rules.checkedBaggage],
-    ["Bagagem mão", rules.handBaggage],
-    ["Seleção de assento", rules.seatSelection],
-  ];
-
+  const items = [["Cancelamento", rules.cancellation], ["Reembolso", rules.refund], ["Alteração", rules.change], ["Bagagem despacho", rules.checkedBaggage], ["Bagagem mão", rules.handBaggage], ["Assento", rules.seatSelection]];
   return (
-    <div className="bg-dark-800/50 rounded-xl p-4">
-      <div className="space-y-3">
-        {items.map(([label, val]) => (
-          <div key={label} className="flex flex-col gap-1">
-            <span className="text-xs text-dark-400 uppercase tracking-wider">{label}</span>
-            <span className="text-sm text-dark-100">{val}</span>
+    <div className="bg-dark-800/50 rounded-xl p-5">
+      <div className="space-y-4">
+        {items.map(([l, v]) => (
+          <div key={l as string}>
+            <div className="text-xs text-dark-400 uppercase tracking-wider mb-1">{l}</div>
+            <div className="text-sm text-dark-100">{v}</div>
           </div>
         ))}
       </div>
@@ -208,137 +112,123 @@ function RulesTab({ rules }: { rules: FlightOffer['ticketRules'] }) {
   );
 }
 
-function PriceHistoryTab({ history, currency }: { history: FlightOffer['priceHistory']; currency: string }) {
-  if (!history.length) return <p className="text-dark-400 text-sm">Sem dados de histórico.</p>;
-
+function HistoryTab({ history, currency }: { history: FlightOffer['priceHistory']; currency: string }) {
+  if (history.length < 3) return <p className="text-dark-400 text-sm">Histórico indisponível.</p>;
   const prices = history.map((h) => h.price);
-  const min = Math.min(...prices);
-  const max = Math.max(...prices);
-  const range = max - min || 1;
-  const w = 400;
-  const h = 150;
-  const pad = 30;
-
-  const points = prices.map((p, i) => {
-    const x = pad + (i / (prices.length - 1)) * (w - pad * 2);
-    const y = pad + ((max - p) / range) * (h - pad * 2);
-    return `${x},${y}`;
-  }).join(" ");
-
+  const min = Math.min(...prices), max = Math.max(...prices), range = max - min || 1;
+  const w = 400, h = 150, pad = 30;
+  const pts = prices.map((p, i) => `${pad + (i / (prices.length - 1)) * (w - pad * 2)},${pad + ((max - p) / range) * (h - pad * 2)}`).join(" ");
   return (
-    <div className="bg-dark-800/50 rounded-xl p-4">
+    <div className="bg-dark-800/50 rounded-xl p-5">
       <div className="flex items-center justify-between mb-3">
-        <h4 className="text-sm font-semibold text-dark-200">Histórico de Preços</h4>
+        <h4 className="text-sm font-bold text-dark-200">Histórico de Preços</h4>
         <div className="flex gap-3 text-xs">
-          <span className="text-emerald-400">Min: {formatPrice(min, currency)}</span>
-          <span className="text-red-400">Max: {formatPrice(max, currency)}</span>
+          <span className="text-emerald-400">Min: {fp(min, currency)}</span>
+          <span className="text-red-400">Max: {fp(max, currency)}</span>
         </div>
       </div>
-
       <svg width="100%" viewBox={`0 0 ${w} ${h}`} className="overflow-visible">
-        <defs>
-          <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="rgb(59,130,246)" stopOpacity="0.2" />
-            <stop offset="100%" stopColor="rgb(59,130,246)" stopOpacity="0" />
-          </linearGradient>
-        </defs>
-
+        <defs><linearGradient id="ag" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#3b82f6" stopOpacity="0.2" /><stop offset="100%" stopColor="#3b82f6" stopOpacity="0" /></linearGradient></defs>
         {[0, 0.25, 0.5, 0.75, 1].map((pct) => {
           const y = pad + pct * (h - pad * 2);
-          const price = Math.round(max - pct * range);
-          return (
-            <g key={pct}>
-              <line x1={pad} y1={y} x2={w - pad} y2={y} stroke="rgb(63,63,70)" strokeWidth="0.5" />
-              <text x={pad - 4} y={y + 3} textAnchor="end" fontSize="9" fill="#71717a">
-                {formatPrice(price, currency)}
-              </text>
-            </g>
-          );
+          return <g key={pct}><line x1={pad} y1={y} x2={w - pad} y2={y} stroke="#3f3f46" strokeWidth="0.5" /><text x={pad - 4} y={y + 3} textAnchor="end" fontSize="9" fill="#71717a">{fp(Math.round(max - pct * range), currency)}</text></g>;
         })}
-
-        <polygon fill="url(#areaGrad)" points={`${pad},${h - pad} ${points} ${w - pad},${h - pad}`} />
-        <polyline fill="none" stroke="rgb(59,130,246)" strokeWidth="2" points={points} />
-
-        {prices.map((p, i) => {
-          if (i % 5 !== 0) return null;
-          const x = pad + (i / (prices.length - 1)) * (w - pad * 2);
-          const y = pad + ((max - p) / range) * (h - pad * 2);
-          return (
-            <circle key={i} cx={x} cy={y} r="3" fill="rgb(59,130,246)" stroke="rgb(15,15,20)" strokeWidth="2" />
-          );
-        })}
+        <polygon fill="url(#ag)" points={`${pad},${h - pad} ${pts} ${w - pad},${h - pad}`} />
+        <polyline fill="none" stroke="#3b82f6" strokeWidth="2" points={pts} />
+        {prices.map((p, i) => i % 5 !== 0 ? null : <circle key={i} cx={pad + (i / (prices.length - 1)) * (w - pad * 2)} cy={pad + ((max - p) / range) * (h - pad * 2)} r="3" fill="#3b82f6" stroke="#0f0f14" strokeWidth="2" />)}
       </svg>
     </div>
   );
 }
 
 export default function DetailModal({ offer, onClose, onMonitor }: Props) {
-  const [activeTab, setActiveTab] = useState<"itinerary" | "fare" | "rules" | "history">("itinerary");
-  const isSearchLink = offer.totalPrice === 0;
-
-  if (isSearchLink) {
-    return <SearchLinkModal offer={offer} onClose={onClose} />;
-  }
+  const [tab, setTab] = useState<"itinerary"|"fare"|"rules"|"history">("itinerary");
+  const out = offer.outboundLegs[0];
+  const ret = offer.returnLegs?.[0];
+  const isLink = offer.totalPrice === 0;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
-
       <div className="relative bg-dark-800 border border-dark-600/50 rounded-2xl w-full max-w-2xl max-h-[85vh] overflow-y-auto animate-slide-up">
-        <div className="sticky top-0 bg-dark-800/95 backdrop-blur-xl border-b border-dark-600/50 p-4 flex items-center justify-between z-10">
+
+        {/* Header */}
+        <div className="sticky top-0 bg-dark-800/95 backdrop-blur-xl border-b border-dark-600/50 p-5 flex items-center justify-between z-10">
           <div>
-            <h2 className="text-lg font-bold text-dark-50">
-              {offer.origin} → {offer.destination}
-            </h2>
-            <p className="text-sm text-dark-400">
-              {offer.outboundLegs[0].departure.slice(0, 10)}
-              {offer.returnLegs && ` — ${offer.returnLegs[0].departure.slice(0, 10)}`}
+            <h2 className="text-xl font-bold text-dark-50">{offer.origin} → {offer.destination}</h2>
+            <p className="text-sm text-dark-400 mt-0.5">
+              {out.departure.slice(0, 10)}{ret && ` — ${ret.departure.slice(0, 10)}`}
+              {!isLink && ` • ${out.airlineName}`}
             </p>
           </div>
-          <button onClick={onClose} className="text-dark-400 hover:text-dark-100 text-2xl leading-none">&times;</button>
+          <button onClick={onClose} className="w-8 h-8 rounded-lg bg-dark-700 hover:bg-dark-600 flex items-center justify-center text-dark-400 hover:text-dark-100 transition-all text-lg">&times;</button>
         </div>
 
-        <div className="p-4 flex gap-2 border-b border-dark-600/50">
-          <TabButton active={activeTab === "itinerary"} onClick={() => setActiveTab("itinerary")}>Itinerário</TabButton>
-          <TabButton active={activeTab === "fare"} onClick={() => setActiveTab("fare")}>Tarifas</TabButton>
-          <TabButton active={activeTab === "rules"} onClick={() => setActiveTab("rules")}>Regras</TabButton>
-          {offer.priceHistory.length > 0 && (
-            <TabButton active={activeTab === "history"} onClick={() => setActiveTab("history")}>Histórico</TabButton>
+        {/* Tabs */}
+        {!isLink && (
+          <div className="px-5 pt-4 flex gap-2 border-b border-dark-600/50">
+            <Tab active={tab==="itinerary"} onClick={()=>setTab("itinerary")}>Itinerário</Tab>
+            <Tab active={tab==="fare"} onClick={()=>setTab("fare")}>Tarifas</Tab>
+            <Tab active={tab==="rules"} onClick={()=>setTab("rules")}>Regras</Tab>
+            {offer.priceHistory.length >= 3 && <Tab active={tab==="history"} onClick={()=>setTab("history")}>Histórico</Tab>}
+          </div>
+        )}
+
+        {/* Content */}
+        <div className="p-5">
+          {isLink ? (
+            <div className="text-center py-8">
+              <div className="text-4xl mb-4">🔍</div>
+              <h3 className="text-lg font-bold text-dark-50 mb-2">Pesquisa de voos para esta rota</h3>
+              <p className="text-sm text-dark-400 mb-6 max-w-sm mx-auto">
+                Clique abaixo para abrir a busca real de voos com preços atualizados nesta plataforma.
+              </p>
+              <div className="flex flex-col gap-3 max-w-sm mx-auto">
+                <a href={offer.bookingLink} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 p-4 rounded-xl bg-dark-700/50 border border-dark-600/50 hover:border-green-500/30 transition-all">
+                  <span className="text-2xl">🟢</span>
+                  <div className="text-left flex-1"><div className="text-sm font-bold text-dark-50">Google Flights</div><div className="text-xs text-dark-400">Pesquisa real com preços ao vivo</div></div>
+                  <svg className="w-5 h-5 text-dark-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+                </a>
+                {offer.deepLink && (
+                  <a href={offer.deepLink} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 p-4 rounded-xl bg-dark-700/50 border border-dark-600/50 hover:border-blue-500/30 transition-all">
+                    <span className="text-2xl">🔵</span>
+                    <div className="text-left flex-1"><div className="text-sm font-bold text-dark-50">Skyscanner</div><div className="text-xs text-dark-400">Compare preços entre agências</div></div>
+                    <svg className="w-5 h-5 text-dark-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+                  </a>
+                )}
+              </div>
+            </div>
+          ) : (
+            <>
+              {tab === "itinerary" && <ItineraryTab legs={offer.outboundLegs} />}
+              {tab === "fare" && <FareTab fare={offer.fareBreakdown} currency={offer.currency} />}
+              {tab === "rules" && <RulesTab rules={offer.ticketRules} />}
+              {tab === "history" && <HistoryTab history={offer.priceHistory} currency={offer.currency} />}
+            </>
           )}
         </div>
 
-        <div className="p-4">
-          {activeTab === "itinerary" && <ItineraryTab legs={offer.outboundLegs} currency={offer.currency} />}
-          {activeTab === "fare" && <FareTab fare={offer.fareBreakdown} currency={offer.currency} />}
-          {activeTab === "rules" && <RulesTab rules={offer.ticketRules} />}
-          {activeTab === "history" && <PriceHistoryTab history={offer.priceHistory} currency={offer.currency} />}
-        </div>
-
-        <div className="sticky bottom-0 bg-dark-800/95 backdrop-blur-xl border-t border-dark-600/50 p-4 flex items-center justify-between">
-          <button
-            onClick={onMonitor}
-            className="px-4 py-2 text-sm text-dark-300 hover:text-emerald-400 border border-dark-600 hover:border-emerald-500/30 rounded-lg transition-all"
-          >
-            Monitorar preço
-          </button>
-          <div className="flex items-center gap-2">
-            {offer.deepLink && (
-              <a
-                href={offer.deepLink}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="px-4 py-2 text-sm text-dark-300 border border-dark-600 rounded-lg hover:border-blue-500/30 hover:text-blue-400 transition-all"
-              >
-                Skyscanner
-              </a>
-            )}
-            <button
-              onClick={() => openBookingLink(offer)}
-              className="px-6 py-2 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-lg transition-all"
-            >
-              Reservar — {formatPrice(offer.totalPrice, offer.currency)}
-            </button>
-          </div>
+        {/* Footer */}
+        <div className="sticky bottom-0 bg-dark-800/95 backdrop-blur-xl border-t border-dark-600/50 p-5 flex items-center justify-between">
+          {!isLink ? (
+            <>
+              <button onClick={onMonitor} className="px-4 py-2.5 text-sm text-dark-300 hover:text-emerald-400 border border-dark-600 hover:border-emerald-500/30 rounded-xl transition-all">
+                Monitorar preço
+              </button>
+              <div className="flex items-center gap-2">
+                {offer.deepLink && (
+                  <a href={offer.deepLink} target="_blank" rel="noopener noreferrer" className="px-4 py-2.5 text-sm text-dark-300 border border-dark-600 rounded-xl hover:border-blue-500/30 hover:text-blue-400 transition-all">
+                    Skyscanner
+                  </a>
+                )}
+                <button onClick={() => openBookingLink(offer)} className="px-6 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl transition-all shadow-lg shadow-blue-500/20">
+                  Reservar — {fp(offer.totalPrice, offer.currency)}
+                </button>
+              </div>
+            </>
+          ) : (
+            <button onClick={onClose} className="w-full py-2.5 text-sm text-dark-300 border border-dark-600 rounded-xl hover:bg-dark-700 transition-all">Fechar</button>
+          )}
         </div>
       </div>
     </div>

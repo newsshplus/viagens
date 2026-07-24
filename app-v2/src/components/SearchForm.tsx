@@ -165,7 +165,7 @@ export default function SearchForm({ onSearch, loading }: Props) {
 
         {/* Calendários inline */}
         {showCalendars && originIata && destIata && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 animate-slide-up">
+          <div className="space-y-4 animate-slide-up">
             <PriceCalendar
               month={new Date()}
               prices={departurePrices}
