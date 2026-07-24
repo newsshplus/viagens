@@ -1,9 +1,10 @@
-import { useRef, useState, useMemo, useCallback } from 'react';
+import { useRef, useState, useCallback, useEffect } from 'react';
 import type { SearchParams } from '../types';
 import AirportSearch from './AirportSearch';
 import PassengerSelector from './PassengerSelector';
 import PriceCalendar from './PriceCalendar';
 import FlexibleDateSearch from './FlexibleDateSearch';
+import { fetchCalendarMonth } from '../lib/searchEngine';
 
 interface Props {
   onSearch: (params: SearchParams) => void;
@@ -21,22 +22,6 @@ const POPULAR_ROUTES = [
   { origin: "GRU", dest: "AMS", label: "São Paulo → Amsterdã" },
 ];
 
-function generateMockCalendarPrices(basePrice: number): Record<string, number> {
-  const prices: Record<string, number> = {};
-  const today = new Date();
-  for (let d = 0; d < 90; d++) {
-    const date = new Date(today);
-    date.setDate(date.getDate() + d);
-    const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
-    const dayOfWeek = date.getDay();
-    const weekendFactor = (dayOfWeek === 0 || dayOfWeek === 6) ? 1.3 : 1;
-    const seasonalFactor = 1 + Math.sin(d / 7) * 0.15;
-    const noise = (Math.random() - 0.5) * 0.3;
-    prices[key] = Math.round(basePrice * weekendFactor * seasonalFactor * (1 + noise));
-  }
-  return prices;
-}
-
 export default function SearchForm({ onSearch, loading }: Props) {
   const formRef = useRef<HTMLFormElement>(null);
   const [adults, setAdults] = useState(1);
@@ -53,14 +38,29 @@ export default function SearchForm({ onSearch, loading }: Props) {
   const [showFlexSearch, setShowFlexSearch] = useState(false);
   const [searchError, setSearchError] = useState<string | null>(null);
 
-  const departurePrices = useMemo(() => {
-    if (!originIata || !destIata) return {};
-    return generateMockCalendarPrices(300 + Math.random() * 400);
-  }, [originIata, destIata]);
+  const [departurePrices, setDeparturePrices] = useState<Record<string, number>>({});
+  const [returnPrices, setReturnPrices] = useState<Record<string, number>>({});
 
-  const returnPrices = useMemo(() => {
-    if (!originIata || !destIata) return {};
-    return generateMockCalendarPrices(300 + Math.random() * 400);
+  useEffect(() => {
+    if (!originIata || !destIata) { setDeparturePrices({}); return; }
+    const ctrl = new AbortController();
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = today.getMonth();
+    const monthKey = `${year}-${String(month + 1).padStart(2, '0')}-01`;
+
+    fetchCalendarMonth(originIata, destIata, year, month, 'eur').then((data) => {
+      if (ctrl.signal.aborted) return;
+      const prices: Record<string, number> = {};
+      for (const [dateStr, v] of Object.entries(data)) {
+        prices[dateStr] = v.price;
+      }
+      setDeparturePrices(prices);
+    }).catch(() => {
+      if (!ctrl.signal.aborted) setDeparturePrices({});
+    });
+
+    return () => ctrl.abort();
   }, [originIata, destIata]);
 
   const totalPassengers = adults + childrenCount + infants;
