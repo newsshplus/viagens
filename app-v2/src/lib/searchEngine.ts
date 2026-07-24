@@ -627,36 +627,18 @@ export async function searchFlights(params: {
   currency: string;
   tripType: string;
 }): Promise<FlightOffer[]> {
-  await new Promise((r) => setTimeout(r, 600 + Math.random() * 800));
+  const { searchAllSources } = await import('./sources/index');
 
-  // Try Travelpayouts API first
-  if (TP_TOKEN) {
-    try {
-      const { direct: tpDirect, stops: tpStops } = await fetchCheapFlights(
-        params.origin, params.destination, params.dateFrom, params.dateTo, params.currency
-      );
+  const result = await searchAllSources({
+    origin: params.origin,
+    destination: params.destination,
+    dateFrom: params.dateFrom,
+    dateTo: params.dateTo,
+    adults: params.adults,
+    currency: params.currency,
+  });
 
-      const apiOffers: FlightOffer[] = [];
-
-      // Direct flights from API
-      for (const entry of tpDirect.slice(0, 5)) {
-        apiOffers.push(buildOfferFromTP(entry, params.origin, params.destination, params.dateFrom, params.dateTo, params.adults, params.currency, 0));
-      }
-
-      // Stops flights from API
-      for (const entry of tpStops.slice(0, 5)) {
-        apiOffers.push(buildOfferFromTP(entry, params.origin, params.destination, params.dateFrom, params.dateTo, params.adults, params.currency, entry.number_of_changes || 1));
-      }
-
-      if (apiOffers.length > 0) {
-        return apiOffers.sort((a, b) => a.totalPrice - b.totalPrice);
-      }
-
-      // API returned no data for this route — fallback to mock
-    } catch {
-      // API error — fallback to mock
-    }
-  }
+  if (result.offers.length > 0) return result.offers;
 
   return buildMockOffers(params);
 }

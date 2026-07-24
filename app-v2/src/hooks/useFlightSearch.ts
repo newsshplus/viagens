@@ -1,6 +1,7 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import type { FlightOffer, SearchParams } from '../types';
 import { searchFlights } from '../lib/searchEngine';
+import type { SourceResult } from '../lib/sources/types';
 import { detectPriceAnomaly, generateMonitorAlert } from '../lib/scheduler';
 import type { Monitor } from '../types';
 
@@ -15,6 +16,7 @@ interface UseSearchResult {
   sortBy: (key: "price" | "duration" | "stops") => void;
   selectedOffer: FlightOffer | null;
   selectOffer: (offer: FlightOffer | null) => void;
+  sourceStats: { name: string; count: number; latencyMs: number; error?: string }[];
 }
 
 export function useFlightSearch(): UseSearchResult {
@@ -26,25 +28,43 @@ export function useFlightSearch(): UseSearchResult {
   const [lastSearchTime, setLastSearchTime] = useState<string | null>(null);
   const [selectedOffer, setSelectedOffer] = useState<FlightOffer | null>(null);
   const [currentParams, setCurrentParams] = useState<SearchParams | null>(null);
+  const [sourceStats, setSourceStats] = useState<{ name: string; count: number; latencyMs: number; error?: string }[]>([]);
 
   const search = useCallback(async (params: SearchParams) => {
     setLoading(true);
     setError(null);
     setCurrentParams(params);
+    setSourceStats([]);
 
     try {
-      const results = await searchFlights({
+      const { searchAllSources } = await import('../lib/sources/index');
+      const result = await searchAllSources({
         origin: params.origin,
         destination: params.destination,
         dateFrom: params.dateFrom,
         dateTo: params.dateTo,
         adults: params.adults,
         currency: params.currency,
-        tripType: params.tripType,
       });
 
-      setAllOffers(results);
-      setOffers(results);
+      setSourceStats(result.sources);
+
+      let offers = result.offers;
+      if (offers.length === 0) {
+        const mockResults = await searchFlights({
+          origin: params.origin,
+          destination: params.destination,
+          dateFrom: params.dateFrom,
+          dateTo: params.dateTo,
+          adults: params.adults,
+          currency: params.currency,
+          tripType: params.tripType,
+        });
+        offers = mockResults;
+      }
+
+      setAllOffers(offers);
+      setOffers(offers);
       setSearchCount((c) => c + 1);
       setLastSearchTime(new Date().toISOString());
     } catch (err) {
@@ -73,7 +93,7 @@ export function useFlightSearch(): UseSearchResult {
   }, []);
 
   return {
-    offers, loading, error, searchCount, lastSearchTime,
+    offers, loading, error, searchCount, lastSearchTime, sourceStats,
     search, filterDirect, sortBy,
     selectedOffer, selectOffer: setSelectedOffer,
   };

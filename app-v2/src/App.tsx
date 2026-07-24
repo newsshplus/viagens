@@ -120,6 +120,18 @@ export default function App() {
                   <span className="text-dark-400">Buscas realizadas</span>
                   <span className="text-dark-200 font-mono">{search.searchCount}</span>
                 </div>
+                {search.sourceStats.length > 0 && (
+                  <div className="mt-2 pt-2 border-t border-dark-600/50 space-y-1">
+                    {search.sourceStats.map((s) => (
+                      <div key={s.name} className="flex justify-between text-[10px]">
+                        <span className="text-dark-400 capitalize">{s.name === 'google_flights' ? 'Google Flights' : s.name}</span>
+                        <span className={`font-mono ${s.error ? 'text-red-400' : 'text-dark-300'}`}>
+                          {s.error ? 'erro' : `${s.count} voos · ${s.latencyMs}ms`}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
 
@@ -146,6 +158,11 @@ export default function App() {
                   {search.lastSearchTime && (
                     <span className="text-xs text-dark-500">
                       • {new Date(search.lastSearchTime).toLocaleTimeString("pt-BR")}
+                    </span>
+                  )}
+                  {search.sourceStats.length > 0 && (
+                    <span className="text-[10px] text-dark-500">
+                      • {search.sourceStats.filter(s => s.count > 0).map(s => s.name === 'google_flights' ? 'Google' : s.name).join(' + ')}
                     </span>
                   )}
                 </div>
