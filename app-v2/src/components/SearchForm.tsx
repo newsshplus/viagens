@@ -45,10 +45,13 @@ export default function SearchForm({ onSearch, loading }: Props) {
   const [childAges, setChildAges] = useState<number[]>([]);
   const [originIata, setOriginIata] = useState("");
   const [destIata, setDestIata] = useState("");
+  const [originDisplay, setOriginDisplay] = useState("");
+  const [destDisplay, setDestDisplay] = useState("");
   const [showCalendars, setShowCalendars] = useState(false);
   const [departureDate, setDepartureDate] = useState<string | null>(null);
   const [returnDate, setReturnDate] = useState<string | null>(null);
   const [showFlexSearch, setShowFlexSearch] = useState(false);
+  const [searchError, setSearchError] = useState<string | null>(null);
 
   const departurePrices = useMemo(() => {
     if (!originIata || !destIata) return {};
@@ -64,14 +67,36 @@ export default function SearchForm({ onSearch, loading }: Props) {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!originIata || !destIata || !departureDate) return;
+    setSearchError(null);
+    if (!departureDate) { setSearchError("Selecione a data de ida"); return; }
 
     const fd = new FormData(e.currentTarget);
     const tripType = fd.get("tripType") as string;
 
+    let origin = originIata;
+    let dest = destIata;
+    if (!origin) {
+      const h = fd.get("origin_iata") as string;
+      if (h && h.length === 3) origin = h.toUpperCase();
+      else {
+        const v = fd.get("origin") as string;
+        if (v && /^[A-Za-z]{3}$/.test(v.trim())) origin = v.trim().toUpperCase();
+      }
+    }
+    if (!dest) {
+      const h = fd.get("destination_iata") as string;
+      if (h && h.length === 3) dest = h.toUpperCase();
+      else {
+        const v = fd.get("destination") as string;
+        if (v && /^[A-Za-z]{3}$/.test(v.trim())) dest = v.trim().toUpperCase();
+      }
+    }
+
+    if (!origin || !dest) { setSearchError("Selecione origem e destino (clique na sugestão ou digite o código IATA)"); return; }
+
     const params: SearchParams = {
-      origin: originIata,
-      destination: destIata,
+      origin,
+      destination: dest,
       dateFrom: departureDate,
       dateTo: tripType === "roundtrip" ? (returnDate || undefined) : undefined,
       adults,
@@ -137,14 +162,14 @@ export default function SearchForm({ onSearch, loading }: Props) {
             label="Origem"
             placeholder="Digite a cidade de saída..."
             required
-            onChange={(a) => setOriginIata(a?.iata || "")}
+            onChange={(a) => { setOriginIata(a?.iata || ""); setOriginDisplay(a ? `${a.city} (${a.iata})` : ""); }}
           />
           <AirportSearch
             name="destination"
             label="Destino"
             placeholder="Digite a cidade de destino..."
             required
-            onChange={(a) => setDestIata(a?.iata || "")}
+            onChange={(a) => { setDestIata(a?.iata || ""); setDestDisplay(a ? `${a.city} (${a.iata})` : ""); }}
           />
         </div>
 
@@ -238,16 +263,16 @@ export default function SearchForm({ onSearch, loading }: Props) {
         </div>
 
         {/* Resumo */}
-        {departureDate && (
+        {(originIata || destIata) && (
           <div className="bg-dark-700/50 rounded-xl p-3 flex items-center justify-between">
             <div className="text-sm text-dark-300">
-              <span className="text-dark-100 font-semibold">{originIata}</span>
+              <span className="text-dark-100 font-semibold">{originDisplay || originIata || "—"}</span>
               <span className="mx-1.5 text-dark-500">→</span>
-              <span className="text-dark-100 font-semibold">{destIata}</span>
+              <span className="text-dark-100 font-semibold">{destDisplay || destIata || "—"}</span>
               {returnDate && (
                 <>
                   <span className="mx-1.5 text-dark-500">→</span>
-                  <span className="text-dark-100 font-semibold">{originIata}</span>
+                  <span className="text-dark-100 font-semibold">{originDisplay || originIata}</span>
                 </>
               )}
             </div>
@@ -263,10 +288,17 @@ export default function SearchForm({ onSearch, loading }: Props) {
           <span className="text-sm text-dark-300">Apenas voos diretos</span>
         </label>
 
+        {/* Erro */}
+        {searchError && (
+          <div className="bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-2.5 animate-fade-in">
+            <p className="text-sm text-red-400">{searchError}</p>
+          </div>
+        )}
+
         {/* Botão */}
         <button
           type="submit"
-          disabled={loading || !originIata || !destIata || !departureDate}
+          disabled={loading || !departureDate}
           className="w-full py-3 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 disabled:from-dark-600 disabled:to-dark-600 disabled:text-dark-400 text-white font-semibold rounded-xl transition-all shadow-lg shadow-blue-500/20"
         >
           {loading ? (
