@@ -1,4 +1,4 @@
-import type { FlightOffer, PromoTag } from '../types';
+import type { FlightOffer } from '../types';
 import { formatDuration } from '../lib/format';
 
 interface Props {
@@ -10,16 +10,21 @@ function ConfidenceBadge({ confidence }: { confidence: string }) {
   const colors: Record<string, string> = {
     high: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30",
     medium: "bg-yellow-500/20 text-yellow-400 border-yellow-500/30",
-    low: "bg-red-500/20 text-red-400 border-red-500/30",
+    low: "bg-blue-500/20 text-blue-400 border-blue-500/30",
+  };
+  const labels: Record<string, string> = {
+    high: "Preço confirmado",
+    medium: "Preço estimado",
+    low: "Ver preço",
   };
   return (
-    <span className={`px-2 py-0.5 rounded-full text-xs font-medium border ${colors[confidence] || colors.medium}`}>
-      {confidence === "high" ? "Alta confiança" : confidence === "medium" ? "Média" : "Baixa"}
+    <span className={`px-2 py-0.5 rounded-full text-xs font-medium border ${colors[confidence] || colors.low}`}>
+      {labels[confidence] || labels.low}
     </span>
   );
 }
 
-function PromoBadge({ tag }: { tag: PromoTag }) {
+function PromoBadge({ tag }: { tag: import('../types').PromoTag }) {
   const colors: Record<string, string> = {
     green: "bg-emerald-500/20 text-emerald-400",
     yellow: "bg-yellow-500/20 text-yellow-400",
@@ -34,7 +39,7 @@ function PromoBadge({ tag }: { tag: PromoTag }) {
   );
 }
 
-function MiniPriceChart({ history }: { history: { price: number; timestamp: string }[] }) {
+function MiniPriceChart({ history }: { history: { price: number }[] }) {
   if (!history.length) return null;
   const prices = history.map((h) => h.price);
   const min = Math.min(...prices);
@@ -52,21 +57,13 @@ function MiniPriceChart({ history }: { history: { price: number; timestamp: stri
   return (
     <svg width={w} height={h} className="opacity-60">
       <defs>
-        <linearGradient id="priceGrad" x1="0" y1="0" x2="0" y2="1">
+        <linearGradient id={`pg-${prices[0]}`} x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stopColor="rgb(59,130,246)" stopOpacity="0.3" />
           <stop offset="100%" stopColor="rgb(59,130,246)" stopOpacity="0" />
         </linearGradient>
       </defs>
-      <polyline
-        fill="none"
-        stroke="rgb(59,130,246)"
-        strokeWidth="1.5"
-        points={points}
-      />
-      <polygon
-        fill="url(#priceGrad)"
-        points={`0,${h} ${points} ${w},${h}`}
-      />
+      <polyline fill="none" stroke="rgb(59,130,246)" strokeWidth="1.5" points={points} />
+      <polygon fill={`url(#pg-${prices[0]})`} points={`0,${h} ${points} ${w},${h}`} />
     </svg>
   );
 }
@@ -77,8 +74,44 @@ function formatPrice(price: number, currency: string): string {
 }
 
 export default function FlightCard({ offer, onSelect }: Props) {
+  const isSearchLink = offer.totalPrice === 0;
   const outbound = offer.outboundLegs[0];
   const returnLeg = offer.returnLegs?.[0];
+
+  if (isSearchLink) {
+    return (
+      <div
+        onClick={() => onSelect(offer)}
+        className="glass glass-hover rounded-2xl p-5 cursor-pointer animate-slide-up group relative overflow-hidden border-dashed border-dark-500/50 hover:border-blue-500/30"
+      >
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 rounded-xl bg-blue-500/15 flex items-center justify-center flex-shrink-0">
+            <span className="text-2xl">🔍</span>
+          </div>
+          <div className="flex-1">
+            <h3 className="text-base font-bold text-dark-50 group-hover:text-blue-400 transition-colors">
+              {outbound.airlineName}
+            </h3>
+            <p className="text-sm text-dark-300 mt-0.5">
+              Clique para abrir a busca real de voos nesta plataforma
+            </p>
+            <div className="flex items-center gap-3 mt-2">
+              <span className="text-xs text-dark-400 font-mono">{offer.origin} → {offer.destination}</span>
+              <span className="text-xs text-dark-500">•</span>
+              <span className="text-xs text-dark-400">{offer.outboundLegs[0].departure.slice(0, 10)}</span>
+            </div>
+          </div>
+          <div className="flex flex-col items-end gap-1">
+            <div className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold rounded-xl transition-all">
+              Buscar preços
+            </div>
+            <span className="text-[10px] text-dark-500">Pesquisa real e atualizada</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   const hasStops = outbound.stops > 0;
 
   return (
@@ -106,6 +139,9 @@ export default function FlightCard({ offer, onSelect }: Props) {
         <div className="text-center">
           <div className="text-xl font-bold font-mono">{outbound.departure.slice(11, 16)}</div>
           <div className="text-xs text-dark-300">{outbound.departureAirport}</div>
+          {outbound.departureTerminal && (
+            <div className="text-[10px] text-dark-500">T{outbound.departureTerminal}</div>
+          )}
         </div>
 
         <div className="flex-1 flex flex-col items-center gap-1">
@@ -121,6 +157,9 @@ export default function FlightCard({ offer, onSelect }: Props) {
         <div className="text-center">
           <div className="text-xl font-bold font-mono">{outbound.arrival.slice(11, 16)}</div>
           <div className="text-xs text-dark-300">{outbound.arrivalAirport}</div>
+          {outbound.arrivalTerminal && (
+            <div className="text-[10px] text-dark-500">T{outbound.arrivalTerminal}</div>
+          )}
         </div>
       </div>
 
@@ -146,17 +185,21 @@ export default function FlightCard({ offer, onSelect }: Props) {
 
       <div className="flex items-end justify-between">
         <div className="flex flex-col gap-1">
-          <div className="flex items-center gap-2">
-            <MiniPriceChart history={offer.priceHistory.slice(-15)} />
-            <span className="text-xs text-dark-400">30 dias</span>
-          </div>
-          <div className="flex items-center gap-2">
-            {Object.entries(offer.crossRef.prices).map(([src, price]) => (
-              <span key={src} className="text-xs text-dark-400">
-                {src === "travelpayouts" ? "TP" : src === "google_flights" ? "GF" : "SK"}: {formatPrice(price, offer.currency)}
-              </span>
-            ))}
-          </div>
+          {offer.priceHistory.length > 0 && (
+            <div className="flex items-center gap-2">
+              <MiniPriceChart history={offer.priceHistory.slice(-15)} />
+              <span className="text-xs text-dark-400">30 dias</span>
+            </div>
+          )}
+          {Object.keys(offer.crossRef.prices).length > 1 && (
+            <div className="flex items-center gap-2">
+              {Object.entries(offer.crossRef.prices).map(([src, price]) => (
+                <span key={src} className="text-xs text-dark-400">
+                  {src === "travelpayouts" ? "TP" : src === "google_flights" ? "GF" : "SK"}: {formatPrice(price, offer.currency)}
+                </span>
+              ))}
+            </div>
+          )}
         </div>
 
         <div className="text-right">

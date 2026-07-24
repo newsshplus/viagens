@@ -1,6 +1,9 @@
-import { useRef, useCallback } from 'react';
+import { useRef, useState, useMemo, useCallback } from 'react';
 import type { SearchParams } from '../types';
 import AirportSearch from './AirportSearch';
+import PassengerSelector from './PassengerSelector';
+import PriceCalendar from './PriceCalendar';
+import FlexibleDateSearch from './FlexibleDateSearch';
 
 interface Props {
   onSearch: (params: SearchParams) => void;
@@ -18,26 +21,62 @@ const POPULAR_ROUTES = [
   { origin: "GRU", dest: "AMS", label: "São Paulo → Amsterdã" },
 ];
 
+function generateMockCalendarPrices(basePrice: number): Record<string, number> {
+  const prices: Record<string, number> = {};
+  const today = new Date();
+  for (let d = 0; d < 90; d++) {
+    const date = new Date(today);
+    date.setDate(date.getDate() + d);
+    const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+    const dayOfWeek = date.getDay();
+    const weekendFactor = (dayOfWeek === 0 || dayOfWeek === 6) ? 1.3 : 1;
+    const seasonalFactor = 1 + Math.sin(d / 7) * 0.15;
+    const noise = (Math.random() - 0.5) * 0.3;
+    prices[key] = Math.round(basePrice * weekendFactor * seasonalFactor * (1 + noise));
+  }
+  return prices;
+}
+
 export default function SearchForm({ onSearch, loading }: Props) {
   const formRef = useRef<HTMLFormElement>(null);
+  const [adults, setAdults] = useState(1);
+  const [childrenCount, setChildrenCount] = useState(0);
+  const [infants, setInfants] = useState(0);
+  const [childAges, setChildAges] = useState<number[]>([]);
+  const [originIata, setOriginIata] = useState("");
+  const [destIata, setDestIata] = useState("");
+  const [showCalendars, setShowCalendars] = useState(false);
+  const [departureDate, setDepartureDate] = useState<string | null>(null);
+  const [returnDate, setReturnDate] = useState<string | null>(null);
+  const [showFlexSearch, setShowFlexSearch] = useState(false);
+
+  const departurePrices = useMemo(() => {
+    if (!originIata || !destIata) return {};
+    return generateMockCalendarPrices(300 + Math.random() * 400);
+  }, [originIata, destIata]);
+
+  const returnPrices = useMemo(() => {
+    if (!originIata || !destIata) return {};
+    return generateMockCalendarPrices(300 + Math.random() * 400);
+  }, [originIata, destIata]);
+
+  const totalPassengers = adults + childrenCount + infants;
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!originIata || !destIata || !departureDate) return;
+
     const fd = new FormData(e.currentTarget);
     const tripType = fd.get("tripType") as string;
-    const originIata = fd.get("origin_iata") as string;
-    const destIata = fd.get("destination_iata") as string;
-
-    if (!originIata || !destIata) return;
 
     const params: SearchParams = {
       origin: originIata,
       destination: destIata,
-      dateFrom: fd.get("dateFrom") as string,
-      dateTo: tripType === "roundtrip" ? (fd.get("dateTo") as string) : undefined,
-      adults: Number(fd.get("adults")) || 1,
-      children: Number(fd.get("children")) || 0,
-      infants: Number(fd.get("infants")) || 0,
+      dateFrom: departureDate,
+      dateTo: tripType === "roundtrip" ? (returnDate || undefined) : undefined,
+      adults,
+      children: childrenCount,
+      infants,
       currency: fd.get("currency") as string || "EUR",
       tripType: tripType as "roundtrip" | "oneway",
       directOnly: fd.get("directOnly") === "on",
@@ -47,100 +86,147 @@ export default function SearchForm({ onSearch, loading }: Props) {
   };
 
   const handlePopularRoute = useCallback((origin: string, dest: string) => {
-    if (!formRef.current) return;
-    const fd = new FormData(formRef.current);
-
-    // Find the airports by IATA to get city names for display
-    const originInput = formRef.current.querySelector('input[name="origin"]') as HTMLInputElement;
-    const destInput = formRef.current.querySelector('input[name="destination"]') as HTMLInputElement;
-    const originIataInput = formRef.current.querySelector('input[name="origin_iata"]') as HTMLInputElement;
-    const destIataInput = formRef.current.querySelector('input[name="destination_iata"]') as HTMLInputElement;
-
-    // Set the IATA values directly
-    if (originIataInput) originIataInput.value = origin;
-    if (destIataInput) destIataInput.value = dest;
-
-    // Set visible text to IATA codes for popular routes
+    setOriginIata(origin);
+    setDestIata(dest);
+    const form = formRef.current;
+    if (!form) return;
+    const originInput = form.querySelector('input[name="origin"]') as HTMLInputElement;
+    const destInput = form.querySelector('input[name="destination"]') as HTMLInputElement;
+    const originIataH = form.querySelector('input[name="origin_iata"]') as HTMLInputElement;
+    const destIataH = form.querySelector('input[name="destination_iata"]') as HTMLInputElement;
     if (originInput) originInput.value = origin;
     if (destInput) destInput.value = dest;
-
-    // Submit
-    formRef.current.requestSubmit();
+    if (originIataH) originIataH.value = origin;
+    if (destIataH) destIataH.value = dest;
   }, []);
+
+  const handleSelectFlexDate = (depart: string, ret: string) => {
+    setDepartureDate(depart);
+    setReturnDate(ret);
+    setShowFlexSearch(false);
+  };
 
   return (
     <div className="glass rounded-2xl p-6">
-      <div className="flex items-center gap-2 mb-5">
-        <div className="w-8 h-8 rounded-lg bg-blue-500/20 flex items-center justify-center">
-          <span className="text-blue-400 text-lg">✈</span>
+      <div className="flex items-center justify-between mb-5">
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-lg bg-blue-500/20 flex items-center justify-center">
+            <span className="text-blue-400 text-lg">✈</span>
+          </div>
+          <div>
+            <h2 className="text-lg font-bold text-dark-50">Buscar voos</h2>
+            <p className="text-xs text-dark-400">Anônimo • Anti-rastreamento • Multi-fonte</p>
+          </div>
         </div>
-        <div>
-          <h2 className="text-lg font-bold text-dark-50">Buscar voos</h2>
-          <p className="text-xs text-dark-400">Anônimo • Anti-rastreamento • Multi-fonte</p>
-        </div>
+        {originIata && destIata && (
+          <button
+            type="button"
+            onClick={() => setShowFlexSearch(true)}
+            className="px-3 py-1.5 text-xs bg-purple-500/10 border border-purple-500/20 text-purple-400 rounded-lg hover:bg-purple-500/15 transition-all"
+          >
+            Explorar datas
+          </button>
+        )}
       </div>
 
       <form ref={formRef} onSubmit={handleSubmit} className="space-y-4">
+        {/* Origem / Destino */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <AirportSearch
             name="origin"
             label="Origem"
             placeholder="Digite a cidade de saída..."
             required
-            onChange={() => {}}
+            onChange={(a) => setOriginIata(a?.iata || "")}
           />
           <AirportSearch
             name="destination"
             label="Destino"
             placeholder="Digite a cidade de destino..."
             required
-            onChange={() => {}}
+            onChange={(a) => setDestIata(a?.iata || "")}
           />
         </div>
 
-        <div className="grid grid-cols-3 gap-3">
-          <div>
-            <label className="block text-xs text-dark-400 mb-1.5 uppercase tracking-wider">Tipo</label>
-            <select
-              name="tripType"
-              className="w-full bg-dark-800/80 border border-dark-600 rounded-lg px-3 py-2.5 text-sm text-dark-50 focus:outline-none focus:border-blue-500/50 transition-all"
-            >
-              <option value="roundtrip">Ida e volta</option>
-              <option value="oneway">Somente ida</option>
-            </select>
-          </div>
-          <div>
-            <label className="block text-xs text-dark-400 mb-1.5 uppercase tracking-wider">Data ida</label>
-            <input
-              name="dateFrom"
-              type="date"
-              required
-              className="w-full bg-dark-800/80 border border-dark-600 rounded-lg px-3 py-2.5 text-sm text-dark-50 focus:outline-none focus:border-blue-500/50 transition-all"
-            />
-          </div>
-          <div>
-            <label className="block text-xs text-dark-400 mb-1.5 uppercase tracking-wider">Data volta</label>
-            <input
-              name="dateTo"
-              type="date"
-              className="w-full bg-dark-800/80 border border-dark-600 rounded-lg px-3 py-2.5 text-sm text-dark-50 focus:outline-none focus:border-blue-500/50 transition-all"
-            />
+        {/* Tipo de viagem */}
+        <div>
+          <label className="block text-xs text-dark-400 mb-1.5 uppercase tracking-wider">Tipo de viagem</label>
+          <div className="flex gap-2">
+            <label className="flex-1 flex items-center gap-2 px-3 py-2.5 rounded-lg border border-dark-600 cursor-pointer hover:border-dark-500 transition-all has-[:checked]:bg-blue-500/10 has-[:checked]:border-blue-500/30">
+              <input type="radio" name="tripType" value="roundtrip" defaultChecked className="accent-blue-500" />
+              <span className="text-sm text-dark-200">Ida e volta</span>
+            </label>
+            <label className="flex-1 flex items-center gap-2 px-3 py-2.5 rounded-lg border border-dark-600 cursor-pointer hover:border-dark-500 transition-all has-[:checked]:bg-blue-500/10 has-[:checked]:border-blue-500/30">
+              <input type="radio" name="tripType" value="oneway" className="accent-blue-500" />
+              <span className="text-sm text-dark-200">Somente ida</span>
+            </label>
           </div>
         </div>
 
-        <div className="grid grid-cols-4 gap-3">
+        {/* Calendários inline */}
+        {showCalendars && originIata && destIata && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 animate-slide-up">
+            <PriceCalendar
+              month={new Date()}
+              prices={departurePrices}
+              selectedDate={departureDate}
+              onSelect={(d) => { setDepartureDate(d); }}
+              label="Data de ida"
+            />
+            <PriceCalendar
+              month={new Date()}
+              prices={returnPrices}
+              selectedDate={returnDate}
+              onSelect={(d) => { setReturnDate(d); }}
+              label="Data de volta"
+            />
+          </div>
+        )}
+
+        {/* Datas selecionadas */}
+        <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block text-xs text-dark-400 mb-1.5 uppercase tracking-wider">Adultos</label>
-            <input name="adults" type="number" min={1} max={9} defaultValue={1} className="w-full bg-dark-800/80 border border-dark-600 rounded-lg px-3 py-2.5 text-sm text-dark-50 focus:outline-none focus:border-blue-500/50 transition-all" />
+            <label className="block text-xs text-dark-400 mb-1.5 uppercase tracking-wider">Data ida</label>
+            <button
+              type="button"
+              onClick={() => setShowCalendars(!showCalendars)}
+              className="w-full bg-dark-800/80 border border-dark-600 rounded-lg px-3 py-2.5 text-sm text-left focus:outline-none focus:border-blue-500/50 transition-all"
+            >
+              {departureDate ? (
+                <span className="text-dark-50">{new Date(departureDate + "T12:00:00").toLocaleDateString("pt-BR", { day: "2-digit", month: "short", year: "numeric" })}</span>
+              ) : (
+                <span className="text-dark-500">Selecionar data...</span>
+              )}
+            </button>
+            <input type="hidden" name="dateFrom" value={departureDate || ""} />
           </div>
           <div>
-            <label className="block text-xs text-dark-400 mb-1.5 uppercase tracking-wider">Crianças</label>
-            <input name="children" type="number" min={0} max={9} defaultValue={0} className="w-full bg-dark-800/80 border border-dark-600 rounded-lg px-3 py-2.5 text-sm text-dark-50 focus:outline-none focus:border-blue-500/50 transition-all" />
+            <label className="block text-xs text-dark-400 mb-1.5 uppercase tracking-wider">Data volta</label>
+            <button
+              type="button"
+              onClick={() => setShowCalendars(!showCalendars)}
+              className="w-full bg-dark-800/80 border border-dark-600 rounded-lg px-3 py-2.5 text-sm text-left focus:outline-none focus:border-blue-500/50 transition-all"
+            >
+              {returnDate ? (
+                <span className="text-dark-50">{new Date(returnDate + "T12:00:00").toLocaleDateString("pt-BR", { day: "2-digit", month: "short", year: "numeric" })}</span>
+              ) : (
+                <span className="text-dark-500">Selecionar data...</span>
+              )}
+            </button>
+            <input type="hidden" name="dateTo" value={returnDate || ""} />
           </div>
-          <div>
-            <label className="block text-xs text-dark-400 mb-1.5 uppercase tracking-wider">Bebês</label>
-            <input name="infants" type="number" min={0} max={9} defaultValue={0} className="w-full bg-dark-800/80 border border-dark-600 rounded-lg px-3 py-2.5 text-sm text-dark-50 focus:outline-none focus:border-blue-500/50 transition-all" />
-          </div>
+        </div>
+
+        {/* Passageiros */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <PassengerSelector
+            onChange={(ad, ch, inf, ages) => {
+              setAdults(ad);
+              setChildrenCount(ch);
+              setInfants(inf);
+              setChildAges(ages);
+            }}
+          />
           <div>
             <label className="block text-xs text-dark-400 mb-1.5 uppercase tracking-wider">Moeda</label>
             <select name="currency" className="w-full bg-dark-800/80 border border-dark-600 rounded-lg px-3 py-2.5 text-sm text-dark-50 focus:outline-none focus:border-blue-500/50 transition-all">
@@ -151,16 +237,36 @@ export default function SearchForm({ onSearch, loading }: Props) {
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input type="checkbox" name="directOnly" className="accent-blue-500" />
-            <span className="text-sm text-dark-300">Apenas diretos</span>
-          </label>
-        </div>
+        {/* Resumo */}
+        {departureDate && (
+          <div className="bg-dark-700/50 rounded-xl p-3 flex items-center justify-between">
+            <div className="text-sm text-dark-300">
+              <span className="text-dark-100 font-semibold">{originIata}</span>
+              <span className="mx-1.5 text-dark-500">→</span>
+              <span className="text-dark-100 font-semibold">{destIata}</span>
+              {returnDate && (
+                <>
+                  <span className="mx-1.5 text-dark-500">→</span>
+                  <span className="text-dark-100 font-semibold">{originIata}</span>
+                </>
+              )}
+            </div>
+            <div className="text-sm text-dark-400">
+              {totalPassengers} passageiro{totalPassengers > 1 ? "s" : ""}
+            </div>
+          </div>
+        )}
 
+        {/* Diretos */}
+        <label className="flex items-center gap-2 cursor-pointer">
+          <input type="checkbox" name="directOnly" className="accent-blue-500" />
+          <span className="text-sm text-dark-300">Apenas voos diretos</span>
+        </label>
+
+        {/* Botão */}
         <button
           type="submit"
-          disabled={loading}
+          disabled={loading || !originIata || !destIata || !departureDate}
           className="w-full py-3 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 disabled:from-dark-600 disabled:to-dark-600 disabled:text-dark-400 text-white font-semibold rounded-xl transition-all shadow-lg shadow-blue-500/20"
         >
           {loading ? (
@@ -177,6 +283,7 @@ export default function SearchForm({ onSearch, loading }: Props) {
         </button>
       </form>
 
+      {/* Rotas populares */}
       <div className="mt-4">
         <p className="text-xs text-dark-500 mb-2">Rotas populares:</p>
         <div className="flex flex-wrap gap-1.5">
@@ -191,6 +298,16 @@ export default function SearchForm({ onSearch, loading }: Props) {
           ))}
         </div>
       </div>
+
+      {showFlexSearch && originIata && destIata && (
+        <FlexibleDateSearch
+          origin={originIata}
+          destination={destIata}
+          currency="EUR"
+          onSelect={handleSelectFlexDate}
+          onClose={() => setShowFlexSearch(false)}
+        />
+      )}
     </div>
   );
 }

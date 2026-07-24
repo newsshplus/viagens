@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { FlightOffer } from '../types';
 import { formatDuration } from '../lib/format';
+import { openBookingLink } from '../lib/searchEngine';
 
 interface Props {
   offer: FlightOffer;
@@ -26,6 +27,62 @@ function TabButton({ active, children, onClick }: { active: boolean; children: R
 function formatPrice(price: number, currency: string): string {
   const symbols: Record<string, string> = { EUR: "€", USD: "$", BRL: "R$" };
   return `${symbols[currency] || currency} ${price}`;
+}
+
+function SearchLinkModal({ offer, onClose }: { offer: FlightOffer; onClose: () => void }) {
+  const links = [
+    { name: "Google Flights", url: offer.bookingLink, icon: "🟢", desc: "Pesquisa direta no Google Flights" },
+    ...(offer.deepLink ? [{ name: "Skyscanner", url: offer.deepLink, icon: "🔵", desc: "Comparar preços no Skyscanner" }] : []),
+  ];
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
+      <div className="relative bg-dark-800 border border-dark-600/50 rounded-2xl w-full max-w-lg animate-slide-up p-6">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h2 className="text-lg font-bold text-dark-50">Busca real de voos</h2>
+            <p className="text-sm text-dark-400">{offer.origin} → {offer.destination} • {offer.outboundLegs[0].departure.slice(0, 10)}</p>
+          </div>
+          <button onClick={onClose} className="text-dark-400 hover:text-dark-100 text-2xl leading-none">&times;</button>
+        </div>
+
+        <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-4 mb-4">
+          <p className="text-sm text-blue-400">
+            Esta pesquisa conecta diretamente às plataformas de busca para encontrar os voos reais e preços atualizados para esta rota e data.
+          </p>
+        </div>
+
+        <div className="space-y-3">
+          {links.map((link) => (
+            <a
+              key={link.name}
+              href={link.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-4 p-4 rounded-xl bg-dark-700/50 border border-dark-600/50 hover:border-blue-500/30 hover:bg-dark-700/80 transition-all group"
+            >
+              <span className="text-2xl">{link.icon}</span>
+              <div className="flex-1">
+                <div className="text-sm font-semibold text-dark-50 group-hover:text-blue-400 transition-colors">{link.name}</div>
+                <div className="text-xs text-dark-400">{link.desc}</div>
+              </div>
+              <svg className="w-5 h-5 text-dark-400 group-hover:text-blue-400 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+              </svg>
+            </a>
+          ))}
+        </div>
+
+        <button
+          onClick={onClose}
+          className="w-full mt-4 py-2.5 text-sm text-dark-300 border border-dark-600 rounded-xl hover:bg-dark-700 transition-all"
+        >
+          Fechar
+        </button>
+      </div>
+    </div>
+  );
 }
 
 function ItineraryTab({ legs, currency }: { legs: FlightOffer['outboundLegs']; currency: string }) {
@@ -171,7 +228,7 @@ function PriceHistoryTab({ history, currency }: { history: FlightOffer['priceHis
   return (
     <div className="bg-dark-800/50 rounded-xl p-4">
       <div className="flex items-center justify-between mb-3">
-        <h4 className="text-sm font-semibold text-dark-200">Histórico de Preços (30 dias)</h4>
+        <h4 className="text-sm font-semibold text-dark-200">Histórico de Preços</h4>
         <div className="flex gap-3 text-xs">
           <span className="text-emerald-400">Min: {formatPrice(min, currency)}</span>
           <span className="text-red-400">Max: {formatPrice(max, currency)}</span>
@@ -217,6 +274,11 @@ function PriceHistoryTab({ history, currency }: { history: FlightOffer['priceHis
 
 export default function DetailModal({ offer, onClose, onMonitor }: Props) {
   const [activeTab, setActiveTab] = useState<"itinerary" | "fare" | "rules" | "history">("itinerary");
+  const isSearchLink = offer.totalPrice === 0;
+
+  if (isSearchLink) {
+    return <SearchLinkModal offer={offer} onClose={onClose} />;
+  }
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -240,7 +302,9 @@ export default function DetailModal({ offer, onClose, onMonitor }: Props) {
           <TabButton active={activeTab === "itinerary"} onClick={() => setActiveTab("itinerary")}>Itinerário</TabButton>
           <TabButton active={activeTab === "fare"} onClick={() => setActiveTab("fare")}>Tarifas</TabButton>
           <TabButton active={activeTab === "rules"} onClick={() => setActiveTab("rules")}>Regras</TabButton>
-          <TabButton active={activeTab === "history"} onClick={() => setActiveTab("history")}>Histórico</TabButton>
+          {offer.priceHistory.length > 0 && (
+            <TabButton active={activeTab === "history"} onClick={() => setActiveTab("history")}>Histórico</TabButton>
+          )}
         </div>
 
         <div className="p-4">
@@ -257,14 +321,24 @@ export default function DetailModal({ offer, onClose, onMonitor }: Props) {
           >
             Monitorar preço
           </button>
-          <a
-            href={offer.bookingLink}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="px-6 py-2 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-lg transition-all"
-          >
-            Reservar — {formatPrice(offer.totalPrice, offer.currency)}
-          </a>
+          <div className="flex items-center gap-2">
+            {offer.deepLink && (
+              <a
+                href={offer.deepLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-4 py-2 text-sm text-dark-300 border border-dark-600 rounded-lg hover:border-blue-500/30 hover:text-blue-400 transition-all"
+              >
+                Skyscanner
+              </a>
+            )}
+            <button
+              onClick={() => openBookingLink(offer)}
+              className="px-6 py-2 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-lg transition-all"
+            >
+              Reservar — {formatPrice(offer.totalPrice, offer.currency)}
+            </button>
+          </div>
         </div>
       </div>
     </div>
