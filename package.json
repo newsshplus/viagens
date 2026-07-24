@@ -1,0 +1,9 @@
+{
+  "name": "viagens-deploy",
+  "private": true,
+  "scripts": {
+    "install:app": "cd app-v2 && npm install",
+    "build:app": "cd app-v2 && npm run build",
+    "build": "npm run install:app && npm run build:app"
+  }
+}

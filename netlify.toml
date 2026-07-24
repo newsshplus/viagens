@@ -1,5 +1,11 @@
 [build]
-  publish = "web"
+  command = "cd app-v2 && npm install && npm run build"
+  publish = "app-v2/dist"
 
 [functions]
   directory = "api"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

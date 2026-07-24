@@ -1,14 +1,8 @@
 {
-  "outputDirectory": "web",
+  "buildCommand": "cd app-v2 && npm install && npm run build",
+  "outputDirectory": "app-v2/dist",
+  "installCommand": "npm install",
   "rewrites": [
-    { "source": "/app/(.*)", "destination": "/app/index.html" }
-  ],
-  "headers": [
-    {
-      "source": "/app/(.*)",
-      "headers": [
-        { "key": "Content-Type", "value": "text/html; charset=utf-8" }
-      ]
-    }
+    { "source": "/(.*)", "destination": "/index.html" }
   ]
 }

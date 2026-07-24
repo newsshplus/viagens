@@ -4,19 +4,29 @@ on:
   push:
     branches: [main]
     paths:
+      - 'app-v2/**'
       - 'web/**'
       - 'api/**'
       - 'netlify/**'
       - 'vercel.json'
       - 'netlify.toml'
+      - 'package.json'
 
 permissions:
   contents: read
 
 jobs:
-  deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install & Build app-v2
+        run: |
+          cd app-v2
+          npm install
+          npm run build
       - name: Deploy info
-        run: echo "Deploy automatico via Vercel/Netlify - conecte o repositorio na plataforma"
+        run: echo "Build OK - Vercel/Netlify auto-deploys from connected repo"
