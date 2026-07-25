@@ -27,7 +27,30 @@ interface SkyItinerary {
   legs: SkyFlightLeg[];
 }
 
+// Cache local: um código IATA sempre resolve pro mesmo skyId/entityId - não
+// precisa gastar cota da RapidAPI perguntando de novo a cada busca. Cache
+// não expira (aeroportos praticamente nunca mudam de código).
+const ENTITY_CACHE_KEY = 'viagens_skyscanner_entity_cache_v1';
+
+function loadEntityCache(): Record<string, { skyId: string; entityId: string }> {
+  try {
+    const raw = localStorage.getItem(ENTITY_CACHE_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch { return {}; }
+}
+
+function saveEntityToCache(iata: string, entity: { skyId: string; entityId: string }) {
+  try {
+    const cache = loadEntityCache();
+    cache[iata] = entity;
+    localStorage.setItem(ENTITY_CACHE_KEY, JSON.stringify(cache));
+  } catch { /* não crítico */ }
+}
+
 async function resolveEntity(iata: string): Promise<{ skyId: string; entityId: string } | { error: string } | null> {
+  const cached = loadEntityCache()[iata];
+  if (cached) return cached;
+
   try {
     const resp = await fetch(`/api/flights-skyscanner?action=searchAirport&query=${iata}`);
     if (!resp.ok) return { error: `HTTP ${resp.status}` };
@@ -38,13 +61,15 @@ async function resolveEntity(iata: string): Promise<{ skyId: string; entityId: s
       a.navigation.relevantFlightParams.flightPlaceType === 'AIRPORT' &&
       a.navigation.relevantFlightParams.skyId === iata
     ) || data.data[0];
-    return { skyId: match.navigation.relevantFlightParams.skyId, entityId: match.navigation.entityId };
+    const entity = { skyId: match.navigation.relevantFlightParams.skyId, entityId: match.navigation.entityId };
+    saveEntityToCache(iata, entity);
+    return entity;
   } catch (err) { return { error: String(err).slice(0, 120) }; }
 }
 
-async function searchFlightsWithPolling(params: Record<string, string>): Promise<SkyItinerary[]> {
+async function searchFlightsWithPolling(params: Record<string, string>): Promise<{ itineraries: SkyItinerary[]; error?: string }> {
   const allItineraries: SkyItinerary[] = [];
-  let maxPolls = 5;
+  const maxPolls = 3; // cada poll consome 1 requisição da cota gratuita da RapidAPI
   let sessionId: string | undefined;
 
   for (let attempt = 0; attempt < maxPolls; attempt++) {
@@ -53,8 +78,9 @@ async function searchFlightsWithPolling(params: Record<string, string>): Promise
     searchParams.set('action', 'searchFlights');
 
     const resp = await fetch(`/api/flights-skyscanner?${searchParams}`);
-    if (!resp.ok) break;
+    if (!resp.ok) return { itineraries: allItineraries, error: `HTTP ${resp.status}` };
     const result = await resp.json();
+    if (result?.message) return { itineraries: allItineraries, error: String(result.message).slice(0, 120) };
     if (!result?.data?.itineraries) break;
 
     allItineraries.push(...result.data.itineraries);
@@ -65,7 +91,7 @@ async function searchFlightsWithPolling(params: Record<string, string>): Promise
     await new Promise(r => setTimeout(r, 2000));
   }
 
-  return allItineraries;
+  return { itineraries: allItineraries };
 }
 
 function buildOffer(itin: SkyItinerary, params: SourceParams): FlightOffer | null {
@@ -173,10 +199,10 @@ export async function searchSkyscanner(params: SourceParams): Promise<SourceResu
     };
     if (params.dateTo) searchParams.returnDate = params.dateTo;
 
-    const itineraries = await searchFlightsWithPolling(searchParams);
+    const { itineraries, error: pollError } = await searchFlightsWithPolling(searchParams);
     const offers = itineraries.slice(0, 10).map(itin => buildOffer(itin, params)).filter((o): o is FlightOffer => o !== null);
 
-    return { source: 'skyscanner', offers, latencyMs: Date.now() - t0 };
+    return { source: 'skyscanner', offers, latencyMs: Date.now() - t0, error: offers.length === 0 ? pollError : undefined };
   } catch (err) {
     return { source: 'skyscanner', offers: [], latencyMs: Date.now() - t0, error: String(err) };
   }
