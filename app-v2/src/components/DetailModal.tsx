@@ -2,6 +2,7 @@ import { useState } from 'react';
 import type { FlightOffer } from '../types';
 import { formatDuration } from '../lib/format';
 import { openBookingLink } from '../lib/searchEngine';
+import AiAnalysisPanel from './AiAnalysisPanel';
 
 interface Props {
   offer: FlightOffer;
@@ -112,8 +113,19 @@ function RulesTab({ rules }: { rules: FlightOffer['ticketRules'] }) {
   );
 }
 
-function HistoryTab({ history, currency }: { history: FlightOffer['priceHistory']; currency: string }) {
-  if (history.length < 3) return <p className="text-dark-400 text-sm">Histórico indisponível.</p>;
+function HistoryTab({ offer }: { offer: FlightOffer }) {
+  const { priceHistory: history, currency, origin, destination, totalPrice } = offer;
+  if (history.length < 3) {
+    return (
+      <div className="bg-dark-800/50 rounded-xl p-5">
+        <p className="text-dark-400 text-sm">
+          Histórico ainda curto pra essa rota ({history.length} {history.length === 1 ? 'busca registrada' : 'buscas registradas'}).
+          O gráfico aparece a partir de 3 buscas - a análise por IA já funciona desde já.
+        </p>
+        <AiAnalysisPanel origin={origin} destination={destination} currentPrice={totalPrice} currency={currency} history={history} />
+      </div>
+    );
+  }
   const prices = history.map((h) => h.price);
   const min = Math.min(...prices), max = Math.max(...prices), range = max - min || 1;
   const w = 400, h = 150, pad = 30;
@@ -137,6 +149,7 @@ function HistoryTab({ history, currency }: { history: FlightOffer['priceHistory'
         <polyline fill="none" stroke="#3b82f6" strokeWidth="2" points={pts} />
         {prices.map((p, i) => i % 5 !== 0 ? null : <circle key={i} cx={pad + (i / (prices.length - 1)) * (w - pad * 2)} cy={pad + ((max - p) / range) * (h - pad * 2)} r="3" fill="#3b82f6" stroke="#0f0f14" strokeWidth="2" />)}
       </svg>
+      <AiAnalysisPanel origin={origin} destination={destination} currentPrice={totalPrice} currency={currency} history={history} />
     </div>
   );
 }
@@ -170,7 +183,7 @@ export default function DetailModal({ offer, onClose, onMonitor }: Props) {
             <Tab active={tab==="itinerary"} onClick={()=>setTab("itinerary")}>Itinerário</Tab>
             <Tab active={tab==="fare"} onClick={()=>setTab("fare")}>Tarifas</Tab>
             <Tab active={tab==="rules"} onClick={()=>setTab("rules")}>Regras</Tab>
-            {offer.priceHistory.length >= 3 && <Tab active={tab==="history"} onClick={()=>setTab("history")}>Histórico</Tab>}
+            {offer.priceHistory.length >= 1 && <Tab active={tab==="history"} onClick={()=>setTab("history")}>Histórico</Tab>}
           </div>
         )}
 
@@ -203,7 +216,7 @@ export default function DetailModal({ offer, onClose, onMonitor }: Props) {
               {tab === "itinerary" && <ItineraryTab legs={offer.outboundLegs} />}
               {tab === "fare" && <FareTab fare={offer.fareBreakdown} currency={offer.currency} />}
               {tab === "rules" && <RulesTab rules={offer.ticketRules} />}
-              {tab === "history" && <HistoryTab history={offer.priceHistory} currency={offer.currency} />}
+              {tab === "history" && <HistoryTab offer={offer} />}
             </>
           )}
         </div>

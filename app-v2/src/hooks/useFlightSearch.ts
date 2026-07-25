@@ -2,6 +2,7 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 import type { FlightOffer, SearchParams } from '../types';
 import type { SourceResult } from '../lib/sources/types';
 import { detectPriceAnomaly, generateMonitorAlert } from '../lib/scheduler';
+import { recordPrice, getHistory } from '../lib/priceTracker';
 import type { Monitor } from '../types';
 
 interface UseSearchResult {
@@ -50,6 +51,18 @@ export function useFlightSearch(): UseSearchResult {
 
       const offers = result.offers;
 
+      // Grava cada preço real encontrado no histórico local (por rota) e
+      // anexa o histórico real acumulado a cada oferta, pra alimentar o
+      // gráfico de tendência e a análise por IA.
+      for (const offer of offers) {
+        const src = offer.sources?.[0] || 'desconhecida';
+        recordPrice(offer.origin, offer.destination, offer.totalPrice, src);
+      }
+      const routeHistory = offers.length > 0 ? getHistory(offers[0].origin, offers[0].destination) : [];
+      for (const offer of offers) {
+        offer.priceHistory = routeHistory;
+      }
+
       setAllOffers(offers);
       setOffers(offers);
       setSearchCount((c) => c + 1);
@@ -59,8 +72,8 @@ export function useFlightSearch(): UseSearchResult {
         const allFailed = result.sources.length > 0 && result.sources.every((s) => s.error);
         setError(
           allFailed
-            ? "Nenhuma das fontes (Google Flights, Skyscanner, Travelpayouts) respondeu agora - provavelmente falta configurar as chaves de API na Vercel, ou o servi\u00e7o est\u00e1 bloqueando temporariamente. Veja o painel \"Status do Sistema\" ao lado para detalhes por fonte."
-            : "Nenhum voo real encontrado para essa rota/data. Tente outras datas ou um destino pr\u00f3ximo - isto n\u00e3o \u00e9 um erro, as fontes simplesmente n\u00e3o t\u00eam oferta dispon\u00edvel agora."
+            ? "Nenhuma das fontes (Google Flights, Skyscanner, Travelpayouts) respondeu agora - provavelmente falta configurar as chaves de API na Vercel, ou o serviço está bloqueando temporariamente. Veja o painel \"Status do Sistema\" ao lado para detalhes por fonte."
+            : "Nenhum voo real encontrado para essa rota/data. Tente outras datas ou um destino próximo - isto não é um erro, as fontes simplesmente não têm oferta disponível agora."
         );
       }
     } catch (err) {
