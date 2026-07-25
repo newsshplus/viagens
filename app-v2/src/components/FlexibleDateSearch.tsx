@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
-import { fetchCalendarMonth } from '../lib/searchEngine';
 
 interface FlexResult {
   departDate: string;
@@ -17,109 +16,79 @@ interface Props {
   onClose: () => void;
 }
 
-function monthKeysBetween(from: Date, to: Date): Set<string> {
-  const keys = new Set<string>();
-  const cur = new Date(from.getFullYear(), from.getMonth(), 1);
-  const end = new Date(to.getFullYear(), to.getMonth(), 1);
-  while (cur <= end) {
-    keys.add(`${cur.getFullYear()}-${cur.getMonth()}`);
-    cur.setMonth(cur.getMonth() + 1);
-  }
-  return keys;
+// Intervalo de amostragem entre datas testadas - com periodos maiores,
+// espaca mais os dias testados pra nao precisar de centenas de chamadas.
+function sampleInterval(rangeDays: number): number {
+  if (rangeDays <= 7) return 1;
+  if (rangeDays <= 14) return 2;
+  if (rangeDays <= 30) return 3;
+  if (rangeDays <= 60) return 5;
+  return 10; // periodo de 6 meses
 }
 
-// Busca combinacoes reais de ida+volta usando o calendario de precos do
-// Travelpayouts (mesma fonte real ja usada no resto do sistema).
-//
-// IMPORTANTE (descoberto testando ao vivo): o calendario do Travelpayouts e
-// bem esparso - pra uma rota como LIS->BCN, um mes inteiro pode ter so 1 ou
-// 2 dias com preco realmente em cache, nao um preco por dia. Por isso o
-// algoritmo NAO exige uma data de ida especifica bater com uma data de
-// volta especifica numa janela pequena (isso quase sempre dava "sem dados"
-// mesmo tendo preco real disponivel) - em vez disso, pega TODAS as datas de
-// ida com preco real, TODAS as datas de volta com preco real, e pra cada
-// ida real casa com a volta real mais proxima da estadia ideal pedida.
+// Busca o preco real mais barato pra um trecho de ida numa data especifica,
+// usando o MESMO endpoint que a busca normal do sistema usa (nao o
+// endpoint de "calendario"). Testando ao vivo, descobrimos que o
+// calendario (prices_for_dates com uma faixa de datas) e MUITO mais esparso
+// que a busca de um dia especifico - pra uma rota como LIS->BCN, o
+// calendario as vezes so tinha 1 dia com preco em cache no mes inteiro,
+// enquanto a busca de dia especifico encontra voos reais quase sempre.
+async function fetchOneWayPrice(origin: string, destination: string, date: string, currency: string): Promise<number | null> {
+  try {
+    const qs = new URLSearchParams({ origin, destination, departure_at: date, currency, limit: '3' });
+    const resp = await fetch(`/api/flights-travelpayouts?${qs}`);
+    if (!resp.ok) return null;
+    const json = await resp.json();
+    if (!json.data || json.data.length === 0) return null;
+    let min = Infinity;
+    for (const entry of json.data) {
+      if (entry.price > 0 && entry.price < min) min = entry.price;
+    }
+    return Number.isFinite(min) ? min : null;
+  } catch {
+    return null;
+  }
+}
+
 async function fetchFlexResults(
   origin: string, destination: string,
   stayMin: number, stayMax: number, rangeDays: number, currency: string
 ): Promise<FlexResult[]> {
   const start = new Date();
   start.setDate(start.getDate() + 1);
-
-  const lastDepart = new Date(start);
-  lastDepart.setDate(lastDepart.getDate() + rangeDays);
-  const lastReturn = new Date(lastDepart);
-  lastReturn.setDate(lastReturn.getDate() + stayMax);
-
-  const cur = currency.toLowerCase();
-
-  // Busca todos os meses em paralelo (nao um de cada vez) - com periodo de
-  // ate 6 meses, buscar em sequencia deixaria a espera bem mais longa.
-  const departPrices: Record<string, number> = {};
-  const departResults = await Promise.all(
-    [...monthKeysBetween(start, lastDepart)].map((key) => {
-      const [y, mo] = key.split('-').map(Number);
-      return fetchCalendarMonth(origin, destination, y, mo, cur);
-    })
-  );
-  for (const data of departResults) {
-    for (const [date, v] of Object.entries(data)) departPrices[date] = v.price;
-  }
-
-  const returnPrices: Record<string, number> = {};
-  const returnResults = await Promise.all(
-    [...monthKeysBetween(start, lastReturn)].map((key) => {
-      const [y, mo] = key.split('-').map(Number);
-      return fetchCalendarMonth(destination, origin, y, mo, cur);
-    })
-  );
-  for (const data of returnResults) {
-    for (const [date, v] of Object.entries(data)) returnPrices[date] = v.price;
-  }
-
-  const startStr = start.toISOString().slice(0, 10);
-  const lastDepartStr = lastDepart.toISOString().slice(0, 10);
-  const departDates = Object.keys(departPrices)
-    .filter((d) => departPrices[d] > 0 && d >= startStr && d <= lastDepartStr)
-    .sort();
-  const returnDates = Object.keys(returnPrices)
-    .filter((d) => returnPrices[d] > 0)
-    .sort();
-
   const idealStay = Math.round((stayMin + stayMax) / 2);
-  // margem generosa - so descarta combinacoes visivelmente absurdas (tipo
-  // volta 3 meses depois quando a pessoa pediu 7 dias), sem ser tao rigido
-  // a ponto de rejeitar a unica data real disponivel.
-  const maxReasonableStay = stayMax + 21;
+  const interval = sampleInterval(rangeDays);
+
+  const pairs: { departStr: string; returnStr: string }[] = [];
+  for (let d = 0; d < rangeDays; d += interval) {
+    const departDate = new Date(start);
+    departDate.setDate(departDate.getDate() + d);
+    const returnDate = new Date(departDate);
+    returnDate.setDate(returnDate.getDate() + idealStay);
+    pairs.push({
+      departStr: departDate.toISOString().slice(0, 10),
+      returnStr: returnDate.toISOString().slice(0, 10),
+    });
+  }
 
   const results: FlexResult[] = [];
-  for (const departStr of departDates) {
-    const departPrice = departPrices[departStr];
-    const departDate = new Date(`${departStr}T00:00:00`);
-
-    let bestReturn: { returnStr: string; price: number; nights: number } | null = null;
-    let bestDiff = Infinity;
-
-    for (const returnStr of returnDates) {
-      const returnDate = new Date(`${returnStr}T00:00:00`);
-      const nights = Math.round((returnDate.getTime() - departDate.getTime()) / (1000 * 60 * 60 * 24));
-      if (nights < 1 || nights > maxReasonableStay) continue;
-
-      const diff = Math.abs(nights - idealStay);
-      if (diff < bestDiff) {
-        bestDiff = diff;
-        bestReturn = { returnStr, price: returnPrices[returnStr], nights };
-      }
-    }
-
-    if (bestReturn) {
-      results.push({
+  const BATCH_SIZE = 8; // busca em lotes pra nao estourar conexoes simultaneas
+  for (let i = 0; i < pairs.length; i += BATCH_SIZE) {
+    const batch = pairs.slice(i, i + BATCH_SIZE);
+    const batchResults = await Promise.all(batch.map(async ({ departStr, returnStr }) => {
+      const [depPrice, retPrice] = await Promise.all([
+        fetchOneWayPrice(origin, destination, departStr, currency),
+        fetchOneWayPrice(destination, origin, returnStr, currency),
+      ]);
+      if (depPrice === null || retPrice === null) return null;
+      return {
         departDate: departStr,
-        returnDate: bestReturn.returnStr,
-        stayNights: bestReturn.nights,
-        price: Math.round(departPrice + bestReturn.price),
-      });
-    }
+        returnDate: returnStr,
+        stayNights: idealStay,
+        price: Math.round(depPrice + retPrice),
+      };
+    }));
+    for (const r of batchResults) if (r) results.push(r);
   }
 
   return results.sort((a, b) => a.price - b.price);
@@ -242,13 +211,13 @@ export default function FlexibleDateSearch({ origin, destination, currency, onSe
 
           {loading && (
             <div className="text-center py-6 text-sm text-dark-400">
-              Consultando preços reais para o período...
+              Consultando preços reais dia por dia no período (pode levar alguns segundos)...
             </div>
           )}
 
           {!loading && searched && results.length === 0 && (
             <div className="text-center py-6 text-sm text-dark-400">
-              Sem dados de preço reais disponíveis pra esse período/rota agora. Tente um período de busca maior ou volte mais tarde.
+              Sem voos reais encontrados nas datas testadas desse período/rota agora. Tente um período de busca maior ou volte mais tarde.
             </div>
           )}
 
@@ -277,7 +246,7 @@ export default function FlexibleDateSearch({ origin, destination, currency, onSe
               </div>
 
               <p className="text-[10px] text-dark-500">
-                Preço = soma do menor preço real de ida + menor preço real de volta encontrados no calendário para cada data. Toque numa combinação pra buscar os voos de verdade nela.
+                Preço = soma do preço real de ida + preço real de volta encontrados numa busca de voos de verdade pra cada data testada. Toque numa combinação pra buscar os voos de verdade nela.
               </p>
 
               <div className="space-y-1.5 max-h-64 overflow-y-auto">
