@@ -1,9 +1,6 @@
 import type { FlightOffer, FlightLeg } from '../../types';
 import type { SourceParams, SourceResult } from './types';
 
-const TP_TOKEN = import.meta.env.VITE_TRAVELPAYOUTS_TOKEN as string | undefined;
-const TP_BASE = 'https://api.travelpayouts.com';
-
 const AIRLINES: Record<string, string> = {
   TP: 'TAP Air Portugal', LA: 'LATAM Airlines', G3: 'Gol', AD: 'Azul',
   AF: 'Air France', KL: 'KLM', LH: 'Lufthansa', BA: 'British Airways',
@@ -14,10 +11,7 @@ const AIRLINES: Record<string, string> = {
   A3: 'Aegean Airlines', S4: 'SATA Azores', JJ: 'LATAM Brasil',
   DL: 'Delta', UA: 'United Airlines', AA: 'American Airlines',
   AC: 'Air Canada', AR: 'Aerolineas Argentinas', WN: 'Southwest',
-  NK: 'Spirit Airlines', F9: 'Frontier', B6: 'JetBlue',
-  VS: 'Virgin Atlantic', AI: 'Air India', SQ: 'Singapore Airlines',
-  CX: 'Cathay Pacific', NH: 'ANA', JL: 'Japan Airlines',
-  KE: 'Korean Air', OZ: 'Asiana', UX: 'Air Europa',
+  UX: 'Air Europa',
 };
 
 interface TPV3Entry {
@@ -27,37 +21,14 @@ interface TPV3Entry {
   departure_at: string;
   return_at?: string;
   transfers?: number;
-  return_transfers?: number;
-  origin_airport?: string;
-  destination_airport?: string;
-  origin?: string;
-  destination?: string;
-  duration?: number;
   duration_to?: number;
   duration_back?: number;
-  gate?: string;
+  duration?: number;
+  return_transfers?: number;
   link?: string;
 }
 
-async function tpFetch<T>(path: string, params: Record<string, string> = {}): Promise<T | null> {
-  if (!TP_TOKEN) return null;
-  try {
-    const url = new URL(`${TP_BASE}${path}`);
-    for (const [k, v] of Object.entries(params)) url.searchParams.set(k, v);
-    url.searchParams.set('token', TP_TOKEN);
-    const resp = await fetch(url.toString(), {
-      headers: { 'Accept-Encoding': 'gzip, deflate' },
-    });
-    if (!resp.ok) return null;
-    const json = await resp.json() as { success: boolean; data: T; error?: string };
-    if (!json.success) return null;
-    return json.data;
-  } catch {
-    return null;
-  }
-}
-
-function buildOffer(entry: TPV3Entry, params: SourceParams, source: 'travelpayouts_one_way' | 'travelpayouts_round_trip'): FlightOffer {
+function buildOffer(entry: TPV3Entry, params: SourceParams): FlightOffer {
   const airline = entry.airline;
   const name = AIRLINES[airline] || airline;
   const price = Math.round(entry.price * params.adults);
@@ -68,12 +39,9 @@ function buildOffer(entry: TPV3Entry, params: SourceParams, source: 'travelpayou
   const depM = depTime.getMinutes();
   const durMin = entry.duration_to || entry.duration || (stops === 0 ? 120 : 240);
   const arrTotalMin = depH * 60 + depM + durMin;
-
   const depDate = entry.departure_at ? entry.departure_at.split('T')[0] : params.dateFrom;
 
   const STOPS_AIRPORTS = ['MAD', 'CDG', 'AMS', 'FRA', 'IST', 'LHR', 'DOH'];
-  const stopAirports = stops >= 1 ? [STOPS_AIRPORTS[Math.floor(Math.random() * STOPS_AIRPORTS.length)]] : [];
-  const stopDurations = stops >= 1 ? [45 + Math.floor(Math.random() * 120)] : [];
 
   const outbound: FlightLeg = {
     airline, airlineName: name,
@@ -83,10 +51,9 @@ function buildOffer(entry: TPV3Entry, params: SourceParams, source: 'travelpayou
     arrival: `${depDate}T${String(Math.floor(arrTotalMin / 60) % 24).padStart(2, '0')}:${String(arrTotalMin % 60).padStart(2, '0')}:00`,
     departureAirport: params.origin,
     arrivalAirport: params.destination,
-    durationMinutes: durMin,
-    stops,
-    stopAirports,
-    stopDurations,
+    durationMinutes: durMin, stops,
+    stopAirports: stops >= 1 ? [STOPS_AIRPORTS[Math.floor(Math.random() * STOPS_AIRPORTS.length)]] : [],
+    stopDurations: stops >= 1 ? [45 + Math.floor(Math.random() * 120)] : [],
   };
 
   let returnLegs: FlightLeg[] | undefined;
@@ -104,10 +71,8 @@ function buildOffer(entry: TPV3Entry, params: SourceParams, source: 'travelpayou
         aircraft: 'A confirmar',
         departure: `${retDate}T${String(rH).padStart(2, '0')}:${String(rM).padStart(2, '0')}:00`,
         arrival: `${retDate}T${String(Math.floor(rArr / 60) % 24).padStart(2, '0')}:${String(rArr % 60).padStart(2, '0')}:00`,
-        departureAirport: params.destination,
-        arrivalAirport: params.origin,
-        durationMinutes: rDur,
-        stops: entry.return_transfers || 0,
+        departureAirport: params.destination, arrivalAirport: params.origin,
+        durationMinutes: rDur, stops: entry.return_transfers || 0,
         stopAirports: entry.return_transfers ? [STOPS_AIRPORTS[Math.floor(Math.random() * STOPS_AIRPORTS.length)]] : [],
         stopDurations: entry.return_transfers ? [40 + Math.floor(Math.random() * 100)] : [],
       }];
@@ -121,12 +86,8 @@ function buildOffer(entry: TPV3Entry, params: SourceParams, source: 'travelpayou
         aircraft: 'A confirmar',
         departure: `${params.dateTo}T${String(rH).padStart(2, '0')}:00:00`,
         arrival: `${params.dateTo}T${String(Math.floor(rArr / 60) % 24).padStart(2, '0')}:${String(rArr % 60).padStart(2, '0')}:00`,
-        departureAirport: params.destination,
-        arrivalAirport: params.origin,
-        durationMinutes: rDur,
-        stops: 0,
-        stopAirports: [],
-        stopDurations: [],
+        departureAirport: params.destination, arrivalAirport: params.origin,
+        durationMinutes: rDur, stops: 0, stopAirports: [], stopDurations: [],
       }];
     }
   }
@@ -135,44 +96,18 @@ function buildOffer(entry: TPV3Entry, params: SourceParams, source: 'travelpayou
     ? `https://www.aviasales.com${entry.link}`
     : `https://www.skyscanner.com/transport/flights/${params.origin.toLowerCase()}/${params.destination.toLowerCase()}/${params.dateFrom.replace(/-/g, '')}/`;
 
-  const bookingLink = `https://www.google.com/travel/flights?q=Flights+from+${params.origin}+to+${params.destination}+on+${params.dateFrom}`;
-
   return {
     id: `tp-${airline}-${entry.flight_number || Date.now()}-${Math.random().toString(36).slice(2, 5)}`,
-    origin: params.origin,
-    destination: params.destination,
+    origin: params.origin, destination: params.destination,
     totalDurationMinutes: outbound.durationMinutes + (returnLegs?.[0]?.durationMinutes || 0),
-    outboundLegs: [outbound],
-    returnLegs,
-    totalPrice: price,
-    currency: params.currency,
-    fareBreakdown: {
-      baseFare: Math.round(price * 0.62),
-      airportTax: Math.round(price * 0.18),
-      localTaxes: Math.round(price * 0.12),
-      serviceFee: Math.round(price * 0.08),
-      totalFees: Math.round(price * 0.38),
-      baggageHand: 'Consultar',
-      baggageChecked: 'Consultar',
-    },
-    ticketRules: {
-      cancellation: 'Consultar',
-      refund: 'Consultar',
-      change: 'Consultar',
-      checkedBaggage: 'Consultar',
-      handBaggage: 'Consultar',
-      seatSelection: 'Consultar',
-    },
-    bookingLink,
+    outboundLegs: [outbound], returnLegs,
+    totalPrice: price, currency: params.currency,
+    fareBreakdown: { baseFare: Math.round(price * 0.62), airportTax: Math.round(price * 0.18), localTaxes: Math.round(price * 0.12), serviceFee: Math.round(price * 0.08), totalFees: Math.round(price * 0.38), baggageHand: 'Consultar', baggageChecked: 'Consultar' },
+    ticketRules: { cancellation: 'Consultar', refund: 'Consultar', change: 'Consultar', checkedBaggage: 'Consultar', handBaggage: 'Consultar', seatSelection: 'Consultar' },
+    bookingLink: `https://www.google.com/travel/flights?q=Flights+from+${params.origin}+to+${params.destination}+on+${params.dateFrom}`,
     deepLink,
-    sources: [source],
-    crossRef: {
-      sourcesChecked: 1,
-      prices: { Travelpayouts: price },
-      avgPrice: price,
-      divergencePct: 0,
-      confidence: 'medium',
-    },
+    sources: ['travelpayouts'],
+    crossRef: { sourcesChecked: 1, prices: { Travelpayouts: price }, avgPrice: price, divergencePct: 0, confidence: 'medium' },
     lastUpdated: new Date().toISOString(),
     priceHistory: [],
   };
@@ -180,50 +115,24 @@ function buildOffer(entry: TPV3Entry, params: SourceParams, source: 'travelpayou
 
 export async function searchTravelpayouts(params: SourceParams): Promise<SourceResult> {
   const t0 = Date.now();
-  if (!TP_TOKEN) return { source: 'travelpayouts', offers: [], latencyMs: 0, error: 'No token' };
 
   try {
     const offers: FlightOffer[] = [];
 
-    // v3 API: search for specific departure date
-    const v3Params: Record<string, string> = {
-      currency: params.currency,
+    const originParams = new URLSearchParams({
       origin: params.origin,
       destination: params.destination,
       departure_at: params.dateFrom,
-      sorting: 'price',
+      currency: params.currency,
       limit: '20',
-      direct: 'false',
-    };
+    });
 
-    // Search one-way from origin
-    const oneWayData = await tpFetch<TPV3Entry[]>('/v3/prices_for_dates', v3Params);
-    if (oneWayData) {
-      for (const entry of oneWayData) {
-        if (entry.price > 0) {
-          offers.push(buildOffer(entry, params, 'travelpayouts_one_way'));
-        }
-      }
-    }
-
-    // Search one-way return (if round-trip)
-    if (params.dateTo) {
-      const returnParams: Record<string, string> = {
-        currency: params.currency,
-        origin: params.destination,
-        destination: params.origin,
-        departure_at: params.dateTo,
-        sorting: 'price',
-        limit: '20',
-        direct: 'false',
-      };
-      const returnData = await tpFetch<TPV3Entry[]>('/v3/prices_for_dates', returnParams);
-      if (returnData) {
-        for (const entry of returnData) {
-          if (entry.price > 0 && !offers.some(o => o.outboundLegs[0]?.flightNumber === `${entry.airline}${entry.flight_number}`)) {
-            offers.push(buildOffer(entry, params, 'travelpayouts_round_trip'));
-          }
-        }
+    const resp = await fetch(`/api/flights-travelpayouts?${originParams}`);
+    if (!resp.ok) return { source: 'travelpayouts', offers: [], latencyMs: Date.now() - t0, error: `HTTP ${resp.status}` };
+    const json = await resp.json();
+    if (json.data) {
+      for (const entry of json.data) {
+        if (entry.price > 0) offers.push(buildOffer(entry, params));
       }
     }
 

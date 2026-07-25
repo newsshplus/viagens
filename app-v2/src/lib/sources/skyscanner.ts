@@ -1,94 +1,44 @@
 import type { FlightOffer, FlightLeg } from '../../types';
 import type { SourceParams, SourceResult } from './types';
 
-const RAPIDAPI_KEY = import.meta.env.VITE_RAPIDAPI_KEY as string | undefined;
-const SKY_HOST = 'sky-scrapper.p.rapidapi.com';
-
-interface SkyAirportResult {
-  data: Array<{
-    presentation: { title: string; suggestionTitle: string; subtitle: string };
-    navigation: {
-      entityId: string;
-      entityType: string;
-      relevantFlightParams: { skyId: string; entityId: string; flightPlaceType: string; localizedName: string };
-    };
-  }>;
-}
-
 interface SkyFlightLeg {
   id: string;
-  origin: { id: string; entityId: string; name: string; displayCode: string; city: string; country: string };
-  destination: { id: string; entityId: string; name: string; displayCode: string; city: string; country: string };
+  origin: { id: string; name: string; displayCode: string; city: string; country: string };
+  destination: { id: string; name: string; displayCode: string; city: string; country: string };
   durationInMinutes: number;
   stopCount: number;
   departure: string;
   arrival: string;
-  carriers: {
-    marketing: Array<{ id: number; alternateId: string; name: string }>;
-  };
+  carriers: { marketing: Array<{ id: number; alternateId: string; name: string }> };
   segments: Array<{
-    origin: { flightPlaceId: string; displayCode: string; name: string };
-    destination: { flightPlaceId: string; displayCode: string; name: string };
+    origin: { displayCode: string; name: string };
+    destination: { displayCode: string; name: string };
     departure: string;
     arrival: string;
     durationInMinutes: number;
     flightNumber: string;
     marketingCarrier: { displayCode: string; name: string };
-    operatingCarrier: { displayCode: string; name: string };
   }>;
 }
 
 interface SkyItinerary {
   id: string;
-  token?: string;
   price: { raw: number; formatted: string };
   legs: SkyFlightLeg[];
-  isSelfTransfer: boolean;
-}
-
-interface SkySearchResult {
-  status: boolean;
-  data: {
-    itineraries: SkyItinerary[];
-    context: { status: string; sessionId?: string };
-  };
-}
-
-async function skyFetch<T>(path: string, params: Record<string, string> = {}): Promise<T | null> {
-  if (!RAPIDAPI_KEY) return null;
-  try {
-    const url = new URL(`https://${SKY_HOST}${path}`);
-    for (const [k, v] of Object.entries(params)) url.searchParams.set(k, v);
-    const resp = await fetch(url.toString(), {
-      headers: {
-        'X-RapidAPI-Key': RAPIDAPI_KEY,
-        'X-RapidAPI-Host': SKY_HOST,
-      },
-    });
-    if (!resp.ok) return null;
-    const json = await resp.json();
-    return json as T;
-  } catch {
-    return null;
-  }
 }
 
 async function resolveEntity(iata: string): Promise<{ skyId: string; entityId: string } | null> {
-  const data = await skyFetch<SkyAirportResult>('/api/v1/flights/searchAirport', { query: iata, locale: 'en-US' });
-  if (!data?.data?.length) return null;
-
-  const match = data.data.find(a =>
-    a.navigation.relevantFlightParams.flightPlaceType === 'AIRPORT' &&
-    a.navigation.relevantFlightParams.skyId === iata
-  ) || data.data[0];
-
-  if (match) {
-    return {
-      skyId: match.navigation.relevantFlightParams.skyId,
-      entityId: match.navigation.entityId,
-    };
-  }
-  return null;
+  try {
+    const resp = await fetch(`/api/flights-skyscanner?action=searchAirport&query=${iata}`);
+    if (!resp.ok) return null;
+    const data = await resp.json();
+    if (!data?.data?.length) return null;
+    const match = data.data.find((a: { navigation: { relevantFlightParams: { skyId: string; flightPlaceType: string } } }) =>
+      a.navigation.relevantFlightParams.flightPlaceType === 'AIRPORT' &&
+      a.navigation.relevantFlightParams.skyId === iata
+    ) || data.data[0];
+    return { skyId: match.navigation.relevantFlightParams.skyId, entityId: match.navigation.entityId };
+  } catch { return null; }
 }
 
 async function searchFlightsWithPolling(params: Record<string, string>): Promise<SkyItinerary[]> {
@@ -97,21 +47,20 @@ async function searchFlightsWithPolling(params: Record<string, string>): Promise
   let sessionId: string | undefined;
 
   for (let attempt = 0; attempt < maxPolls; attempt++) {
-    const pollParams = { ...params };
-    if (sessionId) pollParams.sessionId = sessionId;
+    const searchParams = new URLSearchParams(params);
+    if (sessionId) searchParams.set('sessionId', sessionId);
+    searchParams.set('action', 'searchFlights');
 
-    const result = await skyFetch<SkySearchResult>('/api/v1/flights/searchFlights', pollParams);
+    const resp = await fetch(`/api/flights-skyscanner?${searchParams}`);
+    if (!resp.ok) break;
+    const result = await resp.json();
     if (!result?.data?.itineraries) break;
 
     allItineraries.push(...result.data.itineraries);
-
     if (result.data.context?.status === 'complete') break;
     if (result.data.context?.sessionId) {
       sessionId = result.data.context.sessionId;
-    } else {
-      break;
-    }
-
+    } else break;
     await new Promise(r => setTimeout(r, 2000));
   }
 
@@ -121,7 +70,6 @@ async function searchFlightsWithPolling(params: Record<string, string>): Promise
 function buildOffer(itin: SkyItinerary, params: SourceParams): FlightOffer | null {
   const legs = itin.legs || [];
   if (legs.length === 0) return null;
-
   const price = Math.round(itin.price?.raw || 0);
   if (price <= 0) return null;
 
@@ -132,15 +80,12 @@ function buildOffer(itin: SkyItinerary, params: SourceParams): FlightOffer | nul
     const leg = legs[i];
     const segments = leg.segments || [];
     const firstSeg = segments[0] || {};
-    const lastSeg = segments[segments.length - 1] || firstSeg;
-
     const marketing = leg.carriers?.marketing?.[0];
     const airlineCode = marketing?.alternateId || firstSeg.marketingCarrier?.displayCode || '?';
     const airlineName = marketing?.name || firstSeg.marketingCarrier?.name || 'Skyscanner';
 
     const fl: FlightLeg = {
-      airline: airlineCode,
-      airlineName,
+      airline: airlineCode, airlineName,
       flightNumber: firstSeg.flightNumber ? `${airlineCode}${firstSeg.flightNumber}` : '?',
       aircraft: 'A confirmar',
       departure: leg.departure || `${params.dateFrom}T08:00:00`,
@@ -163,8 +108,7 @@ function buildOffer(itin: SkyItinerary, params: SourceParams): FlightOffer | nul
 
   return {
     id: `sky-${legs[0]?.carriers?.marketing?.[0]?.alternateId || 'xx'}-${Date.now()}-${Math.random().toString(36).slice(2, 5)}`,
-    origin: params.origin,
-    destination: params.destination,
+    origin: params.origin, destination: params.destination,
     totalDurationMinutes: outboundLegs.reduce((sum, l) => sum + l.durationMinutes, 0) + returnLegs.reduce((sum, l) => sum + l.durationMinutes, 0),
     outboundLegs,
     returnLegs: returnLegs.length ? returnLegs : undefined,
@@ -194,8 +138,7 @@ function buildOffer(itin: SkyItinerary, params: SourceParams): FlightOffer | nul
       sourcesChecked: 1,
       prices: { Skyscanner: price * params.adults },
       avgPrice: price * params.adults,
-      divergencePct: 0,
-      confidence: 'high',
+      divergencePct: 0, confidence: 'high',
     },
     lastUpdated: new Date().toISOString(),
     priceHistory: [],
@@ -204,7 +147,6 @@ function buildOffer(itin: SkyItinerary, params: SourceParams): FlightOffer | nul
 
 export async function searchSkyscanner(params: SourceParams): Promise<SourceResult> {
   const t0 = Date.now();
-  if (!RAPIDAPI_KEY) return { source: 'skyscanner', offers: [], latencyMs: 0, error: 'No RapidAPI key' };
 
   try {
     const [originEntity, destEntity] = await Promise.all([
@@ -224,8 +166,6 @@ export async function searchSkyscanner(params: SourceParams): Promise<SourceResu
       date: params.dateFrom,
       adults: String(params.adults),
       currency: params.currency,
-      countryCode: 'PT',
-      market: 'pt-PT',
     };
     if (params.dateTo) searchParams.returnDate = params.dateTo;
 
