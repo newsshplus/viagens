@@ -9,7 +9,7 @@ export interface SourceParams {
   currency: string;
 }
 
-export type SourceName = 'travelpayouts' | 'google_flights' | 'skyscanner';
+export type SourceName = 'travelpayouts' | 'google_flights' | 'skyscanner' | 'ryanair';
 
 export interface SourceResult {
   source: SourceName;

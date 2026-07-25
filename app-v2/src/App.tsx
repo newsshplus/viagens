@@ -137,7 +137,7 @@ export default function App() {
                   <div className="mt-2 pt-2 border-t border-dark-600/50 space-y-1">
                     {search.sourceStats.map((s) => (
                       <div key={s.name} className="flex justify-between text-[10px]">
-                        <span className="text-dark-400 capitalize">{s.name === 'google_flights' ? 'Google Flights' : s.name}</span>
+                        <span className="text-dark-400 capitalize">{s.name === 'google_flights' ? 'Google Flights' : s.name === 'ryanair' ? 'Ryanair' : s.name}</span>
                         <span className={`font-mono ${s.error ? 'text-red-400' : 'text-dark-300'}`} title={s.error || undefined}>
                           {s.error ? (s.error.length > 28 ? s.error.slice(0, 28) + '…' : s.error) : `${s.count} voos · ${s.latencyMs}ms`}
                         </span>
@@ -175,7 +175,7 @@ export default function App() {
                   )}
                   {search.sourceStats.length > 0 && (
                     <span className="text-[10px] text-dark-500">
-                      • {search.sourceStats.filter(s => s.count > 0).map(s => s.name === 'google_flights' ? 'Google' : s.name).join(' + ')}
+                      • {search.sourceStats.filter(s => s.count > 0).map(s => s.name === 'google_flights' ? 'Google' : s.name === 'ryanair' ? 'Ryanair' : s.name).join(' + ')}
                     </span>
                   )}
                 </div>
@@ -219,7 +219,7 @@ export default function App() {
                   </div>
                   <h3 className="text-lg font-bold text-dark-200 mb-2">Busque seu próximo voo</h3>
                   <p className="text-sm text-dark-400 max-w-sm mx-auto">
-                    Use o formulário ao lado para buscar voos de forma anônima com dados de 3 fontes diferentes.
+                    Use o formulário ao lado para buscar voos de forma anônima com dados de 4 fontes diferentes.
                     Preços são cruzados para garantir confiabilidade.
                   </p>
                 </div>

@@ -3,6 +3,7 @@ import type { SourceParams, SourceName } from './types';
 import { searchTravelpayouts } from './travelpayouts';
 import { searchGoogleFlights } from './googleFlights';
 import { searchSkyscanner } from './skyscanner';
+import { searchRyanair } from './ryanair';
 
 export interface MultiSourceResult {
   offers: FlightOffer[];
@@ -19,6 +20,7 @@ export async function searchAllSources(params: SourceParams): Promise<MultiSourc
     searchTravelpayouts(params),
     searchGoogleFlights(params),
     searchSkyscanner(params),
+    searchRyanair(params),
   ]);
 
   const allOffers: FlightOffer[] = [];

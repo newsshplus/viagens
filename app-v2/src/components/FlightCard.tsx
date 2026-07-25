@@ -89,10 +89,12 @@ export default function FlightCard({ offer, onSelect }: Props) {
             <span className={`px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider ${
               offer.sources[0] === 'google_flights' ? 'bg-blue-500/15 text-blue-400' :
               offer.sources[0] === 'skyscanner' ? 'bg-cyan-500/15 text-cyan-400' :
+              offer.sources[0] === 'ryanair' ? 'bg-yellow-500/15 text-yellow-400' :
               'bg-purple-500/15 text-purple-400'
             }`}>
               {offer.sources[0] === 'google_flights' ? 'Google' :
-               offer.sources[0] === 'skyscanner' ? 'Skyscanner' : 'Travelpayouts'}
+               offer.sources[0] === 'skyscanner' ? 'Skyscanner' :
+               offer.sources[0] === 'ryanair' ? 'Ryanair' : 'Travelpayouts'}
             </span>
           )}
         </div>
