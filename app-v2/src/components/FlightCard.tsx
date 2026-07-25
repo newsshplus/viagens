@@ -5,6 +5,7 @@ import { openBookingLink } from '../lib/searchEngine';
 interface Props {
   offer: FlightOffer;
   onSelect: (offer: FlightOffer) => void;
+  isBest?: boolean;
 }
 
 function ConfidenceBadge({ confidence }: { confidence: string }) {
@@ -65,7 +66,7 @@ function fmt(price: number, cur: string): string {
   return `${s[cur] || cur} ${price}`;
 }
 
-export default function FlightCard({ offer, onSelect }: Props) {
+export default function FlightCard({ offer, onSelect, isBest }: Props) {
   const out = offer.outboundLegs[0];
   const ret = offer.returnLegs?.[0];
   const isLink = offer.totalPrice === 0;
@@ -74,18 +75,31 @@ export default function FlightCard({ offer, onSelect }: Props) {
   return (
     <div
       onClick={() => onSelect(offer)}
-      className="glass glass-hover rounded-2xl p-5 cursor-pointer animate-slide-up group relative overflow-hidden"
+      className={`glass glass-hover rounded-2xl p-5 cursor-pointer animate-slide-up group relative overflow-hidden ${
+        isBest ? 'ring-2 ring-emerald-500/40' : ''
+      }`}
     >
+      {isBest && !offer.promoTag && (
+        <div className="absolute top-3 right-3">
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/20 text-emerald-400">
+            🏆 Melhor preço
+          </span>
+        </div>
+      )}
       {offer.promoTag && (
         <div className="absolute top-3 right-3"><PromoTag tag={offer.promoTag} /></div>
       )}
 
       {/* Header: airline + flight number + badge */}
       <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           <span className="text-sm font-bold text-dark-50">{out.airlineName}</span>
           <span className="text-xs text-dark-400 font-mono">{out.flightNumber}</span>
-          {offer.sources[0] && (
+          {offer.sources.length > 1 ? (
+            <span className="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider bg-emerald-500/15 text-emerald-400">
+              ✓ Confirmado por {offer.sources.length} fontes
+            </span>
+          ) : offer.sources[0] && (
             <span className={`px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider ${
               offer.sources[0] === 'google_flights' ? 'bg-blue-500/15 text-blue-400' :
               offer.sources[0] === 'skyscanner' ? 'bg-cyan-500/15 text-cyan-400' :

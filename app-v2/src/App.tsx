@@ -77,6 +77,12 @@ export default function App() {
     );
   };
 
+  const cheapestOfferId = search.offers.reduce<{ id: string; price: number } | null>((best, o) => {
+    if (o.totalPrice <= 0) return best;
+    if (!best || o.totalPrice < best.price) return { id: o.id, price: o.totalPrice };
+    return best;
+  }, null)?.id ?? null;
+
   const handleSelectCheaperDate = (dateFrom: string) => {
     if (!search.currentParams) return;
     search.search({ ...search.currentParams, dateFrom });
@@ -246,6 +252,7 @@ export default function App() {
                   key={offer.id}
                   offer={offer}
                   onSelect={(o) => search.selectOffer(o)}
+                  isBest={offer.id === cheapestOfferId}
                 />
               ))}
             </div>

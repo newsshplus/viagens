@@ -4,6 +4,7 @@ import { searchTravelpayouts } from './travelpayouts';
 import { searchGoogleFlights } from './googleFlights';
 import { searchSkyscanner } from './skyscanner';
 import { searchRyanair } from './ryanair';
+import { mergeCrossSourceOffers } from './offerMerge';
 
 export interface MultiSourceResult {
   offers: FlightOffer[];
@@ -45,11 +46,15 @@ export async function searchAllSources(params: SourceParams): Promise<MultiSourc
     }
   }
 
-  allOffers.sort((a, b) => {
+  // Junta ofertas de fontes diferentes que sao o mesmo voo real, em vez de
+  // mostrar o mesmo assento repetido com precos desencontrados.
+  const mergedOffers = mergeCrossSourceOffers(allOffers);
+
+  mergedOffers.sort((a, b) => {
     if (a.totalPrice === 0) return 1;
     if (b.totalPrice === 0) return -1;
     return a.totalPrice - b.totalPrice;
   });
 
-  return { offers: allOffers, sources: sourceStats };
+  return { offers: mergedOffers, sources: sourceStats };
 }
