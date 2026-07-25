@@ -10,6 +10,7 @@ import MonitorList from './components/MonitorList';
 import MonitorDialog from './components/MonitorDialog';
 import SkeletonCard from './components/SkeletonCard';
 import InstallAppButton from './components/InstallAppButton';
+import CheaperDateBanner from './components/CheaperDateBanner';
 
 export default function App() {
   const search = useFlightSearch();
@@ -73,6 +74,11 @@ export default function App() {
       },
       price
     );
+  };
+
+  const handleSelectCheaperDate = (dateFrom: string) => {
+    if (!search.currentParams) return;
+    search.search({ ...search.currentParams, dateFrom });
   };
 
   return (
@@ -156,6 +162,14 @@ export default function App() {
           </div>
 
           <div className="lg:col-span-8" ref={resultsRef}>
+            {!search.loading && search.offers.length > 0 && search.currentParams && (
+              <CheaperDateBanner
+                params={search.currentParams}
+                currentPrice={search.offers[0].totalPrice}
+                onSelectDate={handleSelectCheaperDate}
+              />
+            )}
+
             {search.error && (
               <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4 mb-4 animate-fade-in">
                 <p className="text-sm text-red-400">{search.error}</p>

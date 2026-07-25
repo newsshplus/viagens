@@ -12,6 +12,7 @@ interface UseSearchResult {
   error: string | null;
   searchCount: number;
   lastSearchTime: string | null;
+  currentParams: SearchParams | null;
   search: (params: SearchParams) => Promise<void>;
   filterDirect: (direct: boolean) => void;
   sortBy: (key: "price" | "duration" | "stops") => void;
@@ -104,7 +105,7 @@ export function useFlightSearch(): UseSearchResult {
   }, []);
 
   return {
-    offers, loading, error, searchCount, lastSearchTime, sourceStats,
+    offers, loading, error, searchCount, lastSearchTime, sourceStats, currentParams,
     search, filterDirect, sortBy,
     selectedOffer, selectOffer: setSelectedOffer,
   };
