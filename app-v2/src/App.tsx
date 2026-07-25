@@ -136,8 +136,8 @@ export default function App() {
                     {search.sourceStats.map((s) => (
                       <div key={s.name} className="flex justify-between text-[10px]">
                         <span className="text-dark-400 capitalize">{s.name === 'google_flights' ? 'Google Flights' : s.name}</span>
-                        <span className={`font-mono ${s.error ? 'text-red-400' : 'text-dark-300'}`}>
-                          {s.error ? 'erro' : `${s.count} voos · ${s.latencyMs}ms`}
+                        <span className={`font-mono ${s.error ? 'text-red-400' : 'text-dark-300'}`} title={s.error || undefined}>
+                          {s.error ? (s.error.length > 28 ? s.error.slice(0, 28) + '…' : s.error) : `${s.count} voos · ${s.latencyMs}ms`}
                         </span>
                       </div>
                     ))}
