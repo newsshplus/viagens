@@ -14,6 +14,7 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   const apiKey = process.env.GROQ_API_KEY;
+  console.log(`[ai-analysis] GROQ_API_KEY presente: ${apiKey ? 'sim (' + apiKey.length + ' caracteres)' : 'NAO'}`);
   if (!apiKey) {
     return res.status(200).json({
       available: false,
@@ -64,6 +65,7 @@ Se o historico for curto demais (menos de 5 pontos) para conclusoes solidas, dig
 
     if (!resp.ok) {
       const errText = await resp.text();
+      console.log(`[ai-analysis] Groq respondeu status=${resp.status}: ${errText.slice(0, 300)}`);
       return res.status(200).json({ available: false, message: `Groq retornou erro: ${errText.slice(0, 200)}` });
     }
 

@@ -1,8 +1,10 @@
 // Service worker mínimo - existe principalmente pra habilitar a instalação
-// do app (critério exigido pelos navegadores). Faz cache leve do "shell"
-// (HTML/JS/CSS) pra abrir mais rápido, mas nunca serve dado de busca de voo
-// do cache - preços sempre vêm da rede, nunca de uma cópia antiga.
-const CACHE_NAME = 'viagens-smart-shell-v1';
+// do app (critério exigido pelos navegadores). Estratégia network-first:
+// SEMPRE tenta buscar a versão mais nova primeiro, e só usa uma cópia em
+// cache se a rede falhar (modo offline). Isso garante que toda atualização
+// publicada apareça imediatamente, sem o usuário ficar preso numa versão
+// antiga - preços de voo nunca vêm do cache, sempre da rede.
+const CACHE_NAME = 'viagens-smart-shell-v2';
 
 self.addEventListener('install', (event) => {
   self.skipWaiting();
@@ -26,17 +28,14 @@ self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
 
   event.respondWith(
-    caches.match(event.request).then((cached) => {
-      const fetchPromise = fetch(event.request)
-        .then((networkResponse) => {
-          if (networkResponse && networkResponse.status === 200) {
-            const clone = networkResponse.clone();
-            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
-          }
-          return networkResponse;
-        })
-        .catch(() => cached);
-      return cached || fetchPromise;
-    })
+    fetch(event.request)
+      .then((networkResponse) => {
+        if (networkResponse && networkResponse.status === 200) {
+          const clone = networkResponse.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+        }
+        return networkResponse;
+      })
+      .catch(() => caches.match(event.request))
   );
 });

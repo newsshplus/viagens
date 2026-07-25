@@ -97,18 +97,20 @@ function FareTab({ fare, currency }: { fare: FlightOffer['fareBreakdown']; curre
   );
 }
 
-function RulesTab({ rules }: { rules: FlightOffer['ticketRules'] }) {
-  const items = [["Cancelamento", rules.cancellation], ["Reembolso", rules.refund], ["Alteração", rules.change], ["Bagagem despacho", rules.checkedBaggage], ["Bagagem mão", rules.handBaggage], ["Assento", rules.seatSelection]];
+function RulesTab({ offer }: { offer: FlightOffer }) {
+  const source = offer.sources[0];
+  const sourceName = source === 'google_flights' ? 'Google Flights' : source === 'skyscanner' ? 'Skyscanner' : 'Travelpayouts';
   return (
     <div className="bg-dark-800/50 rounded-xl p-5">
-      <div className="space-y-4">
-        {items.map(([l, v]) => (
-          <div key={l as string}>
-            <div className="text-xs text-dark-400 uppercase tracking-wider mb-1">{l}</div>
-            <div className="text-sm text-dark-100">{v}</div>
-          </div>
-        ))}
-      </div>
+      <p className="text-sm text-dark-200 leading-relaxed">
+        As fontes gratuitas usadas aqui ({sourceName}) não fornecem regras detalhadas de cancelamento,
+        reembolso, alteração ou franquia de bagagem — isso exige acesso pago a dados de tarifa da companhia
+        aérea (fare rules), que nenhuma das 3 fontes disponibiliza de graça.
+      </p>
+      <p className="text-sm text-dark-400 mt-3">
+        Pra ver as regras reais dessa tarifa, confira diretamente no site da companhia aérea ou no
+        {offer.deepLink ? ' Skyscanner' : ' Google Flights'} ao finalizar a reserva.
+      </p>
     </div>
   );
 }
@@ -215,7 +217,7 @@ export default function DetailModal({ offer, onClose, onMonitor }: Props) {
             <>
               {tab === "itinerary" && <ItineraryTab legs={offer.outboundLegs} />}
               {tab === "fare" && <FareTab fare={offer.fareBreakdown} currency={offer.currency} />}
-              {tab === "rules" && <RulesTab rules={offer.ticketRules} />}
+              {tab === "rules" && <RulesTab offer={offer} />}
               {tab === "history" && <HistoryTab offer={offer} />}
             </>
           )}
