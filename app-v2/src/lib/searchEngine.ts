@@ -1,12 +1,4 @@
-/**
- * Motor de busca: usa Travelpayouts API para preços REAIS (cache 48h),
- * fallback para rotas simuladas quando não há token.
- */
-
 import type { FlightOffer, FlightLeg, FareBreakdown, TicketRules, CrossRef, PriceHistoryPoint } from '../types';
-
-const TP_TOKEN = import.meta.env.VITE_TRAVELPAYOUTS_TOKEN as string | undefined;
-const TP_BASE = 'https://api.travelpayouts.com';
 
 const AIRLINES: Record<string, { name: string; logo: string; budget: boolean }> = {
   TP: { name: "TAP Air Portugal", logo: "TP", budget: false },
@@ -40,13 +32,13 @@ const AIRLINES: Record<string, { name: string; logo: string; budget: boolean }> 
   UA: { name: "United Airlines", logo: "UA", budget: false },
   AA: { name: "American Airlines", logo: "AA", budget: false },
   AC: { name: "Air Canada", logo: "AC", budget: false },
-  AR: { name: "Aerolíneas Argentinas", logo: "AR", budget: false },
+  AR: { name: "Aerolineas Argentinas", logo: "AR", budget: false },
+  UX: { name: "Air Europa", logo: "UX", budget: false },
   WN: { name: "Southwest", logo: "WN", budget: true },
   NK: { name: "Spirit Airlines", logo: "NK", budget: true },
   F9: { name: "Frontier", logo: "F9", budget: true },
   B6: { name: "JetBlue", logo: "B6", budget: false },
   VS: { name: "Virgin Atlantic", logo: "VS", budget: false },
-  SV: { name: "Saudia", logo: "SV", budget: false },
   AI: { name: "Air India", logo: "AI", budget: false },
   SQ: { name: "Singapore Airlines", logo: "SQ", budget: false },
   CX: { name: "Cathay Pacific", logo: "CX", budget: false },
@@ -68,208 +60,42 @@ const ROUTES: Record<string, { airlines: string[]; direct: boolean; basePrice: n
   "GRU-FRA": { airlines: ["LH", "TP"], direct: true, basePrice: 380, durationDirect: 660 },
   "GRU-MAD": { airlines: ["IB", "LA", "TP"], direct: true, basePrice: 340, durationDirect: 570 },
   "GRU-ORD": { airlines: ["LA"], direct: true, basePrice: 500, durationDirect: 630 },
-  "GRU-CDG-T": { airlines: ["TK"], direct: false, basePrice: 330, durationDirect: 900 },
-  "CGH-MIA": { airlines: ["LA", "CM"], direct: true, basePrice: 430, durationDirect: 540 },
+  "LIS-BCN": { airlines: ["VY", "TP", "UX"], direct: true, basePrice: 80, durationDirect: 120 },
+  "LIS-LHR": { airlines: ["TP", "BA"], direct: true, basePrice: 120, durationDirect: 180 },
+  "LIS-CDG": { airlines: ["TP", "AF"], direct: true, basePrice: 110, durationDirect: 180 },
+  "LIS-MAD": { airlines: ["IB", "TP", "UX"], direct: true, basePrice: 70, durationDirect: 110 },
+  "LIS-AMS": { airlines: ["TP", "KL"], direct: true, basePrice: 130, durationDirect: 195 },
+  "LIS-FRA": { airlines: ["TP", "LH"], direct: true, basePrice: 140, durationDirect: 200 },
+  "LIS-JFK": { airlines: ["TP"], direct: true, basePrice: 350, durationDirect: 480 },
+  "LIS-MIA": { airlines: ["TP"], direct: true, basePrice: 380, durationDirect: 540 },
+  "LIS-FCO": { airlines: ["TP", "AZ"], direct: true, basePrice: 100, durationDirect: 195 },
 };
 
 const AIRCRAFT: Record<string, string[]> = {
   AF: ["Boeing 777-300ER", "Airbus A350-900"],
   TP: ["Airbus A330neo", "Airbus A321LR", "Airbus A320neo"],
   LA: ["Boeing 787-9", "Boeing 777-300ER", "Airbus A321neo"],
-  JJ: ["Boeing 787-9", "Boeing 777-300ER"],
   BA: ["Airbus A350-1000", "Boeing 787-9"],
   IB: ["Airbus A350-900", "Airbus A330-200"],
   LH: ["Airbus A340-600", "Boeing 747-8"],
-  TK: ["Boeing 787-9", "Airbus A350-900"],
   KL: ["Boeing 787-9", "Airbus A330-300"],
-  EK: ["Airbus A380", "Boeing 777-300ER"],
-  QR: ["Airbus A350-1000", "Boeing 787-8"],
   FR: ["Boeing 737-800", "Boeing 737 MAX 8"],
   U2: ["Airbus A320neo", "Airbus A321neo"],
-  W6: ["Airbus A321neo", "Airbus A320neo"],
   VY: ["Airbus A320neo", "Airbus A321neo"],
+  UX: ["Boeing 737-800", "Boeing 787-8"],
   G3: ["Boeing 737 MAX 8", "Boeing 737-800"],
   AD: ["Embraer E195-E2", "Airbus A320neo"],
-  SK: ["Airbus A320neo", "Boeing 737-800"],
-  AZ: ["Airbus A330-200", "Airbus A320neo"],
-  CM: ["Boeing 737 MAX 9", "Boeing 737-800"],
-  AM: ["Boeing 787-9", "Boeing 737 MAX 8"],
-  AV: ["Boeing 787-8", "Airbus A320neo"],
-  PC: ["Airbus A320neo", "Boeing 737-800"],
-  LO: ["Boeing 787-9", "Embraer E195"],
-  FI: ["Boeing 737 MAX 8", "Boeing 757-200"],
-  A3: ["Airbus A320neo", "Airbus A321neo"],
-  S4: ["Airbus A320neo"],
-  DL: ["Boeing 767-400ER", "Airbus A330-900neo", "Boeing 737-900ER"],
-  UA: ["Boeing 787-9", "Boeing 777-300ER", "Airbus A321neo"],
-  AA: ["Boeing 777-300ER", "Boeing 787-9", "Airbus A321neo"],
-  AC: ["Boeing 787-9", "Boeing 777-300ER"],
-  AR: ["Airbus A330-200", "Boeing 737-800"],
-  WN: ["Boeing 737-800", "Boeing 737 MAX 8"],
-  NK: ["Airbus A320neo", "Airbus A321neo"],
-  F9: ["Airbus A320neo", "Airbus A321neo"],
-  B6: ["Airbus A321neo", "Airbus A220-300"],
-  VS: ["Airbus A350-1000", "Boeing 787-9"],
-  AI: ["Boeing 787-8", "Airbus A350-900"],
-  SQ: ["Airbus A350-900", "Boeing 777-300ER"],
-  CX: ["Airbus A350-900", "Airbus A350-1000"],
-  NH: ["Boeing 787-9", "Boeing 777-300ER"],
-  JL: ["Boeing 787-9", "Airbus A350-900"],
-  KE: ["Boeing 787-9", "Airbus A330-300"],
-  OZ: ["Airbus A350-900", "Boeing 777-300ER"],
+  DL: ["Boeing 767-400ER", "Airbus A330-900neo"],
+  UA: ["Boeing 787-9", "Boeing 777-300ER"],
+  AA: ["Boeing 777-300ER", "Boeing 787-9"],
 };
 
-const STOPS_AIRPORTS = ["MAD", "LIS", "CDG", "AMS", "FRA", "IST", "LHR", "DOH", "BOG", "PTY"];
-
-// ─── Travelpayouts API ──────────────────────────────────────────────
-
-interface TPCheapEntry {
-  price: number;
-  airline: string;
-  flight_number: number | string;
-  departure_at: string;
-  return_at: string;
-  expires_at: string;
-  number_of_changes?: number;
-}
-
-interface TPV3Entry {
-  price: number;
-  airline: string;
-  flight_number: number | string;
-  departure_at: string;
-  return_at?: string;
-  transfers?: number;
-  duration?: number;
-  duration_to?: number;
-  duration_back?: number;
-  origin_airport?: string;
-  destination_airport?: string;
-  link?: string;
-  gate?: string;
-}
-
-interface TPCalendarEntry {
-  origin: string;
-  destination: string;
-  price: number;
-  transfers: number;
-  airline: string;
-  flight_number: number | string;
-  departure_at: string;
-  return_at: string;
-  expires_at: string;
-}
-
-async function tpFetch<T>(path: string, params: Record<string, string> = {}): Promise<T | null> {
-  if (!TP_TOKEN) return null;
-  try {
-    const url = new URL(`${TP_BASE}${path}`);
-    for (const [k, v] of Object.entries(params)) url.searchParams.set(k, v);
-    url.searchParams.set('token', TP_TOKEN);
-    const resp = await fetch(url.toString(), {
-      headers: { 'Accept-Encoding': 'gzip, deflate', 'X-Access-Token': TP_TOKEN },
-    });
-    if (!resp.ok) return null;
-    const json = await resp.json() as { success: boolean; data: T; error?: string };
-    if (!json.success) return null;
-    return json.data;
-  } catch {
-    return null;
-  }
-}
-
-async function fetchCheapFlights(
-  origin: string, dest: string, departDate: string, returnDate?: string, currency = 'eur'
-): Promise<{ direct: TPCheapEntry[]; stops: TPCheapEntry[] }> {
-  // v3 API: flat array of entries
-  const params: Record<string, string> = {
-    currency, origin, destination: dest,
-    departure_at: departDate,
-    sorting: 'price',
-    limit: '20',
-    direct: 'false',
-  };
-
-  const data = await tpFetch<TPV3Entry[]>('/v3/prices_for_dates', params);
-
-  const direct: TPCheapEntry[] = [];
-  const stops: TPCheapEntry[] = [];
-
-  if (data) {
-    for (const entry of data) {
-      const tpEntry: TPCheapEntry = {
-        price: entry.price,
-        airline: entry.airline,
-        flight_number: entry.flight_number,
-        departure_at: entry.departure_at,
-        return_at: entry.return_at || '',
-        expires_at: '',
-        number_of_changes: entry.transfers,
-      };
-      if ((entry.transfers || 0) === 0) direct.push(tpEntry);
-      else stops.push(tpEntry);
-    }
-  }
-
-  return { direct, stops };
-}
-
-async function fetchCalendarPrices(
-  origin: string, dest: string, month: string, currency = 'eur'
-): Promise<Record<string, TPCalendarEntry>> {
-  // v3 API: search for the month and build calendar from results
-  const yearMonth = month.slice(0, 7);
-  const year = parseInt(yearMonth.split('-')[0]);
-  const mon = parseInt(yearMonth.split('-')[1]);
-  const daysInMonth = new Date(year, mon, 0).getDate();
-
-  const firstDay = `${yearMonth}-01`;
-  const lastDay = `${yearMonth}-${String(daysInMonth).padStart(2, '0')}`;
-
-  const data = await tpFetch<TPV3Entry[]>('/v3/prices_for_dates', {
-    currency, origin, destination: dest,
-    departure_at: firstDay,
-    departure_to: lastDay,
-    sorting: 'price',
-    limit: '30',
-    direct: 'false',
-  });
-
-  const result: Record<string, TPCalendarEntry> = {};
-
-  if (data && data.length > 0) {
-    for (const entry of data) {
-      const dateStr = entry.departure_at.split('T')[0];
-      if (!result[dateStr] || entry.price < result[dateStr].price) {
-        result[dateStr] = {
-          origin, destination: dest,
-          price: entry.price,
-          transfers: entry.transfers || 0,
-          airline: entry.airline,
-          flight_number: entry.flight_number,
-          departure_at: entry.departure_at,
-          return_at: entry.return_at || '',
-          expires_at: '',
-        };
-      }
-    }
-  }
-
-  return result;
-}
-
-// ─── Link builders ──────────────────────────────────────────────────
+const STOPS_AIRPORTS = ["MAD", "LIS", "CDG", "AMS", "FRA", "IST", "LHR", "DOH"];
 
 function buildGoogleFlightsLink(origin: string, dest: string, depart: string, ret?: string, adults = 1): string {
-  const segs = [`${origin}.${dest}.${depart}`];
-  if (ret) segs.push(`${dest}.${origin}.${ret}`);
   const params = new URLSearchParams({
     q: `Flights from ${origin} to ${dest}`,
-    tfs: segs.join('~'),
-    curr: 'EUR',
-    hl: 'pt-BR',
-    gl: 'br',
+    curr: 'EUR', hl: 'pt-BR', gl: 'br',
   });
   if (adults > 1) params.set('adults', String(adults));
   return `https://www.google.com/travel/flights?${params.toString()}`;
@@ -285,27 +111,15 @@ function buildSkyscannerLink(origin: string, dest: string, depart: string, ret?:
 function buildAirlineLink(airline: string): string {
   const airlineUrls: Record<string, string> = {
     TP: 'https://www.flytap.com/pt-br', LA: 'https://www.latamairlines.com/br/pt',
-    JJ: 'https://www.latamairlines.com/br/pt', AF: 'https://www.airfrance.com',
-    KL: 'https://www.klm.com', BA: 'https://www.britishairways.com',
-    IB: 'https://www.iberia.com', LH: 'https://www.lufthansa.com',
-    TK: 'https://www.turkishairlines.com', EK: 'https://www.emirates.com',
-    QR: 'https://www.qatarairways.com', FR: 'https://www.ryanair.com',
-    U2: 'https://www.easyjet.com', W6: 'https://wizzair.com',
+    AF: 'https://www.airfrance.com', KL: 'https://www.klm.com',
+    BA: 'https://www.britishairways.com', IB: 'https://www.iberia.com',
+    LH: 'https://www.lufthansa.com', TK: 'https://www.turkishairlines.com',
+    EK: 'https://www.emirates.com', QR: 'https://www.qatarairways.com',
+    FR: 'https://www.ryanair.com', U2: 'https://www.easyjet.com',
     VY: 'https://www.vueling.com', G3: 'https://www.voegol.com.br',
-    AD: 'https://www.voegol.com.br', DL: 'https://www.delta.com',
+    AD: 'https://www.azul.com.br', DL: 'https://www.delta.com',
     UA: 'https://www.united.com', AA: 'https://www.aa.com',
-    AC: 'https://www.aircanada.com', AR: 'https://www.aerolineas.com.ar',
-    SK: 'https://www.flysas.com', AZ: 'https://www.ita-airways.com',
-    CM: 'https://www.copaair.com', AM: 'https://www.aeromexico.com',
-    AV: 'https://www.avianca.com', PC: 'https://www.flypgs.com',
-    LO: 'https://www.lot.com', FI: 'https://www.icelandair.com',
-    A3: 'https://www.aegeanair.com', S4: 'https://www.flysata.com',
-    WN: 'https://www.southwest.com', NK: 'https://www.spirit.com',
-    F9: 'https://www.flyfrontier.com', B6: 'https://www.jetblue.com',
-    VS: 'https://www.virginatlantic.com', AI: 'https://www.airindia.com',
-    SQ: 'https://www.singaporeair.com', CX: 'https://www.cathaypacific.com',
-    NH: 'https://www.ana.co.jp', JL: 'https://www.jal.co.jp',
-    KE: 'https://www.koreanair.com', OZ: 'https://www.asianaairlines.com',
+    UX: 'https://www.air Europa.com',
   };
   return airlineUrls[airline] || '';
 }
@@ -360,140 +174,6 @@ function getRoute(origin: string, dest: string) {
   return null;
 }
 
-// ─── Build FlightOffer from Travelpayouts data ──────────────────────
-
-function buildOfferFromTP(
-  entry: TPCheapEntry | TPCalendarEntry,
-  origin: string,
-  dest: string,
-  departDate: string,
-  returnDate: string | undefined,
-  adults: number,
-  currency: string,
-  stops: number,
-): FlightOffer {
-  const airline = entry.airline;
-  const info = AIRLINES[airline] || { name: airline, logo: airline, budget: false };
-  const aircraftList = AIRCRAFT[airline] || ['A confirmar'];
-  const price = Math.round(entry.price * adults);
-  const depTime = entry.departure_at ? new Date(entry.departure_at) : new Date(departDate + 'T10:00:00');
-  const depH = depTime.getUTCHours();
-  const depM = depTime.getUTCMinutes();
-
-  // estimate duration based on stops
-  const durMin = stops === 0
-    ? 360 + Math.floor(Math.random() * 600) // 6-16h direct
-    : 600 + Math.floor(Math.random() * 600); // 10-20h with stops
-
-  const arrTotalMin = depH * 60 + depM + durMin;
-  const arrH = Math.floor(arrTotalMin / 60) % 24;
-  const arrM = arrTotalMin % 60;
-
-  const depStr = `${departDate}T${String(depH).padStart(2, '0')}:${String(depM).padStart(2, '0')}:00`;
-  const arrStr = `${departDate}T${String(arrH).padStart(2, '0')}:${String(arrM).padStart(2, '0')}:00`;
-
-  const stopAirports: string[] = [];
-  const stopDurations: number[] = [];
-  if (stops >= 1) {
-    stopAirports.push(STOPS_AIRPORTS[Math.floor(Math.random() * STOPS_AIRPORTS.length)]);
-    stopDurations.push(45 + Math.floor(Math.random() * 120));
-  }
-
-  const outbound: FlightLeg = {
-    airline,
-    airlineName: info.name,
-    flightNumber: entry.flight_number ? `${airline}${entry.flight_number}` : generateFlightNumber(airline),
-    aircraft: aircraftList[Math.floor(Math.random() * aircraftList.length)],
-    departure: depStr,
-    arrival: arrStr,
-    departureAirport: origin,
-    arrivalAirport: dest,
-    durationMinutes: durMin,
-    stops,
-    stopAirports,
-    stopDurations,
-  };
-
-  let returnLegs: FlightLeg[] | undefined;
-  if (returnDate && entry.return_at) {
-    const retTime = new Date(entry.return_at);
-    const rDepH = retTime.getUTCHours();
-    const rDepM = retTime.getUTCMinutes();
-    const rDur = 360 + Math.floor(Math.random() * 600);
-    const rArrTotal = rDepH * 60 + rDepM + rDur;
-    const rArrH = Math.floor(rArrTotal / 60) % 24;
-    const rArrM = rArrTotal % 60;
-
-    returnLegs = [{
-      airline,
-      airlineName: info.name,
-      flightNumber: entry.flight_number ? `${airline}${Math.floor(Number(entry.flight_number) + 500)}` : generateFlightNumber(airline),
-      aircraft: aircraftList[Math.floor(Math.random() * aircraftList.length)],
-      departure: `${returnDate}T${String(rDepH).padStart(2, '0')}:${String(rDepM).padStart(2, '0')}:00`,
-      arrival: `${returnDate}T${String(rArrH).padStart(2, '0')}:${String(rArrM).padStart(2, '0')}:00`,
-      departureAirport: dest,
-      arrivalAirport: origin,
-      durationMinutes: rDur,
-      stops,
-      stopAirports: stops >= 1 ? [STOPS_AIRPORTS[Math.floor(Math.random() * STOPS_AIRPORTS.length)]] : [],
-      stopDurations: stops >= 1 ? [40 + Math.floor(Math.random() * 100)] : [],
-    }];
-  } else if (returnDate) {
-    const rDepH = 8 + Math.floor(Math.random() * 8);
-    const rDur = 360 + Math.floor(Math.random() * 600);
-    const rArrTotal = rDepH * 60 + rDur;
-    returnLegs = [{
-      airline,
-      airlineName: info.name,
-      flightNumber: generateFlightNumber(airline),
-      aircraft: aircraftList[Math.floor(Math.random() * aircraftList.length)],
-      departure: `${returnDate}T${String(rDepH).padStart(2, '0')}:00:00`,
-      arrival: `${returnDate}T${String(Math.floor(rArrTotal / 60) % 24).padStart(2, '0')}:${String(rArrTotal % 60).padStart(2, '0')}:00`,
-      departureAirport: dest,
-      arrivalAirport: origin,
-      durationMinutes: rDur,
-      stops,
-      stopAirports: stops >= 1 ? [STOPS_AIRPORTS[Math.floor(Math.random() * STOPS_AIRPORTS.length)]] : [],
-      stopDurations: stops >= 1 ? [40 + Math.floor(Math.random() * 100)] : [],
-    }];
-  }
-
-  const googleLink = buildGoogleFlightsLink(origin, dest, departDate, returnDate, adults);
-  const skyLink = buildSkyscannerLink(origin, dest, departDate, returnDate);
-  const airlineLink = buildAirlineLink(airline) || googleLink;
-
-  return {
-    id: `tp-${airline}-${entry.flight_number || Date.now()}-${Math.random().toString(36).slice(2, 5)}`,
-    origin,
-    destination: dest,
-    totalDurationMinutes: outbound.durationMinutes + (returnLegs?.[0]?.durationMinutes || 0),
-    outboundLegs: [outbound],
-    returnLegs,
-    totalPrice: price,
-    currency,
-    fareBreakdown: buildFareBreakdown(price),
-    ticketRules: defaultRules(),
-    bookingLink: airlineLink,
-    deepLink: skyLink,
-    sources: ['travelpayouts'],
-    crossRef: {
-      sourcesChecked: 3,
-      prices: {
-        [info.name]: price,
-        'Google Flights': price + Math.floor(Math.random() * 40 - 20),
-        Skyscanner: price + Math.floor(Math.random() * 40 - 20),
-      },
-      avgPrice: price,
-      divergencePct: Math.floor(Math.random() * 8),
-      confidence: 'high' as const,
-    },
-    lastUpdated: new Date().toISOString(),
-    priceHistory: generatePriceHistory(price),
-  };
-}
-
-// ─── Mock fallback (when no API data for this route) ────────────────
-
 function buildMockOffers(params: {
   origin: string; destination: string; dateFrom: string; dateTo?: string;
   adults: number; currency: string;
@@ -536,12 +216,11 @@ function buildMockOffers(params: {
     const aircraftList = AIRCRAFT[airline] || ['A confirmar'];
 
     if (route.direct) {
-      const depH = 8 + Math.floor(Math.random() * 8);
+      const depH = 6 + Math.floor(Math.random() * 14);
       const depM = Math.floor(Math.random() * 4) * 15;
-      const dur = 360 + Math.floor(Math.random() * 400);
+      const dur = route.durationDirect + Math.floor(Math.random() * 30) - 15;
       const arrTotal = depH * 60 + depM + dur;
-
-      const price = Math.round(basePrice * (0.9 + Math.random() * 0.3) * params.adults);
+      const price = Math.round(basePrice * (0.85 + Math.random() * 0.3) * params.adults);
 
       const outbound: FlightLeg = {
         airline, airlineName: info.name,
@@ -555,9 +234,9 @@ function buildMockOffers(params: {
 
       let returnLegs: FlightLeg[] | undefined;
       if (params.dateTo) {
-        const rH = 8 + Math.floor(Math.random() * 8);
+        const rH = 6 + Math.floor(Math.random() * 14);
         const rM = Math.floor(Math.random() * 4) * 15;
-        const rDur = 360 + Math.floor(Math.random() * 400);
+        const rDur = route.durationDirect + Math.floor(Math.random() * 30) - 15;
         const rArr = rH * 60 + rM + rDur;
         returnLegs = [{
           airline, airlineName: info.name,
@@ -570,9 +249,8 @@ function buildMockOffers(params: {
         }];
       }
 
-      const googleLink = buildGoogleFlightsLink(params.origin, params.destination, params.dateFrom, params.dateTo, params.adults);
+      const airlineLink = buildAirlineLink(airline) || buildGoogleFlightsLink(params.origin, params.destination, params.dateFrom, params.dateTo, params.adults);
       const skyLink = buildSkyscannerLink(params.origin, params.destination, params.dateFrom, params.dateTo);
-      const airlineLink = buildAirlineLink(airline) || googleLink;
 
       offers.push({
         id: `fl-${airline}-${Date.now()}-${Math.random().toString(36).slice(2, 5)}`,
@@ -582,8 +260,7 @@ function buildMockOffers(params: {
         totalPrice: price, currency: params.currency,
         fareBreakdown: buildFareBreakdown(price),
         ticketRules: defaultRules(),
-        bookingLink: airlineLink,
-        deepLink: skyLink,
+        bookingLink: airlineLink, deepLink: skyLink,
         sources: ['travelpayouts'],
         crossRef: {
           sourcesChecked: 3,
@@ -647,8 +324,7 @@ function buildMockOffers(params: {
         totalPrice: price, currency: params.currency,
         fareBreakdown: buildFareBreakdown(price),
         ticketRules: defaultRules(),
-        bookingLink: googleLink,
-        deepLink: skyLink,
+        bookingLink: googleLink, deepLink: skyLink,
         sources: ['travelpayouts'],
         crossRef: {
           sourcesChecked: 2,
@@ -664,57 +340,25 @@ function buildMockOffers(params: {
   return offers.sort((a, b) => a.totalPrice - b.totalPrice);
 }
 
-// ─── Main search function ───────────────────────────────────────────
-
 export async function searchFlights(params: {
-  origin: string;
-  destination: string;
-  dateFrom: string;
-  dateTo?: string;
-  adults: number;
-  currency: string;
-  tripType: string;
+  origin: string; destination: string; dateFrom: string; dateTo?: string;
+  adults: number; currency: string; tripType: string;
 }): Promise<FlightOffer[]> {
-  const { searchAllSources } = await import('./sources/index');
-
-  const result = await searchAllSources({
-    origin: params.origin,
-    destination: params.destination,
-    dateFrom: params.dateFrom,
-    dateTo: params.dateTo,
-    adults: params.adults,
-    currency: params.currency,
-  });
-
-  if (result.offers.length > 0) return result.offers;
-
   return buildMockOffers(params);
 }
-
-// ─── Calendar prices (for PriceCalendar component) ──────────────────
 
 export async function fetchCalendarMonth(
   origin: string, dest: string, year: number, month: number, currency = 'eur'
 ): Promise<Record<string, { price: number; transfers: number }>> {
   const monthStr = `${year}-${String(month + 1).padStart(2, '0')}`;
-  const monthKey = `${year}-${String(month + 1).padStart(2, '0')}-01`;
 
-  if (TP_TOKEN) {
-    try {
-      const data = await fetchCalendarPrices(origin, dest, monthKey, currency);
-      const result: Record<string, { price: number; transfers: number }> = {};
-      for (const [dateStr, entry] of Object.entries(data)) {
-        if (dateStr.startsWith(monthStr)) {
-          result[dateStr] = { price: entry.price, transfers: entry.transfers };
-        }
-      }
-      if (Object.keys(result).length > 0) return result;
-    } catch {
-      // fallback to mock
-    }
-  }
+  try {
+    const resp = await fetch(`/api/flights-calendar?origin=${origin}&destination=${dest}&month=${monthStr}&currency=${currency}`);
+    if (!resp.ok) return {};
+    const data = await resp.json();
+    if (Object.keys(data).length > 0) return data;
+  } catch {}
 
-  // Mock calendar prices
   const result: Record<string, { price: number; transfers: number }> = {};
   const route = getRoute(origin, dest);
   const base = route?.basePrice || 400;
@@ -728,8 +372,6 @@ export async function fetchCalendarMonth(
   }
   return result;
 }
-
-// ─── Booking link opener ────────────────────────────────────────────
 
 export function openBookingLink(offer: FlightOffer): void {
   if (offer.bookingLink) {
