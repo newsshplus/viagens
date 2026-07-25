@@ -31,28 +31,49 @@ export default async function handler(req, res) {
     });
 
     // O Google as vezes bloqueia/degrada respostas de forma intermitente pra
-    // requisicoes vindas de servidor (IP de datacenter, sem navegador real) -
-    // ja vimos a mesma busca falhar e funcionar minutos depois. Por isso,
-    // tenta de novo uma vez antes de desistir.
-    const MAX_ATTEMPTS = 2;
+    // requisicoes vindas de servidor (IP de datacenter compartilhado da
+    // Vercel, sem navegador real) - confirmado ao vivo que o erro mais comum
+    // e um HTTP 429 (limite de requisicoes) lancado como excecao pelo
+    // search.search(). O retry precisa capturar a excecao DENTRO do loop -
+    // antes, uma excecao na tentativa 1 pulava direto pro erro final sem
+    // nunca tentar de novo, o que fazia o retry nao servir pro caso mais
+    // comum de falha.
+    const MAX_ATTEMPTS = 3;
     let rawResults = null;
     let lastAttemptEmpty = false;
+    let lastError = null;
 
     for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
-      const search = new fli.SearchFlights();
-      rawResults = await search.search(filters, {
-        currency: currency || 'EUR',
-        language: 'pt',
-        country: 'br',
-      });
+      try {
+        const search = new fli.SearchFlights();
+        rawResults = await search.search(filters, {
+          currency: currency || 'EUR',
+          language: 'pt',
+          country: 'br',
+        });
+        lastError = null;
 
-      if (rawResults && (Array.isArray(rawResults) ? rawResults.length > 0 : true)) break;
-
-      lastAttemptEmpty = true;
-      if (attempt < MAX_ATTEMPTS) {
-        console.error(`[google-flights] busca ${origin}->${destination} ${dateFrom}: tentativa ${attempt} veio vazia, tentando de novo`);
-        await new Promise((r) => setTimeout(r, 1200));
+        if (rawResults && (Array.isArray(rawResults) ? rawResults.length > 0 : true)) break;
+        lastAttemptEmpty = true;
+      } catch (err) {
+        lastError = err;
+        console.error(`[google-flights] busca ${origin}->${destination} ${dateFrom}: tentativa ${attempt} lancou excecao: ${err.message}`);
       }
+
+      if (attempt < MAX_ATTEMPTS) {
+        // Depois de um 429, espera mais (o limite costuma liberar de novo
+        // depois de alguns segundos) - depois de resultado vazio sem erro,
+        // uma espera curta ja costuma bastar.
+        const isRateLimited = lastError && String(lastError.message).includes('429');
+        const delayMs = isRateLimited ? 2500 : 1200;
+        console.error(`[google-flights] busca ${origin}->${destination} ${dateFrom}: tentativa ${attempt} sem sucesso, tentando de novo em ${delayMs}ms`);
+        await new Promise((r) => setTimeout(r, delayMs));
+      }
+    }
+
+    if (lastError && (!rawResults || (Array.isArray(rawResults) && rawResults.length === 0))) {
+      console.error(`[google-flights] busca ${origin}->${destination} ${dateFrom}: todas as ${MAX_ATTEMPTS} tentativas falharam, ultimo erro: ${lastError.message}`);
+      return res.status(200).json({ offers: [], error: lastError.message });
     }
 
     if (!rawResults) {
