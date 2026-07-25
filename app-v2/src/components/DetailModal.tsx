@@ -222,19 +222,19 @@ export default function DetailModal({ offer, onClose, onMonitor }: Props) {
         </div>
 
         {/* Footer */}
-        <div className="sticky bottom-0 bg-dark-800/95 backdrop-blur-xl border-t border-dark-600/50 p-5 flex items-center justify-between">
+        <div className="sticky bottom-0 bg-dark-800/95 backdrop-blur-xl border-t border-dark-600/50 p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
           {!isLink ? (
             <>
-              <button onClick={onMonitor} className="px-4 py-2.5 text-sm text-dark-300 hover:text-emerald-400 border border-dark-600 hover:border-emerald-500/30 rounded-xl transition-all">
+              <button onClick={onMonitor} className="order-3 sm:order-1 w-full sm:w-auto px-4 py-2.5 text-sm text-dark-300 hover:text-emerald-400 border border-dark-600 hover:border-emerald-500/30 rounded-xl transition-all">
                 Monitorar preço
               </button>
-              <div className="flex items-center gap-2">
+              <div className="order-1 sm:order-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
                 {offer.deepLink && (
-                  <a href={offer.deepLink} target="_blank" rel="noopener noreferrer" className="px-4 py-2.5 text-sm text-dark-300 border border-dark-600 rounded-xl hover:border-blue-500/30 hover:text-blue-400 transition-all">
+                  <a href={offer.deepLink} target="_blank" rel="noopener noreferrer" className="text-center px-4 py-2.5 text-sm text-dark-300 border border-dark-600 rounded-xl hover:border-blue-500/30 hover:text-blue-400 transition-all">
                     Skyscanner
                   </a>
                 )}
-                <button onClick={() => openBookingLink(offer)} className="px-6 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl transition-all shadow-lg shadow-blue-500/20">
+                <button onClick={() => openBookingLink(offer)} className="px-6 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl transition-all shadow-lg shadow-blue-500/20 whitespace-nowrap">
                   Reservar — {fp(offer.totalPrice, offer.currency)}
                 </button>
               </div>

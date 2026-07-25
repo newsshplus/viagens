@@ -139,14 +139,17 @@ function buildOffer(itin: SkyItinerary, params: SourceParams): FlightOffer | nul
     totalDurationMinutes: outboundLegs.reduce((sum, l) => sum + l.durationMinutes, 0) + returnLegs.reduce((sum, l) => sum + l.durationMinutes, 0),
     outboundLegs,
     returnLegs: returnLegs.length ? returnLegs : undefined,
-    totalPrice: price * params.adults,
+    // A API ja recebe "adults" na busca e devolve o preco total pra esse
+    // grupo de passageiros - nao multiplicar de novo (senao dobra o preco
+    // quando ha mais de 1 adulto).
+    totalPrice: price,
     currency: params.currency,
     fareBreakdown: {
-      baseFare: Math.round(price * params.adults * 0.62),
-      airportTax: Math.round(price * params.adults * 0.18),
-      localTaxes: Math.round(price * params.adults * 0.12),
-      serviceFee: Math.round(price * params.adults * 0.08),
-      totalFees: Math.round(price * params.adults * 0.38),
+      baseFare: Math.round(price * 0.62),
+      airportTax: Math.round(price * 0.18),
+      localTaxes: Math.round(price * 0.12),
+      serviceFee: Math.round(price * 0.08),
+      totalFees: Math.round(price * 0.38),
       baggageHand: 'Consultar no Skyscanner',
       baggageChecked: 'Consultar no Skyscanner',
     },
@@ -163,8 +166,8 @@ function buildOffer(itin: SkyItinerary, params: SourceParams): FlightOffer | nul
     sources: ['skyscanner'],
     crossRef: {
       sourcesChecked: 1,
-      prices: { Skyscanner: price * params.adults },
-      avgPrice: price * params.adults,
+      prices: { Skyscanner: price },
+      avgPrice: price,
       divergencePct: 0, confidence: 'high',
     },
     lastUpdated: new Date().toISOString(),

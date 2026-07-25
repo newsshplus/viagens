@@ -178,7 +178,7 @@ export default function FlightCard({ offer, onSelect }: Props) {
               <div className="text-2xl font-extrabold text-gradient group-hover:scale-105 transition-transform">
                 {fmt(offer.totalPrice, offer.currency)}
               </div>
-              <div className="text-[10px] text-dark-400">por pessoa</div>
+              <div className="text-[10px] text-dark-400">preço total</div>
             </>
           )}
         </div>
