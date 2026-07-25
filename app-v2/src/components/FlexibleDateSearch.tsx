@@ -1,11 +1,11 @@
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
+import { fetchCalendarMonth } from '../lib/searchEngine';
 
 interface FlexResult {
   departDate: string;
   returnDate: string;
   stayNights: number;
   price: number;
-  airline: string;
 }
 
 interface Props {
@@ -16,32 +16,72 @@ interface Props {
   onClose: () => void;
 }
 
-const AIRLINES = ["TAP", "LATAM", "GOL", "Azul", "Air France", "KLM", "Lufthansa", "Iberia", "Ryanair", "easyJet"];
+function monthKeysBetween(from: Date, to: Date): Set<string> {
+  const keys = new Set<string>();
+  const cur = new Date(from.getFullYear(), from.getMonth(), 1);
+  const end = new Date(to.getFullYear(), to.getMonth(), 1);
+  while (cur <= end) {
+    keys.add(`${cur.getFullYear()}-${cur.getMonth()}`);
+    cur.setMonth(cur.getMonth() + 1);
+  }
+  return keys;
+}
 
-function generateFlexResults(origin: string, dest: string, stayMin: number, stayMax: number, rangeDays: number): FlexResult[] {
-  const results: FlexResult[] = [];
+// Busca combinacoes reais de ida+volta usando o calendario de precos do
+// Travelpayouts (mesma fonte real ja usada no resto do sistema) - pra cada
+// dia de ida com preco real disponivel, testa as duracoes de estadia
+// pedidas e usa o preco real de volta pra achar a combinacao mais barata de
+// verdade, em vez de sortear numero aleatorio.
+async function fetchFlexResults(
+  origin: string, destination: string,
+  stayMin: number, stayMax: number, rangeDays: number, currency: string
+): Promise<FlexResult[]> {
   const start = new Date();
-  start.setDate(start.getDate() + 3);
+  start.setDate(start.getDate() + 1);
 
+  const lastDepart = new Date(start);
+  lastDepart.setDate(lastDepart.getDate() + rangeDays);
+  const lastReturn = new Date(lastDepart);
+  lastReturn.setDate(lastReturn.getDate() + stayMax);
+
+  const cur = currency.toLowerCase();
+
+  const departPrices: Record<string, number> = {};
+  for (const key of monthKeysBetween(start, lastDepart)) {
+    const [y, mo] = key.split('-').map(Number);
+    const data = await fetchCalendarMonth(origin, destination, y, mo, cur);
+    for (const [date, v] of Object.entries(data)) departPrices[date] = v.price;
+  }
+
+  const returnPrices: Record<string, number> = {};
+  for (const key of monthKeysBetween(start, lastReturn)) {
+    const [y, mo] = key.split('-').map(Number);
+    const data = await fetchCalendarMonth(destination, origin, y, mo, cur);
+    for (const [date, v] of Object.entries(data)) returnPrices[date] = v.price;
+  }
+
+  const results: FlexResult[] = [];
   for (let d = 0; d < rangeDays; d++) {
     const depart = new Date(start);
     depart.setDate(depart.getDate() + d);
+    const departStr = depart.toISOString().slice(0, 10);
+    const departPrice = departPrices[departStr];
+    if (!departPrice || departPrice <= 0) continue;
 
-    const stayNights = stayMin + Math.floor(Math.random() * (stayMax - stayMin + 1));
-    const ret = new Date(depart);
-    ret.setDate(ret.getDate() + stayNights);
+    let best: { returnStr: string; stayNights: number; total: number } | null = null;
+    for (let stay = stayMin; stay <= stayMax; stay++) {
+      const ret = new Date(depart);
+      ret.setDate(ret.getDate() + stay);
+      const returnStr = ret.toISOString().slice(0, 10);
+      const returnPrice = returnPrices[returnStr];
+      if (!returnPrice || returnPrice <= 0) continue;
+      const total = Math.round(departPrice + returnPrice);
+      if (!best || total < best.total) best = { returnStr, stayNights: stay, total };
+    }
 
-    const basePrice = 150 + Math.random() * 600;
-    const weekendBonus = (depart.getDay() === 0 || depart.getDay() === 6) ? 80 : 0;
-    const price = Math.round(basePrice + weekendBonus + (Math.random() - 0.5) * 100);
-
-    results.push({
-      departDate: depart.toISOString().slice(0, 10),
-      returnDate: ret.toISOString().slice(0, 10),
-      stayNights,
-      price: Math.max(50, price),
-      airline: AIRLINES[Math.floor(Math.random() * AIRLINES.length)],
-    });
+    if (best) {
+      results.push({ departDate: departStr, returnDate: best.returnStr, stayNights: best.stayNights, price: best.total });
+    }
   }
 
   return results.sort((a, b) => a.price - b.price);
@@ -60,25 +100,40 @@ function formatDateBR(iso: string): string {
 export default function FlexibleDateSearch({ origin, destination, currency, onSelect, onClose }: Props) {
   const [stayDuration, setStayDuration] = useState(7);
   const [rangeDays, setRangeDays] = useState(30);
-  const [showResults, setShowResults] = useState(false);
-
-  const results = useMemo(() => {
-    if (!showResults) return [];
-    return generateFlexResults(origin, destination, stayDuration, stayDuration + 2, rangeDays);
-  }, [showResults, origin, destination, stayDuration, rangeDays]);
+  const [results, setResults] = useState<FlexResult[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [searched, setSearched] = useState(false);
 
   const cheapest = results.length > 0 ? results[0] : null;
   const avg = results.length > 0 ? Math.round(results.reduce((s, r) => s + r.price, 0) / results.length) : 0;
+
+  const handleSearch = async () => {
+    setLoading(true);
+    setSearched(true);
+    try {
+      const data = await fetchFlexResults(origin, destination, stayDuration, stayDuration + 2, rangeDays, currency);
+      setResults(data);
+    } catch {
+      setResults([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
 
-      <div className="relative bg-dark-800 border border-dark-600/50 rounded-2xl w-full max-w-2xl max-h-[85vh] overflow-y-auto animate-slide-up">
+      {/* max-h em dvh (nao vh) - em navegador mobile o vh conta a altura
+          maxima da tela mesmo com a barra de endereco visivel, o que fazia
+          o modal ficar mais alto que a area realmente visivel e obrigava a
+          rolar a pagina inteira pra ver o resto. dvh acompanha a altura
+          real disponivel na tela. */}
+      <div className="relative bg-dark-800 border border-dark-600/50 rounded-2xl w-full max-w-2xl max-h-[85dvh] overflow-y-auto animate-slide-up">
         <div className="sticky top-0 bg-dark-800/95 backdrop-blur-xl border-b border-dark-600/50 p-4 flex items-center justify-between z-10">
           <div>
             <h2 className="text-lg font-bold text-dark-50">Explorar datas flexíveis</h2>
-            <p className="text-sm text-dark-400">{origin} → {destination} • Encontre as melhores combinações</p>
+            <p className="text-sm text-dark-400">{origin} → {destination} • Preços reais por data</p>
           </div>
           <button onClick={onClose} className="text-dark-400 hover:text-dark-100 text-2xl leading-none">&times;</button>
         </div>
@@ -87,7 +142,7 @@ export default function FlexibleDateSearch({ origin, destination, currency, onSe
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-xs text-dark-400 mb-1.5 uppercase tracking-wider">Dias de estadia</label>
-              <div className="flex gap-1.5">
+              <div className="flex gap-1.5 flex-wrap">
                 {[3, 5, 7, 10, 14, 21].map((d) => (
                   <button
                     key={d}
@@ -107,7 +162,7 @@ export default function FlexibleDateSearch({ origin, destination, currency, onSe
 
             <div>
               <label className="block text-xs text-dark-400 mb-1.5 uppercase tracking-wider">Período de busca</label>
-              <div className="flex gap-1.5">
+              <div className="flex gap-1.5 flex-wrap">
                 {[7, 14, 30, 60].map((d) => (
                   <button
                     key={d}
@@ -126,21 +181,34 @@ export default function FlexibleDateSearch({ origin, destination, currency, onSe
             </div>
           </div>
 
-          <div className="bg-dark-700/50 rounded-xl p-3 flex items-center justify-between">
+          <div className="bg-dark-700/50 rounded-xl p-3 flex items-center justify-between gap-3">
             <div className="text-sm text-dark-300">
               Buscando combinações de <span className="text-dark-100 font-semibold">{stayDuration} dias</span> nos próximos{" "}
               <span className="text-dark-100 font-semibold">{rangeDays} dias</span>
             </div>
             <button
               type="button"
-              onClick={() => setShowResults(true)}
-              className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold rounded-lg transition-all"
+              onClick={handleSearch}
+              disabled={loading}
+              className="shrink-0 px-4 py-2 bg-blue-600 hover:bg-blue-500 disabled:bg-dark-600 text-white text-sm font-semibold rounded-lg transition-all"
             >
-              Buscar
+              {loading ? "Buscando..." : "Buscar"}
             </button>
           </div>
 
-          {showResults && results.length > 0 && (
+          {loading && (
+            <div className="text-center py-6 text-sm text-dark-400">
+              Consultando preços reais para o período...
+            </div>
+          )}
+
+          {!loading && searched && results.length === 0 && (
+            <div className="text-center py-6 text-sm text-dark-400">
+              Sem dados de preço reais disponíveis pra esse período/rota agora. Tente um período de busca maior ou volte mais tarde.
+            </div>
+          )}
+
+          {!loading && results.length > 0 && (
             <div className="space-y-3 animate-fade-in">
               <div className="grid grid-cols-3 gap-3">
                 <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-3 text-center">
@@ -164,12 +232,16 @@ export default function FlexibleDateSearch({ origin, destination, currency, onSe
                 </div>
               </div>
 
+              <p className="text-[10px] text-dark-500">
+                Preço = soma do menor preço real de ida + menor preço real de volta encontrados no calendário para cada data. Toque numa combinação pra buscar os voos de verdade nela.
+              </p>
+
               <div className="space-y-1.5 max-h-64 overflow-y-auto">
                 {results.slice(0, 15).map((r, i) => {
                   const isBest = i === 0;
                   return (
                     <button
-                      key={i}
+                      key={`${r.departDate}-${r.returnDate}`}
                       type="button"
                       onClick={() => onSelect(r.departDate, r.returnDate)}
                       className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl border text-left transition-all ${
@@ -185,7 +257,7 @@ export default function FlexibleDateSearch({ origin, destination, currency, onSe
                           <span className="text-sm font-mono text-dark-50">{formatDateBR(r.returnDate)}</span>
                         </div>
                         <div className="text-[10px] text-dark-400 mt-0.5">
-                          {r.stayNights} noites • {r.airline}
+                          {r.stayNights} noites
                         </div>
                       </div>
                       <div className="text-right">
@@ -197,7 +269,7 @@ export default function FlexibleDateSearch({ origin, destination, currency, onSe
                         )}
                       </div>
                       {i < 3 && (
-                        <div className={`w-1.5 h-1.5 rounded-full ${i === 0 ? "bg-emerald-400" : i === 1 ? "bg-emerald-300" : "bg-emerald-200"}`} />
+                        <div className={`w-1.5 h-1.5 rounded-full shrink-0 ${i === 0 ? "bg-emerald-400" : i === 1 ? "bg-emerald-300" : "bg-emerald-200"}`} />
                       )}
                     </button>
                   );
