@@ -165,7 +165,7 @@ export default function DetailModal({ offer, onClose, onMonitor }: Props) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative bg-dark-800 border border-dark-600/50 rounded-2xl w-full max-w-2xl max-h-[85vh] overflow-y-auto animate-slide-up">
+      <div className="relative bg-dark-800 border border-dark-600/50 rounded-2xl w-full max-w-2xl max-h-[85dvh] overflow-y-auto animate-slide-up">
 
         {/* Header */}
         <div className="sticky top-0 bg-dark-800/95 backdrop-blur-xl border-b border-dark-600/50 p-5 flex items-center justify-between z-10">

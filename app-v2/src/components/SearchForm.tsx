@@ -38,6 +38,7 @@ export default function SearchForm({ onSearch, loading }: Props) {
   const [returnDate, setReturnDate] = useState<string | null>(null);
   const [showFlexSearch, setShowFlexSearch] = useState(false);
   const [searchError, setSearchError] = useState<string | null>(null);
+  const [currency, setCurrency] = useState("EUR");
   const [recentSearches] = useState(() => getRecentSearches());
 
   const [departurePrices, setDeparturePrices] = useState<Record<string, number>>({});
@@ -144,6 +145,24 @@ export default function SearchForm({ onSearch, loading }: Props) {
     setDepartureDate(depart);
     setReturnDate(ret);
     setShowFlexSearch(false);
+
+    if (!originIata || !destIata) return;
+
+    const form = formRef.current;
+    const directOnly = (form?.querySelector('input[name="directOnly"]') as HTMLInputElement)?.checked || false;
+
+    onSearch({
+      origin: originIata,
+      destination: destIata,
+      dateFrom: depart,
+      dateTo: ret,
+      adults,
+      children: childrenCount,
+      infants,
+      currency,
+      tripType: "roundtrip",
+      directOnly,
+    });
   };
 
   return (
@@ -280,7 +299,7 @@ export default function SearchForm({ onSearch, loading }: Props) {
           />
           <div>
             <label className="block text-xs text-dark-400 mb-1.5 uppercase tracking-wider">Moeda</label>
-            <select name="currency" className="w-full bg-dark-800/80 border border-dark-600 rounded-lg px-3 py-2.5 text-sm text-dark-50 focus:outline-none focus:border-blue-500/50 transition-all">
+            <select name="currency" value={currency} onChange={(e) => setCurrency(e.target.value)} className="w-full bg-dark-800/80 border border-dark-600 rounded-lg px-3 py-2.5 text-sm text-dark-50 focus:outline-none focus:border-blue-500/50 transition-all">
               <option value="EUR">EUR €</option>
               <option value="USD">USD $</option>
               <option value="BRL">BRL R$</option>
@@ -333,7 +352,7 @@ export default function SearchForm({ onSearch, loading }: Props) {
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
               </svg>
-              Buscando 3 fontes...
+              Buscando 4 fontes...
             </span>
           ) : (
             "Buscar voos"
@@ -379,7 +398,7 @@ export default function SearchForm({ onSearch, loading }: Props) {
         <FlexibleDateSearch
           origin={originIata}
           destination={destIata}
-          currency="EUR"
+          currency={currency}
           onSelect={handleSelectFlexDate}
           onClose={() => setShowFlexSearch(false)}
         />
