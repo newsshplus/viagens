@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { fetchCalendarMonth } from '../lib/searchEngine';
 
 interface FlexResult {
@@ -68,15 +69,35 @@ async function fetchFlexResults(
     const departPrice = departPrices[departStr];
     if (!departPrice || departPrice <= 0) continue;
 
+    // Pra cada duracao de estadia pedida, tenta a data exata primeiro; se o
+    // calendario nao tiver preco em cache exatamente nesse dia (comum -
+    // o Travelpayouts nao cacheia todo dia), aceita a data de volta REAL
+    // mais proxima dentro de +-3 dias. Continua sendo preco real, so com
+    // mais chance de achar uma combinacao de verdade em vez de "sem dados".
+    const TOLERANCE_DAYS = 3;
     let best: { returnStr: string; stayNights: number; total: number } | null = null;
     for (let stay = stayMin; stay <= stayMax; stay++) {
-      const ret = new Date(depart);
-      ret.setDate(ret.getDate() + stay);
-      const returnStr = ret.toISOString().slice(0, 10);
-      const returnPrice = returnPrices[returnStr];
-      if (!returnPrice || returnPrice <= 0) continue;
-      const total = Math.round(departPrice + returnPrice);
-      if (!best || total < best.total) best = { returnStr, stayNights: stay, total };
+      const idealReturn = new Date(depart);
+      idealReturn.setDate(idealReturn.getDate() + stay);
+
+      let matched: { returnStr: string; price: number } | null = null;
+      for (let offset = 0; offset <= TOLERANCE_DAYS && !matched; offset++) {
+        const signs = offset === 0 ? [0] : [-1, 1];
+        for (const sign of signs) {
+          const candidate = new Date(idealReturn);
+          candidate.setDate(candidate.getDate() + sign * offset);
+          const candidateStr = candidate.toISOString().slice(0, 10);
+          const price = returnPrices[candidateStr];
+          if (price && price > 0) { matched = { returnStr: candidateStr, price }; break; }
+        }
+      }
+      if (!matched) continue;
+
+      const total = Math.round(departPrice + matched.price);
+      const actualStayNights = Math.round(
+        (new Date(matched.returnStr).getTime() - depart.getTime()) / (1000 * 60 * 60 * 24)
+      );
+      if (!best || total < best.total) best = { returnStr: matched.returnStr, stayNights: actualStayNights, total };
     }
 
     if (best) {
@@ -120,7 +141,13 @@ export default function FlexibleDateSearch({ origin, destination, currency, onSe
     }
   };
 
-  return (
+  // Renderiza direto em document.body via portal - se ficasse dentro da
+  // arvore normal, o card "glass" do formulario (que usa backdrop-blur)
+  // quebra o position:fixed dos filhos em praticamente todo navegador
+  // (backdrop-filter no ancestral vira containing block do fixed, do
+  // mesmo jeito que transform faz). Era por isso que o modal aparecia
+  // preso dentro da coluna da esquerda em vez de cobrir a tela toda.
+  return createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
 
@@ -279,6 +306,7 @@ export default function FlexibleDateSearch({ origin, destination, currency, onSe
           )}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
