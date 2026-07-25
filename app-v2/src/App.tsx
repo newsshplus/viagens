@@ -11,6 +11,7 @@ import MonitorDialog from './components/MonitorDialog';
 import SkeletonCard from './components/SkeletonCard';
 import InstallAppButton from './components/InstallAppButton';
 import CheaperDateBanner from './components/CheaperDateBanner';
+import ThemeToggle from './components/ThemeToggle';
 
 export default function App() {
   const search = useFlightSearch();
@@ -105,6 +106,7 @@ export default function App() {
                 <span className="text-xs text-purple-400">🌙 Scan noturno ativo</span>
               </div>
             )}
+            <ThemeToggle />
           </div>
         </div>
       </header>

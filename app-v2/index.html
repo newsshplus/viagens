@@ -2,6 +2,15 @@
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
+    <script>
+      // Aplica o tema salvo ANTES da primeira renderização, pra não piscar
+      // o tema errado por uma fração de segundo ao carregar a página.
+      try {
+        if (localStorage.getItem('viagens_theme') === 'light') {
+          document.documentElement.classList.add('light');
+        }
+      } catch (e) {}
+    </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>Viagens Smart v2 — Busca Anônima Anti-Rastreamento</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />

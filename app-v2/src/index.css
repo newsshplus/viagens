@@ -3,8 +3,40 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    /* Tema escuro (padrão) - mesma paleta que já existia */
+    --color-dark-50: 228 228 231;
+    --color-dark-100: 212 212 216;
+    --color-dark-200: 161 161 170;
+    --color-dark-300: 113 113 122;
+    --color-dark-400: 82 82 91;
+    --color-dark-500: 63 63 70;
+    --color-dark-600: 39 39 42;
+    --color-dark-700: 26 26 36;
+    --color-dark-800: 18 18 26;
+    --color-dark-900: 15 15 20;
+    --color-dark-950: 10 10 15;
+  }
+
+  html.light {
+    /* Tema claro - a mesma escala, invertida (o que era fundo escuro vira
+       fundo claro, o que era texto claro vira texto escuro) */
+    --color-dark-50: 15 23 42;
+    --color-dark-100: 30 41 59;
+    --color-dark-200: 51 65 85;
+    --color-dark-300: 100 116 139;
+    --color-dark-400: 100 116 139;
+    --color-dark-500: 148 163 184;
+    --color-dark-600: 203 213 225;
+    --color-dark-700: 226 232 240;
+    --color-dark-800: 241 245 249;
+    --color-dark-900: 248 250 252;
+    --color-dark-950: 255 255 255;
+  }
+
   * { @apply border-dark-600; }
   html, body { @apply bg-dark-950 text-dark-50 font-sans; overflow-x: hidden; max-width: 100vw; }
+  html, body, #root { transition: background-color 0.2s ease, color 0.2s ease; }
   #root { overflow-x: hidden; }
 }
 
