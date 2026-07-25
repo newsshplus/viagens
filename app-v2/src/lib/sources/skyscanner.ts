@@ -131,7 +131,7 @@ function buildOffer(itin: SkyItinerary, params: SourceParams): FlightOffer | nul
     else returnLegs.push(fl);
   }
 
-  const bookingUrl = `https://www.skyscanner.com/transport/flights/${params.origin.toLowerCase()}/${params.destination.toLowerCase()}/${params.dateFrom.replace(/-/g, '')}/`;
+  const bookingUrl = `https://www.skyscanner.com/transport/flights/${params.origin.toLowerCase()}/${params.destination.toLowerCase()}/${params.dateFrom.replace(/-/g, '')}/${params.dateTo ? `${params.dateTo.replace(/-/g, '')}/` : ''}`;
 
   return {
     id: `sky-${legs[0]?.carriers?.marketing?.[0]?.alternateId || 'xx'}-${Date.now()}-${Math.random().toString(36).slice(2, 5)}`,

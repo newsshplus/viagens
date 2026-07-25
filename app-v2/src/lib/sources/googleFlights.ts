@@ -22,6 +22,19 @@ interface GFResult {
   booking_url: string;
 }
 
+// Quando a API nao devolve um link de compra especifico daquela oferta
+// (booking_url vazio), NAO cai pra home do Google Flights em branco - monta
+// uma busca real pre-preenchida (origem, destino, datas, passageiros) usando
+// o parametro de busca em linguagem natural que o Google Flights processa de
+// verdade, pra abrir direto nos resultados da rota buscada.
+function buildFallbackLink(origin: string, destination: string, dateFrom: string, dateTo: string | undefined, adults: number): string {
+  let q = `Flights from ${origin} to ${destination} on ${dateFrom}`;
+  if (dateTo) q += ` through ${dateTo}`;
+  const params = new URLSearchParams({ q, hl: 'pt-BR', gl: 'br' });
+  if (adults > 1) params.set('adults', String(adults));
+  return `https://www.google.com/travel/flights?${params.toString()}`;
+}
+
 export async function searchGoogleFlights(params: SourceParams): Promise<SourceResult> {
   const t0 = Date.now();
 
@@ -75,7 +88,7 @@ export async function searchGoogleFlights(params: SourceParams): Promise<SourceR
       }
 
       const price = Math.round(r.price * params.adults);
-      const bookingUrl = r.booking_url || `https://www.google.com/travel/flights`;
+      const bookingUrl = r.booking_url || buildFallbackLink(params.origin, params.destination, params.dateFrom, params.dateTo, params.adults);
 
       offers.push({
         id: `gf-${r.primary_airline || 'xx'}-${Date.now()}-${Math.random().toString(36).slice(2, 5)}`,

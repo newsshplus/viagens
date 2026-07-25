@@ -104,7 +104,7 @@ function buildOffer(entry: TPV3Entry, params: SourceParams): FlightOffer {
     totalPrice: price, currency: params.currency,
     fareBreakdown: { baseFare: Math.round(price * 0.62), airportTax: Math.round(price * 0.18), localTaxes: Math.round(price * 0.12), serviceFee: Math.round(price * 0.08), totalFees: Math.round(price * 0.38), baggageHand: 'Consultar', baggageChecked: 'Consultar' },
     ticketRules: { cancellation: 'Consultar', refund: 'Consultar', change: 'Consultar', checkedBaggage: 'Consultar', handBaggage: 'Consultar', seatSelection: 'Consultar' },
-    bookingLink: `https://www.google.com/travel/flights?q=Flights+from+${params.origin}+to+${params.destination}+on+${params.dateFrom}`,
+    bookingLink: `https://www.google.com/travel/flights?q=Flights+from+${params.origin}+to+${params.destination}+on+${params.dateFrom}${params.dateTo ? `+through+${params.dateTo}` : ''}${params.adults > 1 ? `&adults=${params.adults}` : ''}`,
     deepLink,
     sources: ['travelpayouts'],
     crossRef: { sourcesChecked: 1, prices: { Travelpayouts: price }, avgPrice: price, divergencePct: 0, confidence: 'medium' },
