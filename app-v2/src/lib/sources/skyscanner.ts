@@ -27,18 +27,19 @@ interface SkyItinerary {
   legs: SkyFlightLeg[];
 }
 
-async function resolveEntity(iata: string): Promise<{ skyId: string; entityId: string } | null> {
+async function resolveEntity(iata: string): Promise<{ skyId: string; entityId: string } | { error: string } | null> {
   try {
     const resp = await fetch(`/api/flights-skyscanner?action=searchAirport&query=${iata}`);
-    if (!resp.ok) return null;
+    if (!resp.ok) return { error: `HTTP ${resp.status}` };
     const data = await resp.json();
-    if (!data?.data?.length) return null;
+    if (data?.message) return { error: String(data.message).slice(0, 120) };
+    if (!data?.data?.length) return { error: 'sem resultado pro aeroporto' };
     const match = data.data.find((a: { navigation: { relevantFlightParams: { skyId: string; flightPlaceType: string } } }) =>
       a.navigation.relevantFlightParams.flightPlaceType === 'AIRPORT' &&
       a.navigation.relevantFlightParams.skyId === iata
     ) || data.data[0];
     return { skyId: match.navigation.relevantFlightParams.skyId, entityId: match.navigation.entityId };
-  } catch { return null; }
+  } catch (err) { return { error: String(err).slice(0, 120) }; }
 }
 
 async function searchFlightsWithPolling(params: Record<string, string>): Promise<SkyItinerary[]> {
@@ -154,8 +155,11 @@ export async function searchSkyscanner(params: SourceParams): Promise<SourceResu
       resolveEntity(params.destination),
     ]);
 
-    if (!originEntity || !destEntity) {
-      return { source: 'skyscanner', offers: [], latencyMs: Date.now() - t0, error: 'Could not resolve entities' };
+    if (!originEntity || 'error' in originEntity) {
+      return { source: 'skyscanner', offers: [], latencyMs: Date.now() - t0, error: `Origem (${params.origin}): ${originEntity && 'error' in originEntity ? originEntity.error : 'falha'}` };
+    }
+    if (!destEntity || 'error' in destEntity) {
+      return { source: 'skyscanner', offers: [], latencyMs: Date.now() - t0, error: `Destino (${params.destination}): ${destEntity && 'error' in destEntity ? destEntity.error : 'falha'}` };
     }
 
     const searchParams: Record<string, string> = {

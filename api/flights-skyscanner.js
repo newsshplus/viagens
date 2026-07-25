@@ -16,6 +16,9 @@ export default async function handler(req, res) {
     if (action === 'searchAirport') {
       const resp = await fetch(`https://${host}/api/v1/flights/searchAirport?query=${query || 'LIS'}&locale=en-US`, { headers });
       const data = await resp.json();
+      if (!resp.ok || !data?.data) {
+        console.error(`[skyscanner searchAirport] query=${query} status=${resp.status} body=${JSON.stringify(data).slice(0, 500)}`);
+      }
       return res.status(200).json(data);
     }
 
@@ -30,11 +33,15 @@ export default async function handler(req, res) {
 
       const resp = await fetch(`https://${host}/api/v1/flights/searchFlights?${params}`, { headers });
       const data = await resp.json();
+      if (!resp.ok || !data?.data?.itineraries) {
+        console.error(`[skyscanner searchFlights] status=${resp.status} body=${JSON.stringify(data).slice(0, 500)}`);
+      }
       return res.status(200).json(data);
     }
 
     return res.status(400).json({ error: 'Invalid action' });
   } catch (e) {
+    console.error(`[skyscanner ${action}] exception: ${e.message}`);
     return res.status(500).json({ error: e.message });
   }
 }
