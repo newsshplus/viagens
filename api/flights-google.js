@@ -30,15 +30,33 @@ export default async function handler(req, res) {
       sort_by: fli.SortBy.CHEAPEST,
     });
 
-    const search = new fli.SearchFlights();
-    const rawResults = await search.search(filters, {
-      currency: currency || 'EUR',
-      language: 'pt',
-      country: 'br',
-    });
+    // O Google as vezes bloqueia/degrada respostas de forma intermitente pra
+    // requisicoes vindas de servidor (IP de datacenter, sem navegador real) -
+    // ja vimos a mesma busca falhar e funcionar minutos depois. Por isso,
+    // tenta de novo uma vez antes de desistir.
+    const MAX_ATTEMPTS = 2;
+    let rawResults = null;
+    let lastAttemptEmpty = false;
+
+    for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+      const search = new fli.SearchFlights();
+      rawResults = await search.search(filters, {
+        currency: currency || 'EUR',
+        language: 'pt',
+        country: 'br',
+      });
+
+      if (rawResults && (Array.isArray(rawResults) ? rawResults.length > 0 : true)) break;
+
+      lastAttemptEmpty = true;
+      if (attempt < MAX_ATTEMPTS) {
+        console.error(`[google-flights] busca ${origin}->${destination} ${dateFrom}: tentativa ${attempt} veio vazia, tentando de novo`);
+        await new Promise((r) => setTimeout(r, 1200));
+      }
+    }
 
     if (!rawResults) {
-      console.error(`[google-flights] busca ${origin}->${destination} ${dateFrom}: search.search() retornou vazio/nulo`);
+      console.error(`[google-flights] busca ${origin}->${destination} ${dateFrom}: search.search() retornou vazio/nulo apos ${MAX_ATTEMPTS} tentativas`);
       return res.status(200).json({ offers: [] });
     }
 
@@ -75,7 +93,7 @@ export default async function handler(req, res) {
     }
 
     if (offers.length === 0) {
-      console.error(`[google-flights] busca ${origin}->${destination} ${dateFrom}: rawResults=${flatResults.length} itens, ${skippedNoPrice} descartados por preco invalido, 0 ofertas finais`);
+      console.error(`[google-flights] busca ${origin}->${destination} ${dateFrom}: rawResults=${flatResults.length} itens, ${skippedNoPrice} descartados por preco invalido, 0 ofertas finais${lastAttemptEmpty ? ' (apos retry)' : ''}`);
     }
 
     return res.status(200).json({ offers });
