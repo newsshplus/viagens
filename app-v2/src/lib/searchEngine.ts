@@ -133,6 +133,22 @@ interface TPCheapEntry {
   number_of_changes?: number;
 }
 
+interface TPV3Entry {
+  price: number;
+  airline: string;
+  flight_number: number | string;
+  departure_at: string;
+  return_at?: string;
+  transfers?: number;
+  duration?: number;
+  duration_to?: number;
+  duration_back?: number;
+  origin_airport?: string;
+  destination_airport?: string;
+  link?: string;
+  gate?: string;
+}
+
 interface TPCalendarEntry {
   origin: string;
   destination: string;
@@ -166,35 +182,33 @@ async function tpFetch<T>(path: string, params: Record<string, string> = {}): Pr
 async function fetchCheapFlights(
   origin: string, dest: string, departDate: string, returnDate?: string, currency = 'eur'
 ): Promise<{ direct: TPCheapEntry[]; stops: TPCheapEntry[] }> {
-  const month = departDate.slice(0, 7);
-  const params: Record<string, string> = { currency, origin, destination: dest, depart_date: month };
-  if (returnDate) params.return_date = returnDate;
+  // v3 API: flat array of entries
+  const params: Record<string, string> = {
+    currency, origin, destination: dest,
+    departure_at: departDate,
+    sorting: 'price',
+    limit: '20',
+    direct: 'false',
+  };
 
-  const [cheapData, directData] = await Promise.all([
-    tpFetch<Record<string, Record<string, TPCheapEntry>>>('/v1/prices/cheap', params),
-    tpFetch<Record<string, Record<string, TPCheapEntry>>>('/v1/prices/direct', { ...params, destination: dest }),
-  ]);
+  const data = await tpFetch<TPV3Entry[]>('/v3/prices_for_dates', params);
 
-  const stops: TPCheapEntry[] = [];
   const direct: TPCheapEntry[] = [];
+  const stops: TPCheapEntry[] = [];
 
-  if (cheapData) {
-    for (const destKey of Object.keys(cheapData)) {
-      const entries = cheapData[destKey];
-      for (const key of Object.keys(entries)) {
-        const e = entries[key];
-        if (e) stops.push(e);
-      }
-    }
-  }
-
-  if (directData) {
-    for (const destKey of Object.keys(directData)) {
-      const entries = directData[destKey];
-      for (const key of Object.keys(entries)) {
-        const e = entries[key];
-        if (e) direct.push(e);
-      }
+  if (data) {
+    for (const entry of data) {
+      const tpEntry: TPCheapEntry = {
+        price: entry.price,
+        airline: entry.airline,
+        flight_number: entry.flight_number,
+        departure_at: entry.departure_at,
+        return_at: entry.return_at || '',
+        expires_at: '',
+        number_of_changes: entry.transfers,
+      };
+      if ((entry.transfers || 0) === 0) direct.push(tpEntry);
+      else stops.push(tpEntry);
     }
   }
 
@@ -204,11 +218,45 @@ async function fetchCheapFlights(
 async function fetchCalendarPrices(
   origin: string, dest: string, month: string, currency = 'eur'
 ): Promise<Record<string, TPCalendarEntry>> {
-  const data = await tpFetch<Record<string, TPCalendarEntry>>('/v1/prices/calendar', {
+  // v3 API: search for the month and build calendar from results
+  const yearMonth = month.slice(0, 7);
+  const year = parseInt(yearMonth.split('-')[0]);
+  const mon = parseInt(yearMonth.split('-')[1]);
+  const daysInMonth = new Date(year, mon, 0).getDate();
+
+  const firstDay = `${yearMonth}-01`;
+  const lastDay = `${yearMonth}-${String(daysInMonth).padStart(2, '0')}`;
+
+  const data = await tpFetch<TPV3Entry[]>('/v3/prices_for_dates', {
     currency, origin, destination: dest,
-    depart_date: month, calendar_type: 'departure_date',
+    departure_at: firstDay,
+    departure_to: lastDay,
+    sorting: 'price',
+    limit: '30',
+    direct: 'false',
   });
-  return data || {};
+
+  const result: Record<string, TPCalendarEntry> = {};
+
+  if (data && data.length > 0) {
+    for (const entry of data) {
+      const dateStr = entry.departure_at.split('T')[0];
+      if (!result[dateStr] || entry.price < result[dateStr].price) {
+        result[dateStr] = {
+          origin, destination: dest,
+          price: entry.price,
+          transfers: entry.transfers || 0,
+          airline: entry.airline,
+          flight_number: entry.flight_number,
+          departure_at: entry.departure_at,
+          return_at: entry.return_at || '',
+          expires_at: '',
+        };
+      }
+    }
+  }
+
+  return result;
 }
 
 // ─── Link builders ──────────────────────────────────────────────────
