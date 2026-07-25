@@ -27,10 +27,24 @@ export default async function handler(req, res) {
 
     let inboundData = null;
     if (dateTo) {
-      const inUrl = `https://www.ryanair.com/api/farfnd/3/oneWayFares/${destination}/${origin}/cheapestPerDay?outboundDateFrom=${dateTo}&outboundDateTo=${dateTo}&currency=${cur}`;
+      // Em vez de so o dia exato, busca uma janela de +-10 dias em torno da
+      // data de volta pedida - se a Ryanair nao voar exatamente nesse dia,
+      // o cliente pode escolher o dia mais barato disponivel dentro da
+      // janela em vez de simplesmente falhar.
+      const dateToObj = new Date(`${dateTo}T00:00:00`);
+      const minAllowed = new Date(`${dateFrom}T00:00:00`);
+      minAllowed.setDate(minAllowed.getDate() + 1);
+      const windowStart = new Date(dateToObj);
+      windowStart.setDate(windowStart.getDate() - 10);
+      const rangeStart = windowStart < minAllowed ? minAllowed : windowStart;
+      const rangeEnd = new Date(dateToObj);
+      rangeEnd.setDate(rangeEnd.getDate() + 10);
+      const fmt = (d) => d.toISOString().slice(0, 10);
+
+      const inUrl = `https://www.ryanair.com/api/farfnd/3/oneWayFares/${destination}/${origin}/cheapestPerDay?outboundDateFrom=${fmt(rangeStart)}&outboundDateTo=${fmt(rangeEnd)}&currency=${cur}`;
       const inResp = await fetch(inUrl, { headers });
       if (inResp.ok) inboundData = await inResp.json();
-      else console.error(`[ryanair] busca volta ${destination}->${origin} ${dateTo}: status=${inResp.status}`);
+      else console.error(`[ryanair] busca volta ${destination}->${origin} janela em torno de ${dateTo}: status=${inResp.status}`);
     }
 
     return res.status(200).json({ outbound: outboundData, inbound: inboundData });

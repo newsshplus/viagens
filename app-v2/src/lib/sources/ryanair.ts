@@ -111,7 +111,7 @@ export async function searchRyanair(params: SourceParams): Promise<SourceResult>
     const inPrice = inCheapest ? extractPrice(inCheapest) : null;
 
     if (params.dateTo && inPrice === null) {
-      return { source: 'ryanair', offers: [], latencyMs: Date.now() - t0, error: `sem voo Ryanair de volta em ${params.dateTo}` };
+      return { source: 'ryanair', offers: [], latencyMs: Date.now() - t0, error: `sem voo Ryanair de volta em ${params.dateTo} nem nos 10 dias ao redor` };
     }
 
     // A Ryanair devolve o preco por adulto (nao aceita quantidade de
@@ -128,6 +128,13 @@ export async function searchRyanair(params: SourceParams): Promise<SourceResult>
     const realDepDate = outboundLegs[0]?.departure.split('T')[0] || params.dateFrom;
     const realRetDate = returnLegs?.[0]?.departure.split('T')[0];
     const bookingUrl = `https://www.ryanair.com/gb/en/trip/flights/select?adults=${params.adults}&teens=0&children=0&infants=0&dateOut=${realDepDate}${realRetDate ? `&dateIn=${realRetDate}` : ''}&originIata=${params.origin}&destinationIata=${params.destination}&isConnectedFlight=false&isReturn=${realRetDate ? 'true' : 'false'}`;
+
+    // Quando a Ryanair nao tem voo de volta exatamente na data pedida, a
+    // busca no servidor ja veio numa janela de +-10 dias - se a data real
+    // do voo mais barato encontrado for diferente da pedida, avisa
+    // visualmente que a volta foi ajustada em vez de simplesmente sumir
+    // com a oferta ou fingir que a data bateu certinho.
+    const returnDateAdjusted = Boolean(params.dateTo && realRetDate && realRetDate !== params.dateTo);
 
     const offer: FlightOffer = {
       id: `ryanair-${params.origin}-${params.destination}-${Date.now()}-${Math.random().toString(36).slice(2, 5)}`,
@@ -158,6 +165,9 @@ export async function searchRyanair(params: SourceParams): Promise<SourceResult>
       bookingLink: bookingUrl,
       deepLink: bookingUrl,
       sources: ['ryanair'],
+      promoTag: returnDateAdjusted
+        ? { text: `Volta ajustada p/ ${realRetDate!.split('-').reverse().slice(0, 2).join('/')} (mais barato)`, color: 'blue', icon: '📅' }
+        : undefined,
       crossRef: {
         sourcesChecked: 1,
         prices: { Ryanair: totalPrice },

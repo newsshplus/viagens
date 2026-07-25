@@ -53,17 +53,27 @@ async function fetchFlexResults(
 
   const cur = currency.toLowerCase();
 
+  // Busca todos os meses em paralelo (nao um de cada vez) - com periodo de
+  // ate 6 meses, buscar em sequencia deixaria a espera bem mais longa.
   const departPrices: Record<string, number> = {};
-  for (const key of monthKeysBetween(start, lastDepart)) {
-    const [y, mo] = key.split('-').map(Number);
-    const data = await fetchCalendarMonth(origin, destination, y, mo, cur);
+  const departResults = await Promise.all(
+    [...monthKeysBetween(start, lastDepart)].map((key) => {
+      const [y, mo] = key.split('-').map(Number);
+      return fetchCalendarMonth(origin, destination, y, mo, cur);
+    })
+  );
+  for (const data of departResults) {
     for (const [date, v] of Object.entries(data)) departPrices[date] = v.price;
   }
 
   const returnPrices: Record<string, number> = {};
-  for (const key of monthKeysBetween(start, lastReturn)) {
-    const [y, mo] = key.split('-').map(Number);
-    const data = await fetchCalendarMonth(destination, origin, y, mo, cur);
+  const returnResults = await Promise.all(
+    [...monthKeysBetween(start, lastReturn)].map((key) => {
+      const [y, mo] = key.split('-').map(Number);
+      return fetchCalendarMonth(destination, origin, y, mo, cur);
+    })
+  );
+  for (const data of returnResults) {
     for (const [date, v] of Object.entries(data)) returnPrices[date] = v.price;
   }
 
@@ -197,7 +207,7 @@ export default function FlexibleDateSearch({ origin, destination, currency, onSe
             <div>
               <label className="block text-xs text-dark-400 mb-1.5 uppercase tracking-wider">Período de busca</label>
               <div className="flex gap-1.5 flex-wrap">
-                {[7, 14, 30, 60].map((d) => (
+                {[7, 14, 30, 60, 180].map((d) => (
                   <button
                     key={d}
                     type="button"
@@ -208,7 +218,7 @@ export default function FlexibleDateSearch({ origin, destination, currency, onSe
                         : "border-dark-600 text-dark-300 hover:border-dark-500"
                     }`}
                   >
-                    {d}d
+                    {d === 180 ? "6 meses" : `${d}d`}
                   </button>
                 ))}
               </div>
@@ -218,7 +228,7 @@ export default function FlexibleDateSearch({ origin, destination, currency, onSe
           <div className="bg-dark-700/50 rounded-xl p-3 flex items-center justify-between gap-3">
             <div className="text-sm text-dark-300">
               Buscando combinações de <span className="text-dark-100 font-semibold">{stayDuration} dias</span> nos próximos{" "}
-              <span className="text-dark-100 font-semibold">{rangeDays} dias</span>
+              <span className="text-dark-100 font-semibold">{rangeDays === 180 ? "6 meses" : `${rangeDays} dias`}</span>
             </div>
             <button
               type="button"
