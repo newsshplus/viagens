@@ -1,6 +1,7 @@
 {
   "name": "viagens-deploy",
   "private": true,
+  "type": "module",
   "dependencies": {
     "@punitarani/fli": "^0.0.3",
     "buffer": "^6.0.3"

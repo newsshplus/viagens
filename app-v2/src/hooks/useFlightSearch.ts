@@ -1,6 +1,5 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import type { FlightOffer, SearchParams } from '../types';
-import { searchFlights } from '../lib/searchEngine';
 import type { SourceResult } from '../lib/sources/types';
 import { detectPriceAnomaly, generateMonitorAlert } from '../lib/scheduler';
 import type { Monitor } from '../types';
@@ -49,24 +48,21 @@ export function useFlightSearch(): UseSearchResult {
 
       setSourceStats(result.sources);
 
-      let offers = result.offers;
-      if (offers.length === 0) {
-        const mockResults = await searchFlights({
-          origin: params.origin,
-          destination: params.destination,
-          dateFrom: params.dateFrom,
-          dateTo: params.dateTo,
-          adults: params.adults,
-          currency: params.currency,
-          tripType: params.tripType,
-        });
-        offers = mockResults;
-      }
+      const offers = result.offers;
 
       setAllOffers(offers);
       setOffers(offers);
       setSearchCount((c) => c + 1);
       setLastSearchTime(new Date().toISOString());
+
+      if (offers.length === 0) {
+        const allFailed = result.sources.length > 0 && result.sources.every((s) => s.error);
+        setError(
+          allFailed
+            ? "Nenhuma das fontes (Google Flights, Skyscanner, Travelpayouts) respondeu agora - provavelmente falta configurar as chaves de API na Vercel, ou o servi\u00e7o est\u00e1 bloqueando temporariamente. Veja o painel \"Status do Sistema\" ao lado para detalhes por fonte."
+            : "Nenhum voo real encontrado para essa rota/data. Tente outras datas ou um destino pr\u00f3ximo - isto n\u00e3o \u00e9 um erro, as fontes simplesmente n\u00e3o t\u00eam oferta dispon\u00edvel agora."
+        );
+      }
     } catch (err) {
       setError("Erro ao buscar voos. Tente novamente.");
     } finally {
