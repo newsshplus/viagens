@@ -131,7 +131,11 @@ function buildOffer(itin: SkyItinerary, params: SourceParams): FlightOffer | nul
     else returnLegs.push(fl);
   }
 
-  const bookingUrl = `https://www.skyscanner.com/transport/flights/${params.origin.toLowerCase()}/${params.destination.toLowerCase()}/${params.dateFrom.replace(/-/g, '')}/${params.dateTo ? `${params.dateTo.replace(/-/g, '')}/` : ''}`;
+  // Usa a data REAL da oferta (extraida do proprio voo), nao a data da busca -
+  // garante que o link abre exatamente o que o card esta mostrando.
+  const realDepDate = (outboundLegs[0]?.departure || `${params.dateFrom}T`).split('T')[0];
+  const realRetDate = returnLegs[0]?.departure?.split('T')[0];
+  const bookingUrl = `https://www.skyscanner.com/transport/flights/${params.origin.toLowerCase()}/${params.destination.toLowerCase()}/${realDepDate.replace(/-/g, '')}/${realRetDate ? `${realRetDate.replace(/-/g, '')}/` : ''}`;
 
   return {
     id: `sky-${legs[0]?.carriers?.marketing?.[0]?.alternateId || 'xx'}-${Date.now()}-${Math.random().toString(36).slice(2, 5)}`,

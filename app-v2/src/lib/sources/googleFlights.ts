@@ -88,7 +88,9 @@ export async function searchGoogleFlights(params: SourceParams): Promise<SourceR
       }
 
       const price = Math.round(r.price * params.adults);
-      const bookingUrl = r.booking_url || buildFallbackLink(params.origin, params.destination, params.dateFrom, params.dateTo, params.adults);
+      const realDepDate = outboundLegs[0]?.departure.split('T')[0] || params.dateFrom;
+      const realRetDate = returnLegs[0]?.departure.split('T')[0];
+      const bookingUrl = r.booking_url || buildFallbackLink(params.origin, params.destination, realDepDate, realRetDate, params.adults);
 
       offers.push({
         id: `gf-${r.primary_airline || 'xx'}-${Date.now()}-${Math.random().toString(36).slice(2, 5)}`,

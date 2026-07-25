@@ -125,7 +125,9 @@ export async function searchRyanair(params: SourceParams): Promise<SourceResult>
       ? [buildLeg(params.destination, params.origin, params.dateTo, inCheapest)]
       : undefined;
 
-    const bookingUrl = `https://www.ryanair.com/gb/en/trip/flights/select?adults=${params.adults}&teens=0&children=0&infants=0&dateOut=${params.dateFrom}${params.dateTo ? `&dateIn=${params.dateTo}` : ''}&originIata=${params.origin}&destinationIata=${params.destination}&isConnectedFlight=false&isReturn=${params.dateTo ? 'true' : 'false'}`;
+    const realDepDate = outboundLegs[0]?.departure.split('T')[0] || params.dateFrom;
+    const realRetDate = returnLegs?.[0]?.departure.split('T')[0];
+    const bookingUrl = `https://www.ryanair.com/gb/en/trip/flights/select?adults=${params.adults}&teens=0&children=0&infants=0&dateOut=${realDepDate}${realRetDate ? `&dateIn=${realRetDate}` : ''}&originIata=${params.origin}&destinationIata=${params.destination}&isConnectedFlight=false&isReturn=${realRetDate ? 'true' : 'false'}`;
 
     const offer: FlightOffer = {
       id: `ryanair-${params.origin}-${params.destination}-${Date.now()}-${Math.random().toString(36).slice(2, 5)}`,

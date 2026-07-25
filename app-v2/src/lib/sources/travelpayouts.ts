@@ -57,6 +57,7 @@ function buildOffer(entry: TPV3Entry, params: SourceParams): FlightOffer {
   };
 
   let returnLegs: FlightLeg[] | undefined;
+  let retDate: string | undefined;
   if (params.dateTo) {
     if (entry.return_at) {
       const retTime = new Date(entry.return_at);
@@ -64,7 +65,7 @@ function buildOffer(entry: TPV3Entry, params: SourceParams): FlightOffer {
       const rM = retTime.getMinutes();
       const rDur = entry.duration_back || (360 + Math.floor(Math.random() * 600));
       const rArr = rH * 60 + rM + rDur;
-      const retDate = entry.return_at.split('T')[0];
+      retDate = entry.return_at.split('T')[0];
       returnLegs = [{
         airline, airlineName: name,
         flightNumber: `${airline}${Math.floor(Number(entry.flight_number) + 500)}`,
@@ -77,6 +78,7 @@ function buildOffer(entry: TPV3Entry, params: SourceParams): FlightOffer {
         stopDurations: entry.return_transfers ? [40 + Math.floor(Math.random() * 100)] : [],
       }];
     } else {
+      retDate = params.dateTo;
       const rH = 8 + Math.floor(Math.random() * 8);
       const rDur = durMin;
       const rArr = rH * 60 + rDur;
@@ -92,9 +94,12 @@ function buildOffer(entry: TPV3Entry, params: SourceParams): FlightOffer {
     }
   }
 
+  // Links de compra usam SEMPRE as datas reais dessa oferta (depDate/retDate),
+  // nunca as datas originais da busca - a fonte pode ter devolvido um voo de
+  // um dia proximo, e o link precisa abrir exatamente o que o card mostra.
   const deepLink = entry.link
     ? `https://www.aviasales.com${entry.link}`
-    : `https://www.skyscanner.com/transport/flights/${params.origin.toLowerCase()}/${params.destination.toLowerCase()}/${params.dateFrom.replace(/-/g, '')}/`;
+    : `https://www.skyscanner.com/transport/flights/${params.origin.toLowerCase()}/${params.destination.toLowerCase()}/${depDate.replace(/-/g, '')}/${retDate ? `${retDate.replace(/-/g, '')}/` : ''}`;
 
   return {
     id: `tp-${airline}-${entry.flight_number || Date.now()}-${Math.random().toString(36).slice(2, 5)}`,
@@ -104,7 +109,7 @@ function buildOffer(entry: TPV3Entry, params: SourceParams): FlightOffer {
     totalPrice: price, currency: params.currency,
     fareBreakdown: { baseFare: Math.round(price * 0.62), airportTax: Math.round(price * 0.18), localTaxes: Math.round(price * 0.12), serviceFee: Math.round(price * 0.08), totalFees: Math.round(price * 0.38), baggageHand: 'Consultar', baggageChecked: 'Consultar' },
     ticketRules: { cancellation: 'Consultar', refund: 'Consultar', change: 'Consultar', checkedBaggage: 'Consultar', handBaggage: 'Consultar', seatSelection: 'Consultar' },
-    bookingLink: `https://www.google.com/travel/flights?q=Flights+from+${params.origin}+to+${params.destination}+on+${params.dateFrom}${params.dateTo ? `+through+${params.dateTo}` : ''}${params.adults > 1 ? `&adults=${params.adults}` : ''}`,
+    bookingLink: `https://www.google.com/travel/flights?q=Flights+from+${params.origin}+to+${params.destination}+on+${depDate}${retDate ? `+through+${retDate}` : ''}${params.adults > 1 ? `&adults=${params.adults}` : ''}`,
     deepLink,
     sources: ['travelpayouts'],
     crossRef: { sourcesChecked: 1, prices: { Travelpayouts: price }, avgPrice: price, divergencePct: 0, confidence: 'medium' },
