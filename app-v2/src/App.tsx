@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import type { FlightOffer, SearchParams } from './types';
 import { useFlightSearch, useMonitors } from './hooks/useFlightSearch';
 import { getAntiTrackSummary, clearBrowserContext } from './lib/antiTrack';
@@ -19,6 +19,17 @@ export default function App() {
   const [antiTrack, setAntiTrack] = useState(getAntiTrackSummary());
   const [nightScanActive, setNightScanActive] = useState(false);
   const [schedulerStatus, setSchedulerStatus] = useState("");
+  const resultsRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    // Em telas pequenas (abaixo do breakpoint lg do Tailwind, 1024px), o
+    // formulário fica acima dos resultados - rola até os resultados quando
+    // uma busca termina, pra não deixar a pessoa procurando o resultado.
+    if (!search.loading && (search.offers.length > 0 || search.error) && window.innerWidth < 1024) {
+      resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [search.loading]);
 
   useEffect(() => {
     const config = loadSchedulerConfig();
@@ -142,7 +153,7 @@ export default function App() {
             />
           </div>
 
-          <div className="lg:col-span-8">
+          <div className="lg:col-span-8" ref={resultsRef}>
             {search.error && (
               <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4 mb-4 animate-fade-in">
                 <p className="text-sm text-red-400">{search.error}</p>
@@ -150,8 +161,8 @@ export default function App() {
             )}
 
             {!search.loading && search.offers.length > 0 && (
-              <div className="flex items-center justify-between mb-4 animate-fade-in">
-                <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center justify-between gap-3 mb-4 animate-fade-in">
+                <div className="flex items-center gap-2 flex-wrap">
                   <span className="text-sm text-dark-300">
                     {search.offers.length} voos encontrados
                   </span>

@@ -21,6 +21,15 @@ export default function AirportSearch({ name, label, placeholder, required, valu
   const listRef = useRef<HTMLUListElement>(null);
 
   useEffect(() => {
+    if (value !== undefined && value !== query) {
+      setQuery(value);
+      setSelected(null);
+      setIsOpen(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value]);
+
+  useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (wrapperRef.current && !wrapperRef.current.contains(e.target as Node)) {
         setIsOpen(false);

@@ -3,6 +3,7 @@ import type { FlightOffer, SearchParams } from '../types';
 import type { SourceResult } from '../lib/sources/types';
 import { detectPriceAnomaly, generateMonitorAlert } from '../lib/scheduler';
 import { recordPrice, getHistory } from '../lib/priceTracker';
+import { recordSearch } from '../lib/recentSearches';
 import type { Monitor } from '../types';
 
 interface UseSearchResult {
@@ -35,6 +36,7 @@ export function useFlightSearch(): UseSearchResult {
     setError(null);
     setCurrentParams(params);
     setSourceStats([]);
+    recordSearch(params);
 
     try {
       const { searchAllSources } = await import('../lib/sources/index');

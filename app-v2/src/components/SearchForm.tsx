@@ -5,6 +5,7 @@ import PassengerSelector from './PassengerSelector';
 import PriceCalendar from './PriceCalendar';
 import FlexibleDateSearch from './FlexibleDateSearch';
 import { fetchCalendarMonth } from '../lib/searchEngine';
+import { getRecentSearches } from '../lib/recentSearches';
 
 interface Props {
   onSearch: (params: SearchParams) => void;
@@ -37,6 +38,7 @@ export default function SearchForm({ onSearch, loading }: Props) {
   const [returnDate, setReturnDate] = useState<string | null>(null);
   const [showFlexSearch, setShowFlexSearch] = useState(false);
   const [searchError, setSearchError] = useState<string | null>(null);
+  const [recentSearches] = useState(() => getRecentSearches());
 
   const [departurePrices, setDeparturePrices] = useState<Record<string, number>>({});
   const [returnPrices, setReturnPrices] = useState<Record<string, number>>({});
@@ -113,17 +115,30 @@ export default function SearchForm({ onSearch, loading }: Props) {
   const handlePopularRoute = useCallback((origin: string, dest: string) => {
     setOriginIata(origin);
     setDestIata(dest);
-    const form = formRef.current;
-    if (!form) return;
-    const originInput = form.querySelector('input[name="origin"]') as HTMLInputElement;
-    const destInput = form.querySelector('input[name="destination"]') as HTMLInputElement;
-    const originIataH = form.querySelector('input[name="origin_iata"]') as HTMLInputElement;
-    const destIataH = form.querySelector('input[name="destination_iata"]') as HTMLInputElement;
-    if (originInput) originInput.value = origin;
-    if (destInput) destInput.value = dest;
-    if (originIataH) originIataH.value = origin;
-    if (destIataH) destIataH.value = dest;
+    setOriginDisplay(origin);
+    setDestDisplay(dest);
   }, []);
+
+  const handleSwap = useCallback(() => {
+    const newOriginIata = destIata;
+    const newDestIata = originIata;
+    const newOriginDisplay = destDisplay || destIata;
+    const newDestDisplay = originDisplay || originIata;
+    setOriginIata(newOriginIata);
+    setDestIata(newDestIata);
+    setOriginDisplay(newOriginDisplay);
+    setDestDisplay(newDestDisplay);
+  }, [originIata, destIata, originDisplay, destDisplay]);
+
+  const handleRecentSearch = useCallback((params: SearchParams) => {
+    setOriginIata(params.origin);
+    setDestIata(params.destination);
+    setOriginDisplay(params.origin);
+    setDestDisplay(params.destination);
+    setDepartureDate(params.dateFrom);
+    setReturnDate(params.dateTo || null);
+    onSearch(params);
+  }, [onSearch]);
 
   const handleSelectFlexDate = (depart: string, ret: string) => {
     setDepartureDate(depart);
@@ -156,19 +171,30 @@ export default function SearchForm({ onSearch, loading }: Props) {
 
       <form ref={formRef} onSubmit={handleSubmit} className="space-y-4">
         {/* Origem / Destino */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-[1fr_auto_1fr] sm:items-end gap-3">
           <AirportSearch
             name="origin"
             label="Origem"
             placeholder="Digite a cidade de saída..."
             required
+            value={originDisplay}
             onChange={(a) => { setOriginIata(a?.iata || ""); setOriginDisplay(a ? `${a.city} (${a.iata})` : ""); }}
           />
+          <button
+            type="button"
+            onClick={handleSwap}
+            title="Trocar origem e destino"
+            aria-label="Trocar origem e destino"
+            className="justify-self-center w-10 h-10 sm:w-9 sm:h-9 sm:mb-0.5 rounded-full bg-dark-700 hover:bg-dark-600 border border-dark-600 flex items-center justify-center text-dark-300 hover:text-blue-400 transition-all active:scale-95"
+          >
+            <span className="text-base rotate-90 sm:rotate-0">⇄</span>
+          </button>
           <AirportSearch
             name="destination"
             label="Destino"
             placeholder="Digite a cidade de destino..."
             required
+            value={destDisplay}
             onChange={(a) => { setDestIata(a?.iata || ""); setDestDisplay(a ? `${a.city} (${a.iata})` : ""); }}
           />
         </div>
@@ -314,6 +340,24 @@ export default function SearchForm({ onSearch, loading }: Props) {
           )}
         </button>
       </form>
+
+      {/* Buscas recentes */}
+      {recentSearches.length > 0 && (
+        <div className="mt-4">
+          <p className="text-xs text-dark-500 mb-2">Buscas recentes (clique pra refazer):</p>
+          <div className="flex flex-wrap gap-1.5">
+            {recentSearches.map((p, i) => (
+              <button
+                key={`${p.origin}-${p.destination}-${p.dateFrom}-${i}`}
+                onClick={() => handleRecentSearch(p)}
+                className="px-2.5 py-1 text-xs bg-blue-500/10 hover:bg-blue-500/15 text-blue-300 hover:text-blue-200 rounded-md border border-blue-500/20 hover:border-blue-500/40 transition-all"
+              >
+                {p.origin} → {p.destination} · {new Date(p.dateFrom + "T12:00:00").toLocaleDateString("pt-BR", { day: "2-digit", month: "short" })}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Rotas populares */}
       <div className="mt-4">
