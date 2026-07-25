@@ -12,7 +12,7 @@ interface Props {
 
 function Tab({ active, children, onClick }: { active: boolean; children: React.ReactNode; onClick: () => void }) {
   return (
-    <button onClick={onClick} className={`px-4 py-2 text-sm font-medium rounded-lg transition-all ${active ? "bg-blue-500/20 text-blue-400 border border-blue-500/30" : "text-dark-300 hover:text-dark-100 hover:bg-dark-600/50"}`}>
+    <button onClick={onClick} className={`shrink-0 px-4 py-2 text-sm font-medium rounded-lg transition-all whitespace-nowrap ${active ? "bg-blue-500/20 text-blue-400 border border-blue-500/30" : "text-dark-300 hover:text-dark-100 hover:bg-dark-600/50"}`}>
       {children}
     </button>
   );
@@ -179,7 +179,7 @@ export default function DetailModal({ offer, onClose, onMonitor }: Props) {
 
         {/* Tabs */}
         {!isLink && (
-          <div className="px-5 pt-4 flex gap-2 border-b border-dark-600/50">
+          <div className="px-5 pt-4 flex gap-2 border-b border-dark-600/50 overflow-x-auto scrollbar-none">
             <Tab active={tab==="itinerary"} onClick={()=>setTab("itinerary")}>Itinerário</Tab>
             <Tab active={tab==="fare"} onClick={()=>setTab("fare")}>Tarifas</Tab>
             <Tab active={tab==="rules"} onClick={()=>setTab("rules")}>Regras</Tab>

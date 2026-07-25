@@ -9,6 +9,7 @@ import DetailModal from './components/DetailModal';
 import MonitorList from './components/MonitorList';
 import MonitorDialog from './components/MonitorDialog';
 import SkeletonCard from './components/SkeletonCard';
+import InstallAppButton from './components/InstallAppButton';
 
 export default function App() {
   const search = useFlightSearch();
@@ -76,7 +77,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-dark-950">
-      <header className="border-b border-dark-700/50 bg-dark-900/80 backdrop-blur-xl sticky top-0 z-40">
+      <header className="border-b border-dark-700/50 bg-dark-900/80 backdrop-blur-xl sticky top-0 z-40 safe-top">
         <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500 to-emerald-500 flex items-center justify-center shadow-lg shadow-blue-500/20">
@@ -105,6 +106,7 @@ export default function App() {
       <main className="max-w-7xl mx-auto px-4 py-6">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           <div className="lg:col-span-4 space-y-4">
+            <InstallAppButton />
             <SearchForm onSearch={search.search} loading={search.loading} />
 
             <div className="glass rounded-2xl p-4">

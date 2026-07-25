@@ -4,7 +4,8 @@
 
 @layer base {
   * { @apply border-dark-600; }
-  body { @apply bg-dark-950 text-dark-50 font-sans; }
+  html, body { @apply bg-dark-950 text-dark-50 font-sans; overflow-x: hidden; max-width: 100vw; }
+  #root { overflow-x: hidden; }
 }
 
 @layer components {
@@ -14,4 +15,11 @@
   .glow-red { box-shadow: 0 0 20px rgba(239, 68, 68, 0.15); }
   .glow-blue { box-shadow: 0 0 20px rgba(59, 130, 246, 0.15); }
   .text-gradient { @apply bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-emerald-400; }
+}
+
+@layer utilities {
+  .scrollbar-none::-webkit-scrollbar { display: none; }
+  .scrollbar-none { -ms-overflow-style: none; scrollbar-width: none; }
+  .safe-top { padding-top: env(safe-area-inset-top); }
+  .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
 }

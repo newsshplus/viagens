@@ -1,0 +1,16 @@
+{
+  "name": "Viagens Smart - Busca de Passagens",
+  "short_name": "Viagens Smart",
+  "description": "Busca de passagens aéreas anônima e multi-fonte, com análise de preços por IA",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#0a0a0f",
+  "theme_color": "#0a0a0f",
+  "lang": "pt-BR",
+  "icons": [
+    { "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "/icon-maskable.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "maskable" }
+  ]
+}
