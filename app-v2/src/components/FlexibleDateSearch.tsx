@@ -29,10 +29,16 @@ function monthKeysBetween(from: Date, to: Date): Set<string> {
 }
 
 // Busca combinacoes reais de ida+volta usando o calendario de precos do
-// Travelpayouts (mesma fonte real ja usada no resto do sistema) - pra cada
-// dia de ida com preco real disponivel, testa as duracoes de estadia
-// pedidas e usa o preco real de volta pra achar a combinacao mais barata de
-// verdade, em vez de sortear numero aleatorio.
+// Travelpayouts (mesma fonte real ja usada no resto do sistema).
+//
+// IMPORTANTE (descoberto testando ao vivo): o calendario do Travelpayouts e
+// bem esparso - pra uma rota como LIS->BCN, um mes inteiro pode ter so 1 ou
+// 2 dias com preco realmente em cache, nao um preco por dia. Por isso o
+// algoritmo NAO exige uma data de ida especifica bater com uma data de
+// volta especifica numa janela pequena (isso quase sempre dava "sem dados"
+// mesmo tendo preco real disponivel) - em vez disso, pega TODAS as datas de
+// ida com preco real, TODAS as datas de volta com preco real, e pra cada
+// ida real casa com a volta real mais proxima da estadia ideal pedida.
 async function fetchFlexResults(
   origin: string, destination: string,
   stayMin: number, stayMax: number, rangeDays: number, currency: string
@@ -61,47 +67,48 @@ async function fetchFlexResults(
     for (const [date, v] of Object.entries(data)) returnPrices[date] = v.price;
   }
 
+  const startStr = start.toISOString().slice(0, 10);
+  const lastDepartStr = lastDepart.toISOString().slice(0, 10);
+  const departDates = Object.keys(departPrices)
+    .filter((d) => departPrices[d] > 0 && d >= startStr && d <= lastDepartStr)
+    .sort();
+  const returnDates = Object.keys(returnPrices)
+    .filter((d) => returnPrices[d] > 0)
+    .sort();
+
+  const idealStay = Math.round((stayMin + stayMax) / 2);
+  // margem generosa - so descarta combinacoes visivelmente absurdas (tipo
+  // volta 3 meses depois quando a pessoa pediu 7 dias), sem ser tao rigido
+  // a ponto de rejeitar a unica data real disponivel.
+  const maxReasonableStay = stayMax + 21;
+
   const results: FlexResult[] = [];
-  for (let d = 0; d < rangeDays; d++) {
-    const depart = new Date(start);
-    depart.setDate(depart.getDate() + d);
-    const departStr = depart.toISOString().slice(0, 10);
+  for (const departStr of departDates) {
     const departPrice = departPrices[departStr];
-    if (!departPrice || departPrice <= 0) continue;
+    const departDate = new Date(`${departStr}T00:00:00`);
 
-    // Pra cada duracao de estadia pedida, tenta a data exata primeiro; se o
-    // calendario nao tiver preco em cache exatamente nesse dia (comum -
-    // o Travelpayouts nao cacheia todo dia), aceita a data de volta REAL
-    // mais proxima dentro de +-3 dias. Continua sendo preco real, so com
-    // mais chance de achar uma combinacao de verdade em vez de "sem dados".
-    const TOLERANCE_DAYS = 3;
-    let best: { returnStr: string; stayNights: number; total: number } | null = null;
-    for (let stay = stayMin; stay <= stayMax; stay++) {
-      const idealReturn = new Date(depart);
-      idealReturn.setDate(idealReturn.getDate() + stay);
+    let bestReturn: { returnStr: string; price: number; nights: number } | null = null;
+    let bestDiff = Infinity;
 
-      let matched: { returnStr: string; price: number } | null = null;
-      for (let offset = 0; offset <= TOLERANCE_DAYS && !matched; offset++) {
-        const signs = offset === 0 ? [0] : [-1, 1];
-        for (const sign of signs) {
-          const candidate = new Date(idealReturn);
-          candidate.setDate(candidate.getDate() + sign * offset);
-          const candidateStr = candidate.toISOString().slice(0, 10);
-          const price = returnPrices[candidateStr];
-          if (price && price > 0) { matched = { returnStr: candidateStr, price }; break; }
-        }
+    for (const returnStr of returnDates) {
+      const returnDate = new Date(`${returnStr}T00:00:00`);
+      const nights = Math.round((returnDate.getTime() - departDate.getTime()) / (1000 * 60 * 60 * 24));
+      if (nights < 1 || nights > maxReasonableStay) continue;
+
+      const diff = Math.abs(nights - idealStay);
+      if (diff < bestDiff) {
+        bestDiff = diff;
+        bestReturn = { returnStr, price: returnPrices[returnStr], nights };
       }
-      if (!matched) continue;
-
-      const total = Math.round(departPrice + matched.price);
-      const actualStayNights = Math.round(
-        (new Date(matched.returnStr).getTime() - depart.getTime()) / (1000 * 60 * 60 * 24)
-      );
-      if (!best || total < best.total) best = { returnStr: matched.returnStr, stayNights: actualStayNights, total };
     }
 
-    if (best) {
-      results.push({ departDate: departStr, returnDate: best.returnStr, stayNights: best.stayNights, price: best.total });
+    if (bestReturn) {
+      results.push({
+        departDate: departStr,
+        returnDate: bestReturn.returnStr,
+        stayNights: bestReturn.nights,
+        price: Math.round(departPrice + bestReturn.price),
+      });
     }
   }
 
