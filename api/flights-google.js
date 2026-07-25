@@ -37,7 +37,10 @@ export default async function handler(req, res) {
       country: 'br',
     });
 
-    if (!rawResults) return res.status(200).json({ offers: [] });
+    if (!rawResults) {
+      console.error(`[google-flights] busca ${origin}->${destination} ${dateFrom}: search.search() retornou vazio/nulo`);
+      return res.status(200).json({ offers: [] });
+    }
 
     const flatResults = [];
     for (const item of rawResults) {
@@ -46,8 +49,9 @@ export default async function handler(req, res) {
     }
 
     const offers = [];
+    let skippedNoPrice = 0;
     for (const r of flatResults) {
-      if (!r.price || r.price <= 0) continue;
+      if (!r.price || r.price <= 0) { skippedNoPrice++; continue; }
       offers.push({
         price: r.price,
         currency: r.currency || currency || 'EUR',
@@ -70,8 +74,13 @@ export default async function handler(req, res) {
       });
     }
 
+    if (offers.length === 0) {
+      console.error(`[google-flights] busca ${origin}->${destination} ${dateFrom}: rawResults=${flatResults.length} itens, ${skippedNoPrice} descartados por preco invalido, 0 ofertas finais`);
+    }
+
     return res.status(200).json({ offers });
   } catch (e) {
+    console.error(`[google-flights] busca ${origin}->${destination} ${dateFrom}: excecao: ${e.message}`);
     return res.status(200).json({ offers: [], error: e.message });
   }
 }
